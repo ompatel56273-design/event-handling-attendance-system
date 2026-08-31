@@ -219,10 +219,10 @@ const UserDashboard = () => {
 
         {/* Dynamic Real-time Identity QR Stand */}
         <div className="identity-hero-qr-box">
-          <div className="qr-code-white-frame">
+          <div className="cyber-qr-stand">
             <QRCode value={userId} size={105} />
           </div>
-          <span className="qr-label">Identity QR</span>
+          <span className="qr-label" style={{ marginTop: 6 }}>Identity QR</span>
           <span className="qr-sublabel">(SCAN FOR VERIFICATION)</span>
         </div>
       </div>
@@ -277,19 +277,17 @@ const UserDashboard = () => {
       </div>
 
       {/* =========================================================================
-          3. MAIN TWO-COLUMN SPLIT: UPCOMING EVENTS & MY ACTIVE PASSES
+          3. SPLIT SECTION: UPCOMING EVENTS & MY ACTIVE ENROLLED PASSES
           ========================================================================= */}
       <div className="dashboard-split-grid">
-        {/* Left Column: Upcoming Featured Events */}
-        <div className="card">
-          <div className="card-header">
+        {/* Left: Upcoming Events Carousel / Strip */}
+        <div className="card hover-card" style={{ padding: '22px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
             <div>
-              <h2>Upcoming Campus Events</h2>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 2 }}>
-                Explore live competitions & register with one click
-              </p>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#FFFFFF' }}>Upcoming Competitions</h3>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Latest technical & creative hackathons</p>
             </div>
-            <Link to="/user/upcoming-events" className="view-all-link">
+            <Link to="/user/events" className="btn btn-secondary btn-sm">
               View All <HiArrowRight />
             </Link>
           </div>
@@ -297,90 +295,83 @@ const UserDashboard = () => {
           {upcomingEvents.length > 0 ? (
             <div className="events-preview-grid">
               {upcomingEvents.map((evt, idx) => (
-                <div key={evt._id} className="upcoming-mini-card">
+                <div key={evt._id} className="event-preview-card hover-lift">
                   <img
                     src={evt.image?.url || eventThumbnails[idx % eventThumbnails.length]}
                     alt={evt.name}
-                    className="upcoming-mini-thumb"
+                    className="event-preview-img"
                   />
-                  <div className="upcoming-mini-body">
-                    <h4>{evt.name}</h4>
-                    <div className="upcoming-mini-meta">
-                      <span>
-                        <HiCalendar style={{ color: 'var(--primary)' }} />{' '}
-                        {new Date(evt.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                      </span>
-                      <span>
-                        <HiLocationMarker style={{ color: '#0EA5E9' }} /> {evt.location || 'Campus Seminar Hall'}
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-                      <span className="upcoming-mini-badge">
-                        {evt.status ? evt.status.replace(/_/g, ' ') : 'Upcoming'}
-                      </span>
-                      <Link
-                        to="/user/events"
-                        className="btn btn-primary btn-sm"
-                        style={{ fontSize: '0.72rem', padding: '4px 10px' }}
-                      >
-                        Join Event
-                      </Link>
-                    </div>
+                  <div className="event-preview-body">
+                    <span className="badge badge-primary" style={{ alignSelf: 'flex-start', fontSize: '0.62rem' }}>
+                      {evt.category || 'Symposium'}
+                    </span>
+                    <h4 style={{ fontSize: '0.92rem', fontWeight: 700, color: '#FFFFFF', marginTop: 4, marginBottom: 4 }}>
+                      {evt.name}
+                    </h4>
+                    <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                      📅 {new Date(evt.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} • 📍 {evt.location || 'Campus Hall'}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="empty-state">
+            <div className="empty-state" style={{ padding: '30px 10px' }}>
               <div className="empty-icon">🎪</div>
               <h3>No Upcoming Events</h3>
-              <p>New activities and hackathons will be announced soon.</p>
+              <p>Check back later for new hackathons and competitions.</p>
             </div>
           )}
         </div>
 
-        {/* Right Column: My Active Event Passes & Attendance QR */}
-        <div className="card">
-          <div className="card-header">
+        {/* Right: My Enrolled Passes Quick Access */}
+        <div className="card hover-card" style={{ padding: '22px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
             <div>
-              <h2>My Event Passes</h2>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 2 }}>
-                Present QR code to Event Members for check-in
-              </p>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#FFFFFF' }}>My Active Passes</h3>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Instant QR check-in & e-card passes</p>
             </div>
-            <Link to="/user/my-events" className="view-all-link">
+            <Link to="/user/my-events" className="btn btn-secondary btn-sm">
               All Passes <HiArrowRight />
             </Link>
           </div>
 
           {myRegistrations.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {myRegistrations.map((reg) => {
-                const eventObj = reg.eventId || {};
-                const isAccepted = reg.attendanceStatus === 'ACCEPTED';
+                const eventName = reg.eventId?.name || 'Campus Event';
+                const eventDate = reg.eventId?.date
+                  ? new Date(reg.eventId.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
+                  : 'Upcoming';
+
                 return (
-                  <div key={reg._id} className="pass-strip-card">
+                  <div
+                    key={reg._id}
+                    className="pass-quick-card hover-lift"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '14px',
+                      padding: '12px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 12,
+                    }}
+                  >
                     <div>
-                      <h4 style={{ fontSize: '0.92rem', fontWeight: 700, color: '#FFFFFF' }}>
-                        {eventObj.name || 'Campus Event'}
-                      </h4>
-                      <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: 2 }}>
-                        📅 {eventObj.date ? new Date(eventObj.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : 'Soon'} • 📍 {eventObj.location || 'Hall'}
+                      <h4 style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF' }}>{eventName}</h4>
+                      <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                        📅 {eventDate} • <span style={{ color: '#10B981', fontWeight: 700 }}>Pass Active</span>
                       </p>
-                      <div style={{ marginTop: 6 }}>
-                        <span className={`badge ${isAccepted ? 'badge-success' : 'badge-primary'}`} style={{ fontSize: '0.62rem' }}>
-                          {isAccepted ? '✓ Attendance Verified' : '⌛ Pending Scan'}
-                        </span>
-                      </div>
                     </div>
 
                     <button
-                      className="btn btn-secondary btn-sm"
+                      className="btn btn-primary btn-sm"
                       onClick={() => setSelectedPass(reg)}
                       style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}
                     >
-                      <HiQrcode style={{ fontSize: '1.1rem', color: 'var(--primary)' }} /> View QR
+                      <HiQrcode style={{ fontSize: '1.1rem' }} /> View Pass
                     </button>
                   </div>
                 );
@@ -418,18 +409,9 @@ const UserDashboard = () => {
                 Hold this Attendance QR code in front of the scanner camera at the entrance
               </p>
 
-              {/* Attendance QR Stand */}
-              <div
-                style={{
-                  background: '#FFFFFF',
-                  padding: '16px',
-                  borderRadius: '16px',
-                  boxShadow: 'var(--shadow-qr)',
-                  border: '3px solid var(--primary)',
-                  marginBottom: 16,
-                }}
-              >
-                <QRCode value={selectedPass.qrToken || selectedPass._id} size={180} />
+              {/* Holographic Cyber QR Stand */}
+              <div className="cyber-qr-stand" style={{ marginBottom: 16 }}>
+                <QRCode value={selectedPass.qrToken || selectedPass._id} size={175} />
               </div>
 
               {/* 6-Digit PIN Code Fallback Box */}

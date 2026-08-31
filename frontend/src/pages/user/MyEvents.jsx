@@ -90,10 +90,10 @@ const MyEvents = () => {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                <div style={{ background: '#FFFFFF', padding: '12px', borderRadius: '14px', border: '3px solid var(--primary)', boxShadow: 'var(--shadow-qr)' }}>
+                <div className="cyber-qr-stand">
                   <QRCode value={selectedECard.registration?.attendanceQrToken || selectedECard.registration?._id} size={150} />
                 </div>
-                <span className="qr-label" style={{ fontSize: '0.85rem' }}>Attendance Check-in QR</span>
+                <span className="qr-label" style={{ fontSize: '0.85rem', marginTop: 4 }}>Attendance Check-in QR</span>
 
                 {/* 6-Digit PIN Code Fallback */}
                 <div
