@@ -108,25 +108,6 @@ npm install
 cp .env.example .env
 ```
 
-Edit `backend/.env` with your credentials:
-```env
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/event-handling
-JWT_SECRET=your_jwt_secret_key
-PORT=5000
-FRONTEND_URL=http://localhost:5173
-BACKEND_URL=http://localhost:5000
-
-# Cloudinary
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-
-# Brevo (Email)
-BREVO_API_KEY=your_brevo_api_key
-BREVO_SENDER_EMAIL=noreply@yourdomain.com
-BREVO_SENDER_NAME="Event Handling System"
-```
-
 Start the backend server:
 ```bash
 npm run dev
