@@ -69,7 +69,7 @@ const AdminDashboard = () => {
     >
       {/* 4 Metric Stats with Growth Indicators matching Master Image */}
       <div className="stats-grid">
-        <div className="stat-card-clean">
+        <div className="stat-card-clean hover-lift">
           <div className="stat-card-content">
             <p>Total Users</p>
             <h3>{stats.users.toLocaleString()}</h3>
@@ -77,7 +77,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="stat-card-clean">
+        <div className="stat-card-clean hover-lift">
           <div className="stat-card-content">
             <p>Total Events</p>
             <h3>{stats.events}</h3>
@@ -85,7 +85,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="stat-card-clean">
+        <div className="stat-card-clean hover-lift">
           <div className="stat-card-content">
             <p>Registrations</p>
             <h3>{stats.registrations.toLocaleString()}</h3>
@@ -93,7 +93,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="stat-card-clean">
+        <div className="stat-card-clean hover-lift">
           <div className="stat-card-content">
             <p>Attendance</p>
             <h3>{stats.attendance.toLocaleString()}</h3>

@@ -237,7 +237,7 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <strong style={{ fontSize: '0.92rem', color: '#FFFFFF' }}>{t.name}</strong>
-                            {t.id === 'spiderman' && (
+                            {t.id === 'titanium' && (
                               <span className="badge badge-primary" style={{ fontSize: '0.6rem', padding: '2px 6px' }}>
                                 DEFAULT
                               </span>

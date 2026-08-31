@@ -73,11 +73,11 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         {/* Brand Header */}
         <div className="sidebar-brand">
           <div className="sidebar-logo-icon">
-            🕷️
+            ⚡
           </div>
           <div className="sidebar-brand-text">
             <h2>EVENTHUB</h2>
-            <p>EVENT MANAGEMENT SYSTEM</p>
+            <p>ENTERPRISE SUITE</p>
           </div>
           <button
             className="mobile-close-btn"

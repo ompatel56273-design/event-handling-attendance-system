@@ -1,130 +1,130 @@
 /* ==========================================================================
-   EVENTHUB — 5 MULTI-THEME COLOR SYSTEM
-   1. Spider-Man Cyber Red (Default)
-   2. Cyberpunk Neon (Cyan & Violet)
-   3. Amethyst Void (Royal Purple)
-   4. Emerald Matrix (Cyber Green)
-   5. Solar Flare (Flame Orange & Amber)
+   EVENTHUB PRO — 5 NEXT-GEN INDUSTRIAL & ENTERPRISE PALETTES
+   1. Titanium Indigo (Default — Silicon Valley & Apple Pro Luxury)
+   2. Industrial Emerald (High-Tech Matrix & Precision Energy)
+   3. Arctic Ice Blue (Nordic Steel & Deep Space Cobalt)
+   4. Champagne Gold (Executive Luxury & Sovereign Amber)
+   5. Aurora Violet (Cyber Aurora & Neon Horizon)
    ========================================================================== */
 
-/* --- THEME 1: SPIDER-MAN CYBER RED (DEFAULT) --- */
-:root, [data-theme="spiderman"] {
-  --primary: #E20626;
-  --primary-hover: #FF1A3C;
-  --primary-dark: #A00418;
-  --primary-gradient: linear-gradient(135deg, #E20626 0%, #9B0418 100%);
-  --primary-light: rgba(226, 6, 38, 0.15);
-  --primary-subtle: rgba(226, 6, 38, 0.08);
-  --primary-glow: 0 0 20px rgba(226, 6, 38, 0.45);
-  --primary-border: rgba(226, 6, 38, 0.35);
-  --text-red: #FF334B;
-  --shadow-primary: 0 4px 18px rgba(226, 6, 38, 0.45);
-  --shadow-hover: 0 12px 36px rgba(226, 6, 38, 0.18);
-  --shadow-qr: 0 0 25px rgba(226, 6, 38, 0.5);
-  --border-red-glow: rgba(226, 6, 38, 0.4);
-  --bg-app: #08080D;
-  --bg-surface: #0E1017;
-  --bg-card: rgba(15, 17, 26, 0.85);
-  --bg-card-hover: rgba(22, 25, 38, 0.95);
-  --bg-input: #0B0D14;
-  --bg-modal: #0D0F18;
-  --sidebar-bg: #07080C;
+/* --- THEME 1: TITANIUM INDIGO (DEFAULT) --- */
+:root, [data-theme="titanium"], [data-theme="spiderman"] {
+  --primary: #6366F1;
+  --primary-hover: #818CF8;
+  --primary-dark: #4F46E5;
+  --primary-gradient: linear-gradient(135deg, #6366F1 0%, #06B6D4 100%);
+  --primary-light: rgba(99, 102, 241, 0.15);
+  --primary-subtle: rgba(99, 102, 241, 0.08);
+  --primary-glow: 0 0 25px rgba(99, 102, 241, 0.4);
+  --primary-border: rgba(99, 102, 241, 0.35);
+  --text-red: #818CF8;
+  --shadow-primary: 0 4px 20px rgba(99, 102, 241, 0.35);
+  --shadow-hover: 0 14px 40px rgba(99, 102, 241, 0.2);
+  --shadow-qr: 0 0 30px rgba(99, 102, 241, 0.45);
+  --border-red-glow: rgba(99, 102, 241, 0.4);
+  --bg-app: #080A11;
+  --bg-surface: #0F1424;
+  --bg-card: rgba(15, 20, 36, 0.78);
+  --bg-card-hover: rgba(22, 30, 54, 0.92);
+  --bg-input: #0B0E1A;
+  --bg-modal: #0D1220;
+  --sidebar-bg: #06080E;
 }
 
-/* --- THEME 2: CYBERPUNK NEON --- */
-[data-theme="cyberpunk"] {
-  --primary: #00F0FF;
-  --primary-hover: #38F8FF;
-  --primary-dark: #009EB3;
-  --primary-gradient: linear-gradient(135deg, #00F0FF 0%, #0084FF 100%);
-  --primary-light: rgba(0, 240, 255, 0.15);
-  --primary-subtle: rgba(0, 240, 255, 0.08);
-  --primary-glow: 0 0 20px rgba(0, 240, 255, 0.45);
-  --primary-border: rgba(0, 240, 255, 0.35);
-  --text-red: #00F0FF;
-  --shadow-primary: 0 4px 18px rgba(0, 240, 255, 0.45);
-  --shadow-hover: 0 12px 36px rgba(0, 240, 255, 0.18);
-  --shadow-qr: 0 0 25px rgba(0, 240, 255, 0.5);
-  --border-red-glow: rgba(0, 240, 255, 0.4);
-  --bg-app: #060814;
-  --bg-surface: #0B0E1F;
-  --bg-card: rgba(11, 14, 31, 0.85);
-  --bg-card-hover: rgba(18, 24, 48, 0.95);
-  --bg-input: #080B18;
-  --bg-modal: #0B0E1F;
-  --sidebar-bg: #04050D;
-}
-
-/* --- THEME 3: AMETHYST VOID --- */
-[data-theme="purple"] {
-  --primary: #8B5CF6;
-  --primary-hover: #A78BFA;
-  --primary-dark: #6D28D9;
-  --primary-gradient: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
-  --primary-light: rgba(139, 92, 246, 0.15);
-  --primary-subtle: rgba(139, 92, 246, 0.08);
-  --primary-glow: 0 0 20px rgba(139, 92, 246, 0.45);
-  --primary-border: rgba(139, 92, 246, 0.35);
-  --text-red: #A78BFA;
-  --shadow-primary: 0 4px 18px rgba(139, 92, 246, 0.45);
-  --shadow-hover: 0 12px 36px rgba(139, 92, 246, 0.18);
-  --shadow-qr: 0 0 25px rgba(139, 92, 246, 0.5);
-  --border-red-glow: rgba(139, 92, 246, 0.4);
-  --bg-app: #0A0612;
-  --bg-surface: #120C1F;
-  --bg-card: rgba(18, 12, 31, 0.85);
-  --bg-card-hover: rgba(26, 18, 46, 0.95);
-  --bg-input: #0E0918;
-  --bg-modal: #120C1F;
-  --sidebar-bg: #06030A;
-}
-
-/* --- THEME 4: EMERALD MATRIX --- */
+/* --- THEME 2: INDUSTRIAL EMERALD --- */
 [data-theme="emerald"] {
-  --primary: #00D27A;
-  --primary-hover: #10E68B;
-  --primary-dark: #008F52;
-  --primary-gradient: linear-gradient(135deg, #00D27A 0%, #059669 100%);
-  --primary-light: rgba(0, 210, 122, 0.15);
-  --primary-subtle: rgba(0, 210, 122, 0.08);
-  --primary-glow: 0 0 20px rgba(0, 210, 122, 0.45);
-  --primary-border: rgba(0, 210, 122, 0.35);
-  --text-red: #00D27A;
-  --shadow-primary: 0 4px 18px rgba(0, 210, 122, 0.45);
-  --shadow-hover: 0 12px 36px rgba(0, 210, 122, 0.18);
-  --shadow-qr: 0 0 25px rgba(0, 210, 122, 0.5);
-  --border-red-glow: rgba(0, 210, 122, 0.4);
-  --bg-app: #050C08;
-  --bg-surface: #09170F;
-  --bg-card: rgba(9, 23, 15, 0.85);
-  --bg-card-hover: rgba(14, 36, 24, 0.95);
-  --bg-input: #06110B;
-  --bg-modal: #09170F;
-  --sidebar-bg: #030805;
+  --primary: #10B981;
+  --primary-hover: #34D399;
+  --primary-dark: #059669;
+  --primary-gradient: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
+  --primary-light: rgba(16, 185, 129, 0.15);
+  --primary-subtle: rgba(16, 185, 129, 0.08);
+  --primary-glow: 0 0 25px rgba(16, 185, 129, 0.4);
+  --primary-border: rgba(16, 185, 129, 0.35);
+  --text-red: #34D399;
+  --shadow-primary: 0 4px 20px rgba(16, 185, 129, 0.35);
+  --shadow-hover: 0 14px 40px rgba(16, 185, 129, 0.2);
+  --shadow-qr: 0 0 30px rgba(16, 185, 129, 0.45);
+  --border-red-glow: rgba(16, 185, 129, 0.4);
+  --bg-app: #05080A;
+  --bg-surface: #091410;
+  --bg-card: rgba(9, 20, 16, 0.78);
+  --bg-card-hover: rgba(14, 32, 25, 0.92);
+  --bg-input: #060E0B;
+  --bg-modal: #08120F;
+  --sidebar-bg: #030605;
 }
 
-/* --- THEME 5: SOLAR FLARE --- */
-[data-theme="solar"] {
-  --primary: #FF5722;
-  --primary-hover: #FF7043;
-  --primary-dark: #D84315;
-  --primary-gradient: linear-gradient(135deg, #FF5722 0%, #C2185B 100%);
-  --primary-light: rgba(255, 87, 34, 0.15);
-  --primary-subtle: rgba(255, 87, 34, 0.08);
-  --primary-glow: 0 0 20px rgba(255, 87, 34, 0.45);
-  --primary-border: rgba(255, 87, 34, 0.35);
-  --text-red: #FF7043;
-  --shadow-primary: 0 4px 18px rgba(255, 87, 34, 0.45);
-  --shadow-hover: 0 12px 36px rgba(255, 87, 34, 0.18);
-  --shadow-qr: 0 0 25px rgba(255, 87, 34, 0.5);
-  --border-red-glow: rgba(255, 87, 34, 0.4);
-  --bg-app: #0D0807;
-  --bg-surface: #180F0D;
-  --bg-card: rgba(24, 15, 13, 0.85);
-  --bg-card-hover: rgba(36, 23, 20, 0.95);
-  --bg-input: #120B0A;
-  --bg-modal: #180F0D;
-  --sidebar-bg: #080403;
+/* --- THEME 3: ARCTIC ICE BLUE --- */
+[data-theme="arctic"], [data-theme="cyberpunk"] {
+  --primary: #38BDF8;
+  --primary-hover: #7DD3FC;
+  --primary-dark: #0284C7;
+  --primary-gradient: linear-gradient(135deg, #38BDF8 0%, #2563EB 100%);
+  --primary-light: rgba(56, 189, 248, 0.15);
+  --primary-subtle: rgba(56, 189, 248, 0.08);
+  --primary-glow: 0 0 25px rgba(56, 189, 248, 0.4);
+  --primary-border: rgba(56, 189, 248, 0.35);
+  --text-red: #7DD3FC;
+  --shadow-primary: 0 4px 20px rgba(56, 189, 248, 0.35);
+  --shadow-hover: 0 14px 40px rgba(56, 189, 248, 0.2);
+  --shadow-qr: 0 0 30px rgba(56, 189, 248, 0.45);
+  --border-red-glow: rgba(56, 189, 248, 0.4);
+  --bg-app: #060B18;
+  --bg-surface: #0C1832;
+  --bg-card: rgba(12, 24, 50, 0.78);
+  --bg-card-hover: rgba(18, 36, 74, 0.92);
+  --bg-input: #081022;
+  --bg-modal: #0B162E;
+  --sidebar-bg: #040812;
+}
+
+/* --- THEME 4: CHAMPAGNE LUXURY GOLD --- */
+[data-theme="gold"], [data-theme="solar"] {
+  --primary: #F59E0B;
+  --primary-hover: #FBBF24;
+  --primary-dark: #D97706;
+  --primary-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  --primary-light: rgba(245, 158, 11, 0.15);
+  --primary-subtle: rgba(245, 158, 11, 0.08);
+  --primary-glow: 0 0 25px rgba(245, 158, 11, 0.4);
+  --primary-border: rgba(245, 158, 11, 0.35);
+  --text-red: #FBBF24;
+  --shadow-primary: 0 4px 20px rgba(245, 158, 11, 0.35);
+  --shadow-hover: 0 14px 40px rgba(245, 158, 11, 0.2);
+  --shadow-qr: 0 0 30px rgba(245, 158, 11, 0.45);
+  --border-red-glow: rgba(245, 158, 11, 0.4);
+  --bg-app: #0B0A08;
+  --bg-surface: #18140E;
+  --bg-card: rgba(24, 20, 14, 0.78);
+  --bg-card-hover: rgba(36, 30, 20, 0.92);
+  --bg-input: #100D09;
+  --bg-modal: #15110C;
+  --sidebar-bg: #070605;
+}
+
+/* --- THEME 5: AURORA CYBER VIOLET --- */
+[data-theme="aurora"], [data-theme="purple"] {
+  --primary: #A855F7;
+  --primary-hover: #C084FC;
+  --primary-dark: #7E22CE;
+  --primary-gradient: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
+  --primary-light: rgba(168, 85, 247, 0.15);
+  --primary-subtle: rgba(168, 85, 247, 0.08);
+  --primary-glow: 0 0 25px rgba(168, 85, 247, 0.4);
+  --primary-border: rgba(168, 85, 247, 0.35);
+  --text-red: #C084FC;
+  --shadow-primary: 0 4px 20px rgba(168, 85, 247, 0.35);
+  --shadow-hover: 0 14px 40px rgba(168, 85, 247, 0.2);
+  --shadow-qr: 0 0 30px rgba(168, 85, 247, 0.45);
+  --border-red-glow: rgba(168, 85, 247, 0.4);
+  --bg-app: #090712;
+  --bg-surface: #160F26;
+  --bg-card: rgba(22, 15, 38, 0.78);
+  --bg-card-hover: rgba(34, 23, 58, 0.92);
+  --bg-input: #0E0A1A;
+  --bg-modal: #120D20;
+  --sidebar-bg: #06040C;
 }
 
 :root {
@@ -258,34 +258,126 @@ a {
   margin-bottom: 22px;
 }
 
+/* ==========================================================================
+   INTERACTIVE HOVER MICRO-EFFECTS & ADVANCED UI SYSTEM
+   ========================================================================== */
+.hover-lift {
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 260ms ease,
+              background-color 260ms ease !important;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px) scale(1.01) !important;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), var(--primary-glow) !important;
+  border-color: var(--primary-border) !important;
+}
+
+/* Button Shimmer Sweep Effect */
+.btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn:active {
+  transform: scale(0.96) !important;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 20%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  transform: rotate(25deg);
+  transition: none;
+}
+
+.btn-primary:hover::after {
+  left: 140%;
+  transition: left 750ms ease-in-out;
+}
+
+/* Glowing Border Accent Beam */
+.glow-border {
+  position: relative;
+}
+
+.glow-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--primary), transparent 60%, var(--primary-border));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Radar Pulse Beacon */
+.pulse-beacon {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  box-shadow: 0 0 0 0 var(--primary-glow);
+  animation: pulseBeacon 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@keyframes pulseBeacon {
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(99, 102, 241, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+
+/* Sidebar Brand Styling (Executive Diamond / Prism) */
 .sidebar-logo-icon {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 12px;
   background: var(--primary-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   color: #FFFFFF;
-  box-shadow: 0 0 16px rgba(226, 6, 38, 0.6);
+  box-shadow: var(--primary-glow);
   flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .sidebar-brand-text h2 {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 800;
   color: #FFFFFF;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.5px;
   line-height: 1.1;
   text-transform: uppercase;
 }
 
 .sidebar-brand-text p {
   font-size: 0.65rem;
-  color: #E20626;
+  color: var(--primary);
   font-weight: 700;
-  letter-spacing: 0.8px;
+  letter-spacing: 1px;
   text-transform: uppercase;
   margin-top: 2px;
 }

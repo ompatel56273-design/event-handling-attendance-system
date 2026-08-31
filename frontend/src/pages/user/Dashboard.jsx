@@ -151,11 +151,12 @@ const UserDashboard = () => {
       {/* =========================================================================
           1. MODERN CLASSIC EXECUTIVE IDENTITY PASSPORT (HERO E-CARD)
           ========================================================================= */}
-      <div className="identity-hero-card">
+      <div className="identity-hero-card hover-lift glow-border">
         {/* Top Header Tag */}
         <div className="identity-hero-top-badge">
-          <span className="badge badge-primary" style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.65rem' }}>
-            <HiShieldCheck style={{ fontSize: '0.85rem' }} /> OFFICIAL CAMPUS IDENTITY PASSPORT
+          <span className="badge badge-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.68rem', letterSpacing: '1px' }}>
+            <span className="pulse-beacon" />
+            <HiShieldCheck style={{ fontSize: '0.9rem' }} /> OFFICIAL CAMPUS IDENTITY PASSPORT
           </span>
         </div>
 
@@ -230,7 +231,7 @@ const UserDashboard = () => {
           2. FOUR COMMAND STAT METRIC CARDS
           ========================================================================= */}
       <div className="stats-grid">
-        <div className="stat-card-clean">
+        <div className="stat-card-clean hover-lift">
           <div className="stat-card-icon purple">
             <HiCalendar />
           </div>
@@ -241,36 +242,36 @@ const UserDashboard = () => {
           </div>
         </div>
 
-        <div className="stat-card-clean">
+        <div className="stat-card-clean hover-lift">
           <div className="stat-card-icon cyan">
             <HiTicket />
           </div>
           <div className="stat-card-content">
             <p>Total Events</p>
             <h3>{counts.total}</h3>
-            <span className="stat-badge-cyan">● Campus Competitions</span>
+            <span className="stat-badge-green">● Live Catalog</span>
           </div>
         </div>
 
-        <div className="stat-card-clean">
+        <div className="stat-card-clean hover-lift">
           <div className="stat-card-icon green">
             <HiClipboardList />
           </div>
           <div className="stat-card-content">
-            <p>My Enrolled Passes</p>
+            <p>My Registrations</p>
             <h3>{counts.myEvents}</h3>
-            <span className="stat-badge-purple">● Ready for Check-in</span>
+            <span className="stat-badge-green">● Enrolled</span>
           </div>
         </div>
 
-        <div className="stat-card-clean">
+        <div className="stat-card-clean hover-lift">
           <div className="stat-card-icon orange">
             <HiStar />
           </div>
           <div className="stat-card-content">
-            <p>Podium Victories</p>
+            <p>Podium Winners</p>
             <h3>{counts.winners}</h3>
-            <span className="stat-badge-amber">● Hall of Fame</span>
+            <span className="stat-badge-green">● Hall of Fame</span>
           </div>
         </div>
       </div>

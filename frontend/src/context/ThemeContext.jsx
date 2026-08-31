@@ -4,54 +4,54 @@ const ThemeContext = createContext(null);
 
 export const THEMES = [
   {
-    id: 'spiderman',
-    name: 'Spider-Man Cyber (Default)',
-    icon: '🕷️',
-    primary: '#E20626',
-    secondary: '#0EA5E9',
-    accent: '#9C23D9',
-    bg: '#08080D',
-    description: 'Vibrant Crimson Spider-Red with dark midnight mesh',
-  },
-  {
-    id: 'cyberpunk',
-    name: 'Cyberpunk Neon',
+    id: 'titanium',
+    name: 'Titanium Indigo (Default)',
     icon: '⚡',
-    primary: '#00F0FF',
-    secondary: '#D946EF',
-    accent: '#3B82F6',
-    bg: '#060814',
-    description: 'Electric Neon Cyan with cyber violet glows',
-  },
-  {
-    id: 'purple',
-    name: 'Amethyst Void',
-    icon: '🔮',
-    primary: '#8B5CF6',
-    secondary: '#EC4899',
-    accent: '#06B6D4',
-    bg: '#0A0612',
-    description: 'Royal Purple with neon magenta highlights',
+    primary: '#6366F1',
+    secondary: '#06B6D4',
+    accent: '#818CF8',
+    bg: '#080A11',
+    description: 'Silicon Valley Executive Obsidian with Electric Indigo & Cyan Azure',
   },
   {
     id: 'emerald',
-    name: 'Emerald Matrix',
+    name: 'Industrial Emerald',
     icon: '🍃',
-    primary: '#00D27A',
-    secondary: '#F59E0B',
-    accent: '#10B981',
-    bg: '#050C08',
-    description: 'Cyber Matrix Green with golden accents',
+    primary: '#10B981',
+    secondary: '#34D399',
+    accent: '#06B6D4',
+    bg: '#05080A',
+    description: 'Precision High-Tech Matrix with Cyber Emerald & Mint Glow',
   },
   {
-    id: 'solar',
-    name: 'Solar Flare',
-    icon: '🔥',
-    primary: '#FF5722',
-    secondary: '#FACC15',
-    accent: '#EF4444',
-    bg: '#0D0807',
-    description: 'Neon Sunset Flame Orange with solar gold',
+    id: 'arctic',
+    name: 'Arctic Ice Blue',
+    icon: '❄️',
+    primary: '#38BDF8',
+    secondary: '#2563EB',
+    accent: '#7DD3FC',
+    bg: '#060B18',
+    description: 'Nordic Steel Slate with Arctic Cyan & Deep Space Cobalt',
+  },
+  {
+    id: 'gold',
+    name: 'Champagne Luxury Gold',
+    icon: '👑',
+    primary: '#F59E0B',
+    secondary: '#FCD34D',
+    accent: '#D97706',
+    bg: '#0B0A08',
+    description: 'Executive Sovereign Noir with Champagne Gold & Warm Amber',
+  },
+  {
+    id: 'aurora',
+    name: 'Aurora Cyber Violet',
+    icon: '🔮',
+    primary: '#A855F7',
+    secondary: '#EC4899',
+    accent: '#C084FC',
+    bg: '#090712',
+    description: 'Cyber Horizon with Neon Aurora Violet & Hot Pink Flare',
   },
 ];
 
@@ -63,7 +63,12 @@ export const useTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
   const [currentTheme, setCurrentTheme] = useState(() => {
-    return localStorage.getItem('app_theme') || 'spiderman';
+    const saved = localStorage.getItem('app_theme');
+    if (!saved || saved === 'spiderman') return 'titanium';
+    if (saved === 'cyberpunk') return 'arctic';
+    if (saved === 'purple') return 'aurora';
+    if (saved === 'solar') return 'gold';
+    return saved;
   });
 
   useEffect(() => {
