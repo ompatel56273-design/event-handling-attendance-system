@@ -36,6 +36,9 @@ app.use('/api/admin/attendance', require('./routes/admin.attendance.routes'));
 app.use('/api/admin/marks', require('./routes/admin.marks.routes'));
 app.use('/api/admin/winners', require('./routes/admin.winners.routes'));
 app.use('/api/admin/event-members', require('./routes/admin.eventMember.routes'));
+app.use('/api/certificates', require('./routes/certificate.routes'));
+app.use('/api/announcements', require('./routes/announcement.routes'));
+app.use('/api/feedback', require('./routes/feedback.routes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

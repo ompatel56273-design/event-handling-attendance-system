@@ -140,6 +140,23 @@ const AdminAttendance = () => {
     }
   };
 
+  const handleExport = async (format = 'xlsx') => {
+    try {
+      const res = await api.get(`/admin/attendance/export?eventId=${selectedEvent || ''}&format=${format}`, {
+        responseType: 'blob',
+      });
+      const blob = new Blob([res.data], {
+        type: format === 'csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `Attendance_${selectedEvent ? 'Event' : 'All'}_${new Date().toISOString().split('T')[0]}.${format}`;
+      link.click();
+    } catch (err) {
+      console.error('Export failed:', err);
+    }
+  };
+
   const currentEvent = events.find(e => e._id === selectedEvent);
   const currentUser = activeRegistration?.userId;
 
@@ -148,7 +165,21 @@ const AdminAttendance = () => {
       title="Attendance Management"
       subtitle="Issue event attendance QRs and process real-time attendance"
       headerActions={
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => handleExport('xlsx')}
+            title="Download Excel Spreadsheet"
+          >
+            📊 Export Excel
+          </button>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => handleExport('csv')}
+            title="Download CSV"
+          >
+            📄 Export CSV
+          </button>
           <button
             className={`btn ${scanMode ? 'btn-danger' : 'btn-secondary'} btn-sm`}
             onClick={() => { setScanMode(!scanMode); setScanResult(null); setScanInput(''); }}

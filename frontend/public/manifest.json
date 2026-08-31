@@ -1,0 +1,17 @@
+{
+  "name": "EventHub — Campus Event Management & Attendance System",
+  "short_name": "EventHub",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07080C",
+  "theme_color": "#E20626",
+  "orientation": "portrait-primary",
+  "description": "Next-Gen Event Handling, Live QR Attendance Scanner, Identity E-Cards, and Verified Certificates.",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

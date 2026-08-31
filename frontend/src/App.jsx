@@ -38,6 +38,8 @@ import AdminEventMembers from './pages/admin/EventMembers';
 import AdminECards from './pages/admin/ECards';
 import AdminSettings from './pages/admin/Settings';
 
+import VerifyCertificate from './pages/public/VerifyCertificate';
+
 const RootRedirect = () => {
   const { isAuthenticated, role, getDashboardPath } = useAuth();
   if (isAuthenticated) return <Navigate to={getDashboardPath(role)} replace />;
@@ -52,6 +54,10 @@ function App() {
           <Routes>
             {/* Root redirect */}
             <Route path="/" element={<RootRedirect />} />
+
+            {/* Public certificate verification */}
+            <Route path="/verify-certificate/:certificateId" element={<VerifyCertificate />} />
+            <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
 
             {/* Auth routes */}
             <Route path="/login" element={<Login />} />

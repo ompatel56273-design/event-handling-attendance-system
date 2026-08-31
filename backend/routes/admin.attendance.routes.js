@@ -6,6 +6,7 @@ const admin = require('../controllers/admin.controller');
 router.use(auth);
 router.use(authorize('SUPER_ADMIN'));
 
+router.get('/export', admin.exportAttendance);
 router.get('/', admin.getAllAttendance);
 router.get('/event/:eventId', admin.getAttendanceByEvent);
 router.put('/:id', admin.updateAttendance);

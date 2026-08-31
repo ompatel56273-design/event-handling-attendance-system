@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import MobileBottomNav from './MobileBottomNav';
+import NotificationDrawer from '../common/NotificationDrawer';
+import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { HiBell, HiMail, HiCheck, HiX, HiMenu } from 'react-icons/hi';
@@ -10,13 +12,30 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
   const { user, role } = useAuth();
   const { theme, setTheme, themes, activeThemeConfig } = useTheme();
   const [showThemeModal, setShowThemeModal] = useState(false);
+  const [showNotifDrawer, setShowNotifDrawer] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [announcements, setAnnouncements] = useState([]);
 
   const firstName = user?.firstName || user?.name?.split(' ')[0] || (role === 'SUPER_ADMIN' ? 'Admin' : 'John');
   const avatarUrl = user?.profileImage?.url;
   const initials = (user?.firstName ? user.firstName[0] : (user?.name ? user.name[0] : 'J')).toUpperCase();
 
   const profileLink = role === 'SUPER_ADMIN' ? '/admin/settings' : role === 'EVENT_MEMBER' ? '/member/profile' : '/user/settings';
+
+  const fetchAnnouncements = async () => {
+    try {
+      const res = await api.get('/announcements');
+      setAnnouncements(res.data);
+    } catch (err) {
+      console.error('Failed to fetch announcements:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnnouncements();
+  }, []);
+
+  const unreadCount = announcements.filter((a) => !a.isRead).length;
 
   return (
     <div className="app-layout">
@@ -44,6 +63,37 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
             onClick={() => setShowThemeModal(true)}
           >
             {activeThemeConfig.icon}
+          </button>
+
+          <button
+            className="mobile-theme-btn"
+            title="Notifications"
+            onClick={() => setShowNotifDrawer(true)}
+            style={{ position: 'relative' }}
+          >
+            <HiBell style={{ fontSize: '1.1rem' }} />
+            {unreadCount > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: -2,
+                  right: -2,
+                  background: '#EF4444',
+                  color: '#FFFFFF',
+                  fontSize: '0.55rem',
+                  fontWeight: 900,
+                  width: 15,
+                  height: 15,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 0 6px #EF4444',
+                }}
+              >
+                {unreadCount}
+              </span>
+            )}
           </button>
 
           <Link to={profileLink} className="top-avatar-pill" style={{ width: 34, height: 34, borderRadius: 10 }}>
@@ -92,13 +142,35 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
               </span>
             </button>
 
-            <button className="notif-bell-btn" title="Messages" onClick={() => {}}>
-              <HiMail />
-            </button>
-
-            <button className="notif-bell-btn" title="Notifications" onClick={() => {}}>
+            <button
+              className="notif-bell-btn"
+              title="Campus Announcements"
+              onClick={() => setShowNotifDrawer(true)}
+              style={{ position: 'relative' }}
+            >
               <HiBell />
-              <span className="notif-dot"></span>
+              {unreadCount > 0 && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: -2,
+                    right: -2,
+                    background: '#EF4444',
+                    color: '#FFFFFF',
+                    fontSize: '0.6rem',
+                    fontWeight: 900,
+                    width: 17,
+                    height: 17,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 0 8px #EF4444',
+                  }}
+                >
+                  {unreadCount}
+                </span>
+              )}
             </button>
 
             <Link to={profileLink} className="top-avatar-pill" title="My Profile">
@@ -115,6 +187,14 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
         <div className="dashboard-content-body">
           {children}
         </div>
+
+        {/* Notification Drawer Modal */}
+        <NotificationDrawer
+          isOpen={showNotifDrawer}
+          onClose={() => setShowNotifDrawer(false)}
+          announcements={announcements}
+          onRefresh={fetchAnnouncements}
+        />
 
         {/* Global Theme Selector Modal */}
         {showThemeModal && (

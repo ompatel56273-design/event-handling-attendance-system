@@ -64,6 +64,19 @@ const eventSchema = new mongoose.Schema({
     default: 50,
     min: 1,
   },
+  participationType: {
+    type: String,
+    enum: ['INDIVIDUAL', 'TEAM', 'BOTH'],
+    default: 'BOTH',
+  },
+  minTeamSize: {
+    type: Number,
+    default: 1,
+  },
+  maxTeamSize: {
+    type: Number,
+    default: 4,
+  },
   status: {
     type: String,
     enum: ['DRAFT', 'UPCOMING', 'REGISTRATION_OPEN', 'REGISTRATION_CLOSED', 'ONGOING', 'COMPLETED', 'CANCELLED'],

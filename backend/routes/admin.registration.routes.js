@@ -6,6 +6,7 @@ const admin = require('../controllers/admin.controller');
 router.use(auth);
 router.use(authorize('SUPER_ADMIN'));
 
+router.get('/export', admin.exportRegistrations);
 router.get('/', admin.getAllRegistrations);
 router.put('/:id', admin.updateRegistration);
 router.delete('/:id', admin.deleteRegistration);

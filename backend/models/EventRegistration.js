@@ -24,6 +24,32 @@ const eventRegistrationSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  checkInPin: {
+    type: String,
+    default: '',
+  },
+  isTeam: {
+    type: Boolean,
+    default: false,
+  },
+  teamName: {
+    type: String,
+    default: '',
+  },
+  teamRole: {
+    type: String,
+    enum: ['LEADER', 'MEMBER', null],
+    default: null,
+  },
+  teamMembers: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      name: String,
+      userIdentifier: String,
+      rollNumber: String,
+      department: String,
+    },
+  ],
   joinedAt: {
     type: Date,
     default: Date.now,

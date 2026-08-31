@@ -549,3 +549,180 @@ exports.updateEventMemberStatus = async (req, res, next) => {
     next(error);
   }
 };
+
+// ============ DATA EXPORT ENGINE (.XLSX & .CSV) ============
+const exportService = require('../services/export.service');
+
+// GET /api/admin/attendance/export
+exports.exportAttendance = async (req, res, next) => {
+  try {
+    const { eventId, format = 'xlsx' } = req.query;
+    const filter = {};
+    if (eventId) filter.eventId = eventId;
+
+    const records = await Attendance.find(filter)
+      .populate('userId', 'firstName lastName userId department year className rollNumber email mobile')
+      .populate('eventId', 'name date location')
+      .populate('scannedBy', 'name email role')
+      .sort({ scannedAt: -1 });
+
+    const formattedData = records.map((r, i) => ({
+      '#': i + 1,
+      'Student Name': `${r.userId?.firstName || ''} ${r.userId?.lastName || ''}`.trim(),
+      'User ID': r.userId?.userId || 'N/A',
+      'Roll Number': r.userId?.rollNumber || 'N/A',
+      'Department': r.userId?.department || 'N/A',
+      'Year': r.userId?.year ? `${r.userId.year} Year` : 'N/A',
+      'Class': r.userId?.className || 'N/A',
+      'Event Name': r.eventId?.name || 'N/A',
+      'Event Date': r.eventId?.date ? new Date(r.eventId.date).toLocaleDateString('en-GB') : 'N/A',
+      'Attendance Status': r.status || 'ACCEPTED',
+      'Check-in Time': r.scannedAt ? new Date(r.scannedAt).toLocaleString('en-GB') : 'N/A',
+      'Verified By': r.scannedBy?.name || 'System Admin',
+      'Method': r.scanMethod || 'QR_CAMERA',
+    }));
+
+    const result = exportService.generateWorkbook(
+      [{ sheetName: 'Attendance Records', data: formattedData }],
+      format
+    );
+
+    const timestamp = new Date().toISOString().split('T')[0];
+    if (format === 'csv') {
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=Attendance_${timestamp}.csv`);
+      return res.send(result);
+    }
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=Attendance_${timestamp}.xlsx`
+    );
+    res.send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/admin/registrations/export
+exports.exportRegistrations = async (req, res, next) => {
+  try {
+    const { eventId, department, format = 'xlsx' } = req.query;
+    const filter = {};
+    if (eventId) filter.eventId = eventId;
+
+    const records = await EventRegistration.find(filter)
+      .populate('userId', 'firstName lastName userId department year className rollNumber email mobile')
+      .populate('eventId', 'name date location category')
+      .sort({ createdAt: -1 });
+
+    const filtered = department
+      ? records.filter((r) => r.userId?.department === department)
+      : records;
+
+    const formattedData = filtered.map((r, i) => ({
+      '#': i + 1,
+      'Student Name': `${r.userId?.firstName || ''} ${r.userId?.lastName || ''}`.trim(),
+      'User ID': r.userId?.userId || 'N/A',
+      'Email': r.userId?.email || 'N/A',
+      'Mobile': r.userId?.mobile || 'N/A',
+      'Department': r.userId?.department || 'N/A',
+      'Year': r.userId?.year ? `${r.userId.year} Year` : 'N/A',
+      'Class': r.userId?.className || 'N/A',
+      'Roll Number': r.userId?.rollNumber || 'N/A',
+      'Event Name': r.eventId?.name || 'N/A',
+      'Category': r.eventId?.category || 'N/A',
+      'Event Date': r.eventId?.date ? new Date(r.eventId.date).toLocaleDateString('en-GB') : 'N/A',
+      'Registration Date': r.createdAt ? new Date(r.createdAt).toLocaleString('en-GB') : 'N/A',
+      'Attendance Status': r.attendanceStatus || 'PENDING',
+    }));
+
+    const result = exportService.generateWorkbook(
+      [{ sheetName: 'Event Registrations', data: formattedData }],
+      format
+    );
+
+    const timestamp = new Date().toISOString().split('T')[0];
+    if (format === 'csv') {
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=Registrations_${timestamp}.csv`);
+      return res.send(result);
+    }
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=Registrations_${timestamp}.xlsx`
+    );
+    res.send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/admin/marks/export
+exports.exportMarks = async (req, res, next) => {
+  try {
+    const { eventId, format = 'xlsx' } = req.query;
+    const filter = {};
+    if (eventId) filter.eventId = eventId;
+
+    const records = await Marks.find(filter)
+      .populate('userId', 'firstName lastName userId department rollNumber className')
+      .populate('eventId', 'name')
+      .populate('enteredBy', 'name role')
+      .sort({ totalScore: -1 });
+
+    const formattedData = records.map((m, i) => {
+      const criteriaStr = m.criteriaMarks
+        ? m.criteriaMarks.map((c) => `${c.name}: ${c.marks}/${c.maxMarks}`).join(' | ')
+        : 'N/A';
+
+      return {
+        'Rank': i + 1,
+        'Student Name': `${m.userId?.firstName || ''} ${m.userId?.lastName || ''}`.trim(),
+        'User ID': m.userId?.userId || 'N/A',
+        'Roll No': m.userId?.rollNumber || 'N/A',
+        'Department': m.userId?.department || 'N/A',
+        'Class': m.userId?.className || 'N/A',
+        'Event': m.eventId?.name || 'N/A',
+        'Criteria Breakdown': criteriaStr,
+        'Total Score': `${m.totalScore || 0} / ${m.totalMaxMarks || 100}`,
+        'Evaluated By': m.enteredBy?.name || 'Evaluator',
+        'Date': m.createdAt ? new Date(m.createdAt).toLocaleDateString('en-GB') : 'N/A',
+      };
+    });
+
+    const result = exportService.generateWorkbook(
+      [{ sheetName: 'Marks & Evaluations', data: formattedData }],
+      format
+    );
+
+    const timestamp = new Date().toISOString().split('T')[0];
+    if (format === 'csv') {
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=Marks_${timestamp}.csv`);
+      return res.send(result);
+    }
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=Marks_${timestamp}.xlsx`
+    );
+    res.send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+

@@ -56,44 +56,64 @@ exports.generateAttendanceQR = async (req, res, next) => {
   }
 };
 
-// POST /api/attendance/scan — Event Member or SuperAdmin scans attendance QR
+// POST /api/attendance/scan — Event Member or SuperAdmin scans attendance QR or PIN
 exports.scanAttendanceQR = async (req, res, next) => {
   try {
-    const { token } = req.body;
+    const { token, pin, eventId } = req.body;
 
-    // Verify the attendance token
-    let decoded;
-    try {
-      decoded = verifyAttendanceToken(token);
-    } catch (err) {
-      return res.status(400).json({ message: 'Invalid or expired attendance QR code.' });
-    }
+    let registration = null;
 
-    // Verify registration exists
-    const registration = await EventRegistration.findById(decoded.registrationId)
-      .populate('userId')
-      .populate('eventId');
+    // 1. PIN-based manual fallback check-in
+    if (pin && pin.trim().length >= 4) {
+      const pinQuery = { checkInPin: pin.trim() };
+      if (eventId) pinQuery.eventId = eventId;
 
-    if (!registration) {
-      return res.status(404).json({ message: 'Registration not found.' });
+      registration = await EventRegistration.findOne(pinQuery)
+        .populate('userId')
+        .populate('eventId');
+
+      if (!registration) {
+        return res.status(404).json({ message: 'Invalid check-in PIN. No matching registration found.' });
+      }
+    } else if (token) {
+      // 2. Token-based scanning
+      try {
+        const decoded = verifyAttendanceToken(token);
+        registration = await EventRegistration.findById(decoded.registrationId)
+          .populate('userId')
+          .populate('eventId');
+
+        if (!registration || registration.userId._id.toString() !== decoded.userId) {
+          return res.status(400).json({ message: 'QR data does not match registration.' });
+        }
+      } catch (err) {
+        // Fallback: Check if token is registration ID or student User ID directly
+        const trimmedToken = token.trim();
+        registration = await EventRegistration.findOne({
+          $or: [
+            { attendanceQrToken: trimmedToken },
+            { _id: trimmedToken.match(/^[0-9a-fA-F]{24}$/) ? trimmedToken : null },
+          ],
+        })
+          .populate('userId')
+          .populate('eventId');
+
+        if (!registration) {
+          return res.status(400).json({ message: 'Invalid or expired attendance QR code.' });
+        }
+      }
+    } else {
+      return res.status(400).json({ message: 'Please provide either a QR token or a 6-digit PIN.' });
     }
 
     if (registration.status === 'REMOVED_BY_ADMIN') {
       return res.status(400).json({ message: 'This registration has been removed.' });
     }
 
-    // Verify the user+event relationship matches
-    if (
-      registration.userId._id.toString() !== decoded.userId ||
-      registration.eventId._id.toString() !== decoded.eventId
-    ) {
-      return res.status(400).json({ message: 'QR data does not match registration.' });
-    }
-
     // Check for existing attendance
     const existingAttendance = await Attendance.findOne({
-      userId: decoded.userId,
-      eventId: decoded.eventId,
+      userId: registration.userId._id,
+      eventId: registration.eventId._id,
     });
 
     if (existingAttendance && existingAttendance.status !== 'PENDING') {
@@ -126,7 +146,7 @@ exports.scanAttendanceQR = async (req, res, next) => {
     }
 
     res.json({
-      message: 'QR scanned successfully.',
+      message: 'Participant identified successfully.',
       alreadyProcessed: false,
       registrationId: registration._id,
       user: {
@@ -150,6 +170,31 @@ exports.scanAttendanceQR = async (req, res, next) => {
         location: registration.eventId.location,
       },
       existingAttendance,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/attendance/events/:eventId/turnout — Real-time turnout ticker
+exports.getEventTurnout = async (req, res, next) => {
+  try {
+    const { eventId } = req.params;
+
+    const [totalRegistered, checkedInCount] = await Promise.all([
+      EventRegistration.countDocuments({ eventId, status: { $ne: 'REMOVED_BY_ADMIN' } }),
+      Attendance.countDocuments({ eventId, status: 'ACCEPTED' }),
+    ]);
+
+    const turnoutPercentage = totalRegistered > 0
+      ? Math.round((checkedInCount / totalRegistered) * 100)
+      : 0;
+
+    res.json({
+      totalRegistered,
+      checkedInCount,
+      pendingCount: Math.max(totalRegistered - checkedInCount, 0),
+      turnoutPercentage,
     });
   } catch (error) {
     next(error);

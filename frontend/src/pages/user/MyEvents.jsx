@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import CertificateModal from '../../components/common/CertificateModal';
+import FeedbackModal from '../../components/common/FeedbackModal';
 import QRCode from 'react-qr-code';
-import { HiCalendar, HiClock, HiLocationMarker, HiInformationCircle } from 'react-icons/hi';
+import { HiCalendar, HiLocationMarker, HiInformationCircle, HiAcademicCap, HiStar } from 'react-icons/hi';
 
 const eventThumbnails = [
   'https://images.unsplash.com/photo-1511578314322-379afb476865?w=500&auto=format&fit=crop&q=60',
@@ -14,17 +16,25 @@ const eventThumbnails = [
 
 const MyEvents = () => {
   const [registrations, setRegistrations] = useState([]);
+  const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedECard, setSelectedECard] = useState(null);
+  const [selectedCertificate, setSelectedCertificate] = useState(null);
+  const [selectedFeedbackEvent, setSelectedFeedbackEvent] = useState(null);
 
   useEffect(() => {
-    fetchMyEvents();
+    fetchMyEventsAndCerts();
   }, []);
 
-  const fetchMyEvents = async () => {
+  const fetchMyEventsAndCerts = async () => {
     try {
-      const res = await api.get('/users/me/events');
-      setRegistrations(res.data);
+      const [eventsRes, certsRes] = await Promise.allSettled([
+        api.get('/users/me/events'),
+        api.get('/certificates/my-certificates'),
+      ]);
+
+      if (eventsRes.status === 'fulfilled') setRegistrations(eventsRes.value.data);
+      if (certsRes.status === 'fulfilled') setCertificates(certsRes.value.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -41,84 +51,87 @@ const MyEvents = () => {
     }
   };
 
+  const openCertificateForEvent = async (eventId) => {
+    // Find certificate in state or re-fetch
+    const cert = certificates.find((c) => (c.eventId?._id || c.eventId) === eventId);
+    if (cert) {
+      setSelectedCertificate(cert);
+    } else {
+      try {
+        const res = await api.get('/certificates/my-certificates');
+        setCertificates(res.data);
+        const newlyFound = res.data.find((c) => (c.eventId?._id || c.eventId) === eventId);
+        if (newlyFound) setSelectedCertificate(newlyFound);
+      } catch (err) {
+        console.error('Failed to fetch certificate:', err);
+      }
+    }
+  };
+
   return (
     <DashboardLayout
-      title="My Events"
-      subtitle="Track your registered events, attendance, and scores"
+      title="My Events & Certificates"
+      subtitle="Track your registered event passes, live attendance, scores, and verified certificates"
     >
       {/* Attendance E-Card Modal Matching Master UI */}
       {selectedECard && (
         <div className="modal-overlay" onClick={() => setSelectedECard(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 600 }}>
+          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 540 }}>
             <div className="modal-header">
-              <h2>Event Attendance E-Card</h2>
+              <h2>🎟️ Event Attendance Pass</h2>
               <button className="modal-close" onClick={() => setSelectedECard(null)}>✕</button>
             </div>
             <div className="modal-body">
-              <div className="attendance-ecard-card" style={{ border: 'none', boxShadow: 'none', padding: 0 }}>
-                <div className="attendance-ecard-header">
-                  <div>
-                    <span className="badge badge-primary" style={{ marginBottom: 4 }}>Attendance E-Card</span>
-                    <h3 style={{ fontSize: '1.2rem', color: 'var(--text-main)' }}>{selectedECard.event?.name}</h3>
-                  </div>
-                  <span className="badge badge-info">{new Date(selectedECard.event?.date).toLocaleDateString()}</span>
+              <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                <h3 style={{ fontSize: '1.2rem', color: '#FFFFFF', fontWeight: 800 }}>{selectedECard.event?.name}</h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  {new Date(selectedECard.event?.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} • {selectedECard.event?.location || 'Campus Hall'}
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                <div style={{ background: '#FFFFFF', padding: '12px', borderRadius: '14px', border: '3px solid var(--primary)', boxShadow: 'var(--shadow-qr)' }}>
+                  <QRCode value={selectedECard.registration?.attendanceQrToken || selectedECard.registration?._id} size={150} />
                 </div>
+                <span className="qr-label" style={{ fontSize: '0.85rem' }}>Attendance Check-in QR</span>
 
-                <div className="attendance-ecard-body">
-                  {selectedECard.user?.profileImage?.url ? (
-                    <img
-                      src={selectedECard.user.profileImage.url}
-                      alt={selectedECard.user.firstName}
-                      className="identity-hero-avatar"
-                      style={{ width: 90, height: 90 }}
-                    />
-                  ) : (
-                    <div className="identity-hero-avatar-placeholder" style={{ width: 90, height: 90, fontSize: '1.8rem' }}>
-                      {selectedECard.user?.firstName ? selectedECard.user.firstName[0] : 'U'}
-                    </div>
-                  )}
-
-                  <div>
-                    <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>
-                      {selectedECard.user?.firstName} {selectedECard.user?.lastName}
-                    </h3>
-                    <p style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--primary)', fontSize: '0.85rem' }}>
-                      {selectedECard.user?.userId}
-                    </p>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 4 }}>
-                      {selectedECard.user?.department} | {selectedECard.user?.year}nd Year - {selectedECard.user?.className}
-                    </p>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      Roll No. {selectedECard.user?.rollNumber}
-                    </p>
-                  </div>
-
-                  <div className="attendance-qr-container">
-                    {selectedECard.registration?.attendanceQrGenerated && selectedECard.registration?.attendanceQrToken ? (
-                      <>
-                        <div style={{ background: '#fff', padding: '4px', borderRadius: '6px' }}>
-                          <QRCode value={selectedECard.registration.attendanceQrToken} size={110} />
-                        </div>
-                        <p>Attendance QR</p>
-                        <span style={{ fontSize: '0.58rem', color: '#94A3B8' }}>(For this event only)</span>
-                      </>
-                    ) : (
-                      <div style={{ padding: '16px 12px', background: '#F8FAFC', borderRadius: '8px', border: '1px dashed #CBD5E1', textAlign: 'center', width: '130px' }}>
-                        <p style={{ color: '#F59E0B', fontSize: '0.75rem', fontWeight: 600 }}>QR Pending</p>
-                        <span style={{ fontSize: '0.65rem', color: '#64748B' }}>Generated by Admin at event</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="attendance-disclaimer">
-                  <HiInformationCircle style={{ fontSize: '1.2rem', flexShrink: 0 }} />
-                  <span>Only Event Members and Super Admin can scan this QR and mark attendance.</span>
+                {/* 6-Digit PIN Code Fallback */}
+                <div
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '12px',
+                    padding: '6px 14px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                >
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Backup PIN:</span>
+                  <strong style={{ fontSize: '1rem', fontFamily: 'monospace', letterSpacing: '2px', color: 'var(--primary)' }}>
+                    {selectedECard.registration?.checkInPin || selectedECard.registration?._id?.slice(-6)?.toUpperCase() || '849201'}
+                  </strong>
                 </div>
               </div>
+
+              <div className="attendance-disclaimer" style={{ marginTop: 20 }}>
+                <HiInformationCircle style={{ fontSize: '1.2rem', flexShrink: 0 }} />
+                <span>Present this QR code to Event Members at the entrance scanner to mark attendance.</span>
+              </div>
+            </div>
+            <div className="modal-footer" style={{ justifyContent: 'center' }}>
+              <button className="btn btn-primary btn-sm" onClick={() => setSelectedECard(null)}>Done</button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Verified Certificate Modal */}
+      {selectedCertificate && (
+        <CertificateModal
+          certificate={selectedCertificate}
+          onClose={() => setSelectedCertificate(null)}
+        />
       )}
 
       {loading ? (
@@ -139,7 +152,8 @@ const MyEvents = () => {
             const eventDate = reg.eventId?.date
               ? new Date(reg.eventId.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
               : 'Upcoming';
-            const attendanceStatus = reg.status === 'ATTENDED' ? 'Accepted' : reg.status === 'ABSENT' ? 'Declined' : 'Pending';
+            const isAttended = reg.attendanceStatus === 'ACCEPTED' || reg.status === 'ATTENDED';
+            const isDeclined = reg.attendanceStatus === 'DECLINED' || reg.status === 'ABSENT';
 
             return (
               <div key={reg._id} className="event-row-card">
@@ -155,37 +169,60 @@ const MyEvents = () => {
                     <span className="badge badge-success">Registered</span>
                   </div>
                   <div className="event-row-tags">
-                    <span><HiCalendar style={{ color: '#5C33CF' }} /> {eventDate}</span>
-                    <span><HiLocationMarker style={{ color: '#10B981' }} /> {reg.eventId?.location || 'Campus'}</span>
+                    <span><HiCalendar style={{ color: 'var(--primary)' }} /> {eventDate}</span>
+                    <span><HiLocationMarker style={{ color: '#0EA5E9' }} /> {reg.eventId?.location || 'Campus'}</span>
                   </div>
                   <div style={{ display: 'flex', gap: 16, marginTop: 8, fontSize: '0.78rem' }}>
                     <span>
                       <strong>Attendance:</strong>{' '}
-                      <span className={`badge ${attendanceStatus === 'Accepted' ? 'badge-success' : attendanceStatus === 'Declined' ? 'badge-danger' : 'badge-warning'}`}>
-                        {attendanceStatus}
-                      </span>
-                    </span>
-                    <span>
-                      <strong>Marks:</strong>{' '}
-                      <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>
-                        {reg.status === 'ATTENDED' ? '80 / 100' : '- / 100'}
+                      <span className={`badge ${isAttended ? 'badge-success' : isDeclined ? 'badge-danger' : 'badge-warning'}`}>
+                        {isAttended ? '✓ Verified' : isDeclined ? 'Declined' : 'Pending Scan'}
                       </span>
                     </span>
                   </div>
                 </div>
 
-                <div className="event-row-action">
+                <div className="event-row-action" style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'stretch' }}>
                   <button
-                    className="btn btn-primary btn-sm"
+                    className="btn btn-secondary btn-sm"
                     onClick={() => viewECard(reg.eventId?._id)}
                   >
-                    View E-Card
+                    View Pass QR
                   </button>
+
+                  {isAttended && (
+                    <>
+                      <button
+                        className="btn btn-primary btn-sm"
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                        onClick={() => openCertificateForEvent(reg.eventId?._id)}
+                      >
+                        <HiAcademicCap style={{ fontSize: '1.1rem' }} /> Certificate
+                      </button>
+
+                      <button
+                        className="btn btn-secondary btn-sm"
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#F59E0B' }}
+                        onClick={() => setSelectedFeedbackEvent(reg.eventId)}
+                      >
+                        <HiStar style={{ fontSize: '1.1rem' }} /> Give Feedback
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
+      )}
+
+      {/* Feedback Modal */}
+      {selectedFeedbackEvent && (
+        <FeedbackModal
+          event={selectedFeedbackEvent}
+          onClose={() => setSelectedFeedbackEvent(null)}
+          onSubmitted={() => fetchMyEventsAndCerts()}
+        />
       )}
     </DashboardLayout>
   );

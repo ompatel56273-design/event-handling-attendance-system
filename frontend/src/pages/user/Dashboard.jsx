@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { saveOfflineIdentity, getOfflineIdentity, saveOfflinePasses, getOfflinePasses } from '../../services/offlineStorage';
 import QRCode from 'react-qr-code';
 import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
@@ -30,8 +31,14 @@ const UserDashboard = () => {
   const [selectedPass, setSelectedPass] = useState(null);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
   useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
     const fetchDashboardData = async () => {
       try {
         const [profileRes, eventsRes, myEventsRes, winnersRes] = await Promise.allSettled([
@@ -41,7 +48,13 @@ const UserDashboard = () => {
           api.get('/winners'),
         ]);
 
-        if (profileRes.status === 'fulfilled') setProfile(profileRes.value.data);
+        if (profileRes.status === 'fulfilled') {
+          setProfile(profileRes.value.data);
+          saveOfflineIdentity(profileRes.value.data);
+        } else {
+          const cached = getOfflineIdentity();
+          if (cached) setProfile(cached);
+        }
 
         let allEvents = [];
         if (eventsRes.status === 'fulfilled') {
@@ -52,6 +65,11 @@ const UserDashboard = () => {
 
         const myEventsList = myEventsRes.status === 'fulfilled' ? myEventsRes.value.data : [];
         setMyRegistrations(myEventsList.slice(0, 3));
+        if (myEventsList.length > 0) saveOfflinePasses(myEventsList);
+        else {
+          const cachedPasses = getOfflinePasses();
+          if (cachedPasses.length > 0) setMyRegistrations(cachedPasses.slice(0, 3));
+        }
 
         const winnersCount = winnersRes.status === 'fulfilled' ? winnersRes.value.data.length : 0;
 
@@ -63,11 +81,20 @@ const UserDashboard = () => {
         });
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
+        const cachedId = getOfflineIdentity();
+        if (cachedId) setProfile(cachedId);
+        const cachedPasses = getOfflinePasses();
+        if (cachedPasses.length > 0) setMyRegistrations(cachedPasses.slice(0, 3));
       } finally {
         setLoading(false);
       }
     };
     fetchDashboardData();
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
   const data = profile || user;
@@ -97,6 +124,30 @@ const UserDashboard = () => {
         </div>
       }
     >
+      {/* Offline Mode Alert Banner */}
+      {isOffline && (
+        <div
+          style={{
+            background: 'rgba(245, 158, 11, 0.15)',
+            border: '1px solid rgba(245, 158, 11, 0.4)',
+            color: '#F59E0B',
+            padding: '12px 18px',
+            borderRadius: '14px',
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            fontSize: '0.84rem',
+            fontWeight: 600,
+          }}
+        >
+          <span style={{ fontSize: '1.2rem' }}>📱</span>
+          <span>
+            <strong>Offline Mode Active:</strong> You are currently disconnected from the internet. Your Student Identity Pass & QR code are securely served from offline local cache.
+          </span>
+        </div>
+      )}
+
       {/* =========================================================================
           1. MODERN CLASSIC EXECUTIVE IDENTITY PASSPORT (HERO E-CARD)
           ========================================================================= */}
@@ -378,6 +429,25 @@ const UserDashboard = () => {
                 }}
               >
                 <QRCode value={selectedPass.qrToken || selectedPass._id} size={180} />
+              </div>
+
+              {/* 6-Digit PIN Code Fallback Box */}
+              <div
+                style={{
+                  background: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '12px',
+                  padding: '8px 16px',
+                  marginBottom: 14,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Backup Check-in PIN:</span>
+                <strong style={{ fontSize: '1.05rem', fontFamily: 'monospace', letterSpacing: '2px', color: 'var(--primary)' }}>
+                  {selectedPass.checkInPin || selectedPass._id.slice(-6).toUpperCase()}
+                </strong>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: '0.78rem' }}>

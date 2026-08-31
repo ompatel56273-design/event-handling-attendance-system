@@ -58,10 +58,45 @@ const AdminRegistrations = () => {
     }
   };
 
+  const handleExport = async (format = 'xlsx') => {
+    try {
+      const res = await api.get(`/admin/registrations/export?eventId=${selectedEvent || ''}&format=${format}`, {
+        responseType: 'blob',
+      });
+      const blob = new Blob([res.data], {
+        type: format === 'csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `Registrations_${selectedEvent ? 'Event' : 'All'}_${new Date().toISOString().split('T')[0]}.${format}`;
+      link.click();
+    } catch (err) {
+      console.error('Export failed:', err);
+    }
+  };
+
   return (
     <DashboardLayout
       title="Registration Management"
       subtitle="View, filter, and manage all student event registrations"
+      headerActions={
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => handleExport('xlsx')}
+            title="Download Excel Spreadsheet"
+          >
+            📊 Export Excel
+          </button>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => handleExport('csv')}
+            title="Download CSV"
+          >
+            📄 Export CSV
+          </button>
+        </div>
+      }
     >
       {msg.text && <div className={`alert alert-${msg.type}`}>{msg.text}</div>}
 
