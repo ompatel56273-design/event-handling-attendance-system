@@ -75,6 +75,38 @@ export const AuthProvider = ({ children }) => {
     setRole(null);
   };
 
+  // 5-minute Inactivity Auto-Logout ONLY for SuperAdmin on dashboard
+  useEffect(() => {
+    if (!token || role !== 'SUPER_ADMIN') return;
+
+    const IDLE_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+    let timeoutId;
+
+    const handleIdleLogout = () => {
+      logout();
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login?reason=idle_timeout';
+      }
+    };
+
+    const resetTimer = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleIdleLogout, IDLE_TIMEOUT_MS);
+    };
+
+    // User activity listeners
+    const activityEvents = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'];
+    activityEvents.forEach(evt => window.addEventListener(evt, resetTimer, { passive: true }));
+
+    // Initialize timer
+    resetTimer();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      activityEvents.forEach(evt => window.removeEventListener(evt, resetTimer));
+    };
+  }, [token, role]);
+
   const updateUser = (updatedData) => {
     const newUser = { ...user, ...updatedData };
     setUser(newUser);

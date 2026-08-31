@@ -61,9 +61,9 @@ const Winners = () => {
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>{w.userId?.firstName} {w.userId?.lastName}</h3>
                 <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{w.userId?.department} | Roll: {w.userId?.rollNumber}</p>
 
-                <div style={{ background: '#F8FAFC', padding: '12px', borderRadius: '10px', marginTop: 16 }}>
-                  <p style={{ fontWeight: 600, fontSize: '0.84rem', color: 'var(--text-main)' }}>{w.eventId?.name}</p>
-                  <p style={{ fontSize: '0.76rem', color: 'var(--primary)', fontWeight: 700, marginTop: 2 }}>
+                <div style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid var(--border-color)', padding: '12px', borderRadius: '12px', marginTop: 16 }}>
+                  <p style={{ fontWeight: 700, fontSize: '0.86rem', color: '#FFFFFF' }}>{w.eventId?.name}</p>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--primary)', fontWeight: 800, marginTop: 4 }}>
                     Final Score: {w.marks} / 100
                   </p>
                 </div>

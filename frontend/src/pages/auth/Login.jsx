@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const Login = () => {
   const { login, getDashboardPath } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isIdleLogout = searchParams.get('reason') === 'idle_timeout';
+
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,6 +35,11 @@ const Login = () => {
           <h1>🎓 Event System</h1>
           <p>Sign in to your account</p>
         </div>
+        {isIdleLogout && (
+          <div className="alert alert-warning" style={{ marginBottom: 16 }}>
+            🔒 You were automatically signed out after <strong>5 minutes of inactivity</strong> for security.
+          </div>
+        )}
         {error && <div className="alert alert-error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">

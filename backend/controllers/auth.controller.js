@@ -47,7 +47,7 @@ exports.signup = async (req, res, next) => {
       exists = await User.findOne({ userId });
     }
 
-    // Generate verification token
+    // Generate verification token for student email authentication
     const emailVerificationToken = generateToken();
     const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
@@ -62,22 +62,24 @@ exports.signup = async (req, res, next) => {
       mobile: mobile.trim(),
       email: cleanEmail,
       password,
+      isEmailVerified: false,
       emailVerificationToken,
       emailVerificationExpires,
+      accountStatus: 'ACTIVE',
     });
 
     await user.save();
 
-    // Send verification email
+    // Send verification email via Brevo
     const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${emailVerificationToken}`;
     try {
       await sendVerificationEmail(cleanEmail, `${firstName} ${lastName}`, verificationLink);
     } catch (emailError) {
-      console.error('Failed to send verification email:', emailError.message);
+      console.error('Failed to send Brevo verification email:', emailError.message);
     }
 
     res.status(201).json({
-      message: 'Account created successfully. Please check your email to verify your account.',
+      message: 'Account created successfully! Please check your email to verify your account before signing in.',
       userId: user.userId,
     });
   } catch (error) {
@@ -121,9 +123,11 @@ exports.login = async (req, res, next) => {
       return res.status(403).json({ message: 'Account is disabled. Contact administrator.' });
     }
 
-    // Check email verification for regular users
+    // Check email verification ONLY for regular student users (Admins & Event Members are exempt)
     if (model === 'User' && role === 'USER' && !account.isEmailVerified) {
-      return res.status(403).json({ message: 'Please verify your email before logging in.' });
+      return res.status(403).json({
+        message: 'Please verify your email before logging in. Check your inbox for the verification link.',
+      });
     }
 
     const token = signToken(account._id, role);

@@ -159,38 +159,38 @@ const AdminDashboard = () => {
               {/* Circular SVG Donut Chart */}
               <div style={{ width: 130, height: 130, position: 'relative' }}>
                 <svg viewBox="0 0 36 36" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
-                  {/* Upcoming: #5C33CF */}
-                  <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#5C33CF" strokeWidth="3.8" strokeDasharray="25 75" strokeDashoffset="0" />
-                  {/* Ongoing: #00C2FF */}
-                  <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#00C2FF" strokeWidth="3.8" strokeDasharray="18 82" strokeDashoffset="-25" />
-                  {/* Completed: #10B981 */}
-                  <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#10B981" strokeWidth="3.8" strokeDasharray="45 55" strokeDashoffset="-43" />
-                  {/* Cancelled: #EF4444 */}
-                  <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#EF4444" strokeWidth="3.8" strokeDasharray="12 88" strokeDashoffset="-88" />
+                  {/* Upcoming: #E20626 */}
+                  <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#E20626" strokeWidth="3.8" strokeDasharray="25 75" strokeDashoffset="0" />
+                  {/* Ongoing: #0EA5E9 */}
+                  <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#0EA5E9" strokeWidth="3.8" strokeDasharray="18 82" strokeDashoffset="-25" />
+                  {/* Completed: #00D27A */}
+                  <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#00D27A" strokeWidth="3.8" strokeDasharray="45 55" strokeDashoffset="-43" />
+                  {/* Cancelled: #9C23D9 */}
+                  <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#9C23D9" strokeWidth="3.8" strokeDasharray="12 88" strokeDashoffset="-88" />
                 </svg>
               </div>
 
               {/* Legends */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: '0.82rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#5C33CF' }}></span>
+                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#E20626', boxShadow: '0 0 6px #E20626' }}></span>
                   <span style={{ color: 'var(--text-muted)' }}>Upcoming:</span>
-                  <strong style={{ marginLeft: 'auto' }}>{eventStatusCounts.upcoming}</strong>
+                  <strong style={{ marginLeft: 'auto', color: '#FFFFFF' }}>{eventStatusCounts.upcoming}</strong>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#00C2FF' }}></span>
+                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#0EA5E9', boxShadow: '0 0 6px #0EA5E9' }}></span>
                   <span style={{ color: 'var(--text-muted)' }}>Ongoing:</span>
-                  <strong style={{ marginLeft: 'auto' }}>{eventStatusCounts.ongoing}</strong>
+                  <strong style={{ marginLeft: 'auto', color: '#FFFFFF' }}>{eventStatusCounts.ongoing}</strong>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#10B981' }}></span>
+                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#00D27A', boxShadow: '0 0 6px #00D27A' }}></span>
                   <span style={{ color: 'var(--text-muted)' }}>Completed:</span>
-                  <strong style={{ marginLeft: 'auto' }}>{eventStatusCounts.completed}</strong>
+                  <strong style={{ marginLeft: 'auto', color: '#FFFFFF' }}>{eventStatusCounts.completed}</strong>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#EF4444' }}></span>
+                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#9C23D9', boxShadow: '0 0 6px #9C23D9' }}></span>
                   <span style={{ color: 'var(--text-muted)' }}>Cancelled:</span>
-                  <strong style={{ marginLeft: 'auto' }}>{eventStatusCounts.cancelled}</strong>
+                  <strong style={{ marginLeft: 'auto', color: '#FFFFFF' }}>{eventStatusCounts.cancelled}</strong>
                 </div>
               </div>
             </div>

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { signup } = useAuth();
   const [form, setForm] = useState({
     firstName: '', lastName: '', department: '', year: '', className: '',
     rollNumber: '', mobile: '', email: '', password: '', confirmPassword: '',
@@ -34,13 +35,13 @@ const Signup = () => {
     setError('');
     setLoading(true);
     try {
-      const res = await api.post('/auth/signup', {
+      const res = await signup({
         ...form,
         year: parseInt(form.year),
       });
-      setSuccess(res.data.message);
+      setSuccess(res.message || 'Account created successfully! Please check your email to verify your account.');
     } catch (err) {
-      setError(err.response?.data?.message || 'Signup failed.');
+      setError(err.response?.data?.message || 'Signup failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -50,10 +51,14 @@ const Signup = () => {
     return (
       <div className="auth-page">
         <div className="auth-card" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '3rem', marginBottom: 16 }}>✉️</div>
+          <div style={{ fontSize: '3.2rem', marginBottom: 16 }}>✉️</div>
           <h2 style={{ marginBottom: 12 }}>Check Your Email</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: 24 }}>{success}</p>
-          <Link to="/login" className="btn btn-primary">Go to Login</Link>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: 24, lineHeight: '1.6' }}>
+            {success}
+          </p>
+          <Link to="/login" className="btn btn-primary btn-full">
+            Go to Sign In
+          </Link>
         </div>
       </div>
     );
