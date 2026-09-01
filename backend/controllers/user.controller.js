@@ -143,13 +143,20 @@ exports.getEventECard = async (req, res, next) => {
         rollNumber: user.rollNumber,
         profileImage: user.profileImage,
       },
-      event: {
+      event: registration.eventId ? {
         eventId: registration.eventId.eventId,
         name: registration.eventId.name,
         date: registration.eventId.date,
         location: registration.eventId.location,
         startTime: registration.eventId.startTime,
         endTime: registration.eventId.endTime,
+      } : {
+        eventId: 'EVT-000',
+        name: 'Event',
+        date: new Date(),
+        location: 'Campus',
+        startTime: '10:00 AM',
+        endTime: '12:00 PM',
       },
       registration: {
         _id: registration._id,
