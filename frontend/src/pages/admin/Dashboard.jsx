@@ -103,7 +103,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main 2-Column Split matching Master Image */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 24, marginTop: 24 }}>
+      <div className="dashboard-split-grid">
         {/* Left Column: Recent Registrations */}
         <div className="card">
           <div className="card-header">

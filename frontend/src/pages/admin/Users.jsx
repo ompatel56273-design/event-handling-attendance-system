@@ -298,34 +298,105 @@ const AdminUsers = () => {
       {/* User detail modal */}
       {selectedUser && (
         <div className="modal-overlay" onClick={() => setSelectedUser(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header"><h2>User Details</h2><button className="modal-close" onClick={() => setSelectedUser(null)}>✕</button></div>
+          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 460 }}>
+            <div className="modal-header">
+              <h2>👤 User Profile Details</h2>
+              <button className="modal-close" onClick={() => setSelectedUser(null)}>✕</button>
+            </div>
             <div className="modal-body">
-              <div style={{ textAlign: 'center', marginBottom: 16 }}>
+              <div style={{ textAlign: 'center', marginBottom: 20 }}>
                 {selectedUser.profileImage?.url ? (
-                  <img src={selectedUser.profileImage.url} alt="" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover' }} />
+                  <img
+                    src={selectedUser.profileImage.url}
+                    alt=""
+                    style={{ width: 80, height: 80, borderRadius: 20, objectFit: 'cover', border: '2px solid var(--primary)', margin: '0 auto 12px', display: 'block' }}
+                  />
                 ) : (
-                  <div className="e-card-avatar-placeholder">{selectedUser.firstName[0]}{selectedUser.lastName[0]}</div>
+                  <div className="e-card-avatar-placeholder">
+                    {selectedUser.firstName ? selectedUser.firstName[0] : 'U'}
+                    {selectedUser.lastName ? selectedUser.lastName[0] : ''}
+                  </div>
                 )}
-                <h3 style={{ marginTop: 8 }}>{selectedUser.firstName} {selectedUser.lastName}</h3>
-                <p style={{ color: 'var(--primary-400)', fontFamily: 'monospace' }}>{selectedUser.userId}</p>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', marginTop: 4 }}>
+                  {selectedUser.firstName} {selectedUser.lastName}
+                </h3>
+                <span className="user-id-chip" style={{ marginTop: 6, display: 'inline-block' }}>
+                  {selectedUser.userId}
+                </span>
               </div>
-              <div className="e-card-details" style={{ padding: 0 }}>
-                <div className="e-card-detail-row"><span className="label">Email</span><span className="value">{selectedUser.email}</span></div>
-                <div className="e-card-detail-row"><span className="label">Mobile</span><span className="value">{selectedUser.mobile}</span></div>
-                <div className="e-card-detail-row"><span className="label">Department</span><span className="value">{selectedUser.department}</span></div>
-                <div className="e-card-detail-row"><span className="label">Year / Class</span><span className="value">{selectedUser.year} / {selectedUser.className}</span></div>
-                <div className="e-card-detail-row"><span className="label">Roll No.</span><span className="value">{selectedUser.rollNumber}</span></div>
-                <div className="e-card-detail-row"><span className="label">Status</span><span className="value"><span className={`badge ${selectedUser.accountStatus === 'ACTIVE' ? 'badge-success' : 'badge-danger'}`}>{selectedUser.accountStatus}</span></span></div>
-                <div className="e-card-detail-row"><span className="label">Verified</span><span className="value">{selectedUser.isEmailVerified ? '✅ Yes' : '❌ No'}</span></div>
+
+              <div className="e-card-details">
+                <div className="e-card-detail-row">
+                  <span className="label">Email Address</span>
+                  <span className="value">{selectedUser.email}</span>
+                </div>
+                <div className="e-card-detail-row">
+                  <span className="label">Mobile Number</span>
+                  <span className="value">{selectedUser.mobile || '—'}</span>
+                </div>
+                <div className="e-card-detail-row">
+                  <span className="label">Department</span>
+                  <span className="value">{selectedUser.department}</span>
+                </div>
+                <div className="e-card-detail-row">
+                  <span className="label">Year / Class</span>
+                  <span className="value">{selectedUser.year} / {selectedUser.className}</span>
+                </div>
+                <div className="e-card-detail-row">
+                  <span className="label">Roll Number</span>
+                  <span className="value" style={{ fontFamily: 'monospace' }}>{selectedUser.rollNumber}</span>
+                </div>
+                <div className="e-card-detail-row">
+                  <span className="label">Account Status</span>
+                  <span className="value">
+                    <span className={`badge ${selectedUser.accountStatus === 'ACTIVE' ? 'badge-success' : 'badge-danger'}`}>
+                      {selectedUser.accountStatus}
+                    </span>
+                  </span>
+                </div>
+                <div className="e-card-detail-row">
+                  <span className="label">Email Verified</span>
+                  <span className="value">
+                    {selectedUser.isEmailVerified ? (
+                      <span style={{ color: '#10B981', fontWeight: 700 }}>✅ Verified</span>
+                    ) : (
+                      <span style={{ color: '#EF4444', fontWeight: 700 }}>❌ Unverified</span>
+                    )}
+                  </span>
+                </div>
               </div>
             </div>
-            <div className="modal-footer">
-              <button className="btn btn-secondary btn-sm" onClick={() => { setPasswordForm({ userId: selectedUser._id, newPassword: '' }); setShowPasswordModal(true); setSelectedUser(null); }}>Reset Password</button>
+            <div className="modal-footer" style={{ gap: 10 }}>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => {
+                  setPasswordForm({ userId: selectedUser._id, newPassword: '' });
+                  setShowPasswordModal(true);
+                  setSelectedUser(null);
+                }}
+              >
+                Reset Password
+              </button>
               {selectedUser.accountStatus === 'ACTIVE' ? (
-                <button className="btn btn-danger btn-sm" onClick={() => { handleStatusChange(selectedUser._id, 'SUSPENDED'); setSelectedUser(null); }}>Suspend</button>
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => {
+                    handleStatusChange(selectedUser._id, 'SUSPENDED');
+                    setSelectedUser(null);
+                  }}
+                >
+                  Suspend User
+                </button>
               ) : (
-                <button className="btn btn-success btn-sm" onClick={() => { handleStatusChange(selectedUser._id, 'ACTIVE'); setSelectedUser(null); }}>Activate</button>
+                <button
+                  className="btn btn-success btn-sm"
+                  onClick={() => {
+                    handleStatusChange(selectedUser._id, 'ACTIVE');
+                    setSelectedUser(null);
+                  }}
+                >
+                  Activate User
+                </button>
               )}
             </div>
           </div>
