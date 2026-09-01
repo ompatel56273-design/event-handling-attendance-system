@@ -870,10 +870,19 @@ select option:checked, select option:hover, select option:focus {
   font-size: 1.15rem;
 }
 
+.sidebar-user-meta {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
 .sidebar-user-meta h4 {
   font-size: 0.94rem;
   font-weight: 700;
   color: #FFFFFF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sidebar-user-meta p {
@@ -881,6 +890,18 @@ select option:checked, select option:hover, select option:focus {
   font-family: monospace;
   color: var(--primary);
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-user-meta span {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 }
 
 .sidebar-logout-btn {

@@ -56,7 +56,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
   const displaySubtitle = user?.department
     ? `${user.department} | ${user.year ? `${user.year}nd Year` : '2nd Year'} - ${user.className || 'A'}`
-    : (isAdmin ? 'System Administrator' : user?.email || '');
+    : (isAdmin ? 'System Administrator' : (role === 'EVENT_MEMBER' ? 'Event Coordinator' : user?.email || ''));
 
   return (
     <>
