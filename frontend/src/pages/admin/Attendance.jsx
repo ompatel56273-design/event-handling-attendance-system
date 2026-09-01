@@ -3,6 +3,7 @@ import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import QRCode from 'react-qr-code';
 import LiveQRScanner from '../../components/common/LiveQRScanner';
+import FullScreenQRModal from '../../components/common/FullScreenQRModal';
 import {
   HiCheckCircle, HiXCircle, HiInformationCircle,
   HiCamera, HiRefresh, HiLightningBolt
@@ -15,6 +16,7 @@ const AdminAttendance = () => {
   const [participants, setParticipants] = useState([]);
   const [attendanceHistory, setAttendanceHistory] = useState([]);
   const [activeRegistration, setActiveRegistration] = useState(null);
+  const [fullScreenQR, setFullScreenQR] = useState(null);
 
   // Scanner Live Camera States
   const [scanMode, setScanMode] = useState(false);
@@ -358,11 +360,23 @@ const AdminAttendance = () => {
             <div className="attendance-qr-container">
               {activeRegistration?.attendanceQrGenerated && activeRegistration?.attendanceQrToken ? (
                 <>
-                  <div className="cyber-qr-stand" style={{ padding: 8 }}>
+                  <div
+                    className="cyber-qr-stand"
+                    style={{ padding: 8, cursor: 'pointer' }}
+                    title="Click to view QR in Fullscreen"
+                    onClick={() =>
+                      setFullScreenQR({
+                        value: activeRegistration.attendanceQrToken,
+                        title: `Attendance QR — ${currentUser?.firstName} ${currentUser?.lastName || ''}`,
+                        subtitle: `${currentUser?.department} | Roll: ${currentUser?.rollNumber}`,
+                        tokenLabel: `Token: ${activeRegistration.attendanceQrToken}`,
+                      })
+                    }
+                  >
                     <QRCode value={activeRegistration.attendanceQrToken} size={90} />
                   </div>
                   <p style={{ fontSize: '0.74rem', fontWeight: 700, marginTop: 4 }}>Attendance QR</p>
-                  <span style={{ fontSize: '0.58rem', color: '#94A3B8' }}>(For this event only)</span>
+                  <span style={{ fontSize: '0.62rem', color: 'var(--primary)', cursor: 'pointer', fontWeight: 600 }}>🔍 Fullscreen</span>
                 </>
               ) : (
                 <div style={{ padding: '14px 10px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '12px', border: '1px dashed var(--border-color)', textAlign: 'center', width: '110px' }}>
@@ -423,6 +437,13 @@ const AdminAttendance = () => {
           </div>
         </div>
       </div>
+
+      {/* Fullscreen QR Pass Modal */}
+      <FullScreenQRModal
+        isOpen={!!fullScreenQR}
+        onClose={() => setFullScreenQR(null)}
+        {...fullScreenQR}
+      />
     </DashboardLayout>
   );
 };

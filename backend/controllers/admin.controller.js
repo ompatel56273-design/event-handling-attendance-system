@@ -190,9 +190,14 @@ exports.createEvent = async (req, res, next) => {
       exists = await Event.findOne({ eventId });
     }
 
+    const eventData = { ...req.body };
+    if (req.body.imageUrl !== undefined) {
+      eventData.image = { url: req.body.imageUrl, publicId: '' };
+    }
+
     const event = new Event({
       eventId,
-      ...req.body,
+      ...eventData,
       createdBy: req.user._id,
     });
     await event.save();
@@ -205,7 +210,11 @@ exports.createEvent = async (req, res, next) => {
 // PUT /api/admin/events/:id
 exports.updateEvent = async (req, res, next) => {
   try {
-    const event = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const updateData = { ...req.body };
+    if (req.body.imageUrl !== undefined) {
+      updateData.image = { url: req.body.imageUrl, publicId: '' };
+    }
+    const event = await Event.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
     if (!event) return res.status(404).json({ message: 'Event not found.' });
     res.json(event);
   } catch (error) {

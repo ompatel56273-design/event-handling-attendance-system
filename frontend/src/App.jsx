@@ -39,12 +39,7 @@ import AdminECards from './pages/admin/ECards';
 import AdminSettings from './pages/admin/Settings';
 
 import VerifyCertificate from './pages/public/VerifyCertificate';
-
-const RootRedirect = () => {
-  const { isAuthenticated, role, getDashboardPath } = useAuth();
-  if (isAuthenticated) return <Navigate to={getDashboardPath(role)} replace />;
-  return <Navigate to="/login" replace />;
-};
+import PublicLanding from './pages/public/PublicLanding';
 
 function App() {
   return (
@@ -52,8 +47,8 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <Routes>
-            {/* Root redirect */}
-            <Route path="/" element={<RootRedirect />} />
+            {/* Public Landing & Events Showcase Portal */}
+            <Route path="/" element={<PublicLanding />} />
 
             {/* Public certificate verification */}
             <Route path="/verify-certificate/:certificateId" element={<VerifyCertificate />} />

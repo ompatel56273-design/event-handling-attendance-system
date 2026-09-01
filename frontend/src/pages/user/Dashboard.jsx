@@ -6,6 +6,7 @@ import { saveOfflineIdentity, getOfflineIdentity, saveOfflinePasses, getOfflineP
 import QRCode from 'react-qr-code';
 import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import FullScreenQRModal from '../../components/common/FullScreenQRModal';
 import {
   HiCalendar, HiTicket, HiClipboardList, HiStar,
   HiAcademicCap, HiIdentification, HiPhone, HiMail,
@@ -29,6 +30,7 @@ const UserDashboard = () => {
   const [myRegistrations, setMyRegistrations] = useState([]);
   const [counts, setCounts] = useState({ upcoming: 0, total: 0, myEvents: 0, winners: 0 });
   const [selectedPass, setSelectedPass] = useState(null);
+  const [fullScreenQR, setFullScreenQR] = useState(null);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
@@ -217,12 +219,24 @@ const UserDashboard = () => {
         </div>
 
         {/* Dynamic Real-time Identity QR Stand */}
-        <div className="identity-hero-qr-box">
+        <div
+          className="identity-hero-qr-box"
+          onClick={() =>
+            setFullScreenQR({
+              value: userId,
+              title: 'Campus Identity Passport',
+              subtitle: `${fullName} • ${dept} Department`,
+              tokenLabel: `User ID: ${userId}`,
+            })
+          }
+          title="Click to expand QR Code in Fullscreen"
+          style={{ cursor: 'pointer' }}
+        >
           <div className="cyber-qr-stand">
             <QRCode value={userId} size={105} />
           </div>
           <span className="qr-label" style={{ marginTop: 6 }}>Identity QR</span>
-          <span className="qr-sublabel">(SCAN FOR VERIFICATION)</span>
+          <span className="qr-sublabel">(CLICK FOR FULLSCREEN)</span>
         </div>
       </div>
 
@@ -409,9 +423,24 @@ const UserDashboard = () => {
               </p>
 
               {/* Holographic Cyber QR Stand */}
-              <div className="cyber-qr-stand" style={{ marginBottom: 16 }}>
+              <div
+                className="cyber-qr-stand"
+                style={{ marginBottom: 16, cursor: 'pointer' }}
+                title="Click to view QR in Fullscreen"
+                onClick={() =>
+                  setFullScreenQR({
+                    value: selectedPass.qrToken || selectedPass._id,
+                    title: selectedPass.eventId?.name || 'Event Attendance Pass',
+                    subtitle: `${fullName} • ${selectedPass.eventId?.location || 'Campus'}`,
+                    tokenLabel: `Pass Token: ${selectedPass.qrToken || selectedPass._id}`,
+                  })
+                }
+              >
                 <QRCode value={selectedPass.qrToken || selectedPass._id} size={175} />
               </div>
+              <span style={{ fontSize: '0.72rem', color: 'var(--primary)', marginBottom: 14, cursor: 'pointer', fontWeight: 600 }}>
+                🔍 Click QR code for Fullscreen View
+              </span>
 
               {/* 6-Digit PIN Code Fallback Box */}
               <div
@@ -446,6 +475,13 @@ const UserDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Reusable Fullscreen QR Modal */}
+      <FullScreenQRModal
+        isOpen={!!fullScreenQR}
+        onClose={() => setFullScreenQR(null)}
+        {...fullScreenQR}
+      />
     </DashboardLayout>
   );
 };

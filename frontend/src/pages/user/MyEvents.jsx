@@ -4,6 +4,7 @@ import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import CertificateModal from '../../components/common/CertificateModal';
 import FeedbackModal from '../../components/common/FeedbackModal';
+import FullScreenQRModal from '../../components/common/FullScreenQRModal';
 import QRCode from 'react-qr-code';
 import { HiCalendar, HiLocationMarker, HiInformationCircle, HiAcademicCap, HiStar } from 'react-icons/hi';
 
@@ -21,6 +22,7 @@ const MyEvents = () => {
   const [selectedECard, setSelectedECard] = useState(null);
   const [selectedCertificate, setSelectedCertificate] = useState(null);
   const [selectedFeedbackEvent, setSelectedFeedbackEvent] = useState(null);
+  const [fullScreenQR, setFullScreenQR] = useState(null);
 
   useEffect(() => {
     fetchMyEventsAndCerts();
@@ -90,10 +92,25 @@ const MyEvents = () => {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                <div className="cyber-qr-stand">
+                <div
+                  className="cyber-qr-stand"
+                  style={{ cursor: 'pointer' }}
+                  title="Click to view QR in Fullscreen"
+                  onClick={() =>
+                    setFullScreenQR({
+                      value: selectedECard.registration?.attendanceQrToken || selectedECard.registration?._id,
+                      title: selectedECard.event?.name || 'Attendance Pass',
+                      subtitle: `${selectedECard.event?.location || 'Campus'} • ${new Date(selectedECard.event?.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`,
+                      tokenLabel: `Token: ${selectedECard.registration?.attendanceQrToken || selectedECard.registration?._id}`,
+                    })
+                  }
+                >
                   <QRCode value={selectedECard.registration?.attendanceQrToken || selectedECard.registration?._id} size={150} />
                 </div>
-                <span className="qr-label" style={{ fontSize: '0.85rem', marginTop: 4 }}>Attendance Check-in QR</span>
+                <span style={{ fontSize: '0.72rem', color: 'var(--primary)', cursor: 'pointer', fontWeight: 600 }}>
+                  🔍 Click QR code for Fullscreen View
+                </span>
+                <span className="qr-label" style={{ fontSize: '0.85rem' }}>Attendance Check-in QR</span>
 
                 {/* 6-Digit PIN Code Fallback */}
                 <div
@@ -224,6 +241,13 @@ const MyEvents = () => {
           onSubmitted={() => fetchMyEventsAndCerts()}
         />
       )}
+
+      {/* Fullscreen QR Pass Modal */}
+      <FullScreenQRModal
+        isOpen={!!fullScreenQR}
+        onClose={() => setFullScreenQR(null)}
+        {...fullScreenQR}
+      />
     </DashboardLayout>
   );
 };
