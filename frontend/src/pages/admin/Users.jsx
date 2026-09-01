@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { HiSearch } from 'react-icons/hi';
+import { HiSearch, HiKey } from 'react-icons/hi';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -346,9 +346,11 @@ const AdminUsers = () => {
                 <td>{u.className}</td>
                 <td><span className={`badge ${u.accountStatus === 'ACTIVE' ? 'badge-success' : 'badge-danger'}`}>{u.accountStatus}</span></td>
                 <td>
-                  <div className="btn-group">
+                  <div className="table-action-group">
                     <button className="btn btn-secondary btn-sm" onClick={() => setSelectedUser(u)}>View</button>
-                    <button className="btn btn-secondary btn-sm" onClick={() => { setPasswordForm({ userId: u._id, newPassword: '' }); setShowPasswordModal(true); }}>🔐</button>
+                    <button className="btn btn-secondary btn-sm btn-icon-only" title="Reset Password" onClick={() => { setPasswordForm({ userId: u._id, newPassword: '' }); setShowPasswordModal(true); }}>
+                      <HiKey />
+                    </button>
                   </div>
                 </td>
               </tr>

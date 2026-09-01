@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import { HiKey } from 'react-icons/hi';
 
 const AdminEventMembers = () => {
   const [members, setMembers] = useState([]);
@@ -108,11 +109,13 @@ const AdminEventMembers = () => {
                 <td><span className={`badge ${m.accountStatus === 'ACTIVE' ? 'badge-success' : 'badge-danger'}`}>{m.accountStatus}</span></td>
                 <td>{new Date(m.createdAt).toLocaleDateString()}</td>
                 <td>
-                  <div className="btn-group">
+                  <div className="table-action-group">
                     <button className="btn btn-secondary btn-sm" onClick={() => handleStatusToggle(m._id, m.accountStatus)}>
                       {m.accountStatus === 'ACTIVE' ? 'Disable' : 'Enable'}
                     </button>
-                    <button className="btn btn-secondary btn-sm" onClick={() => { setPasswordForm({ id: m._id, newPassword: '' }); setShowPwModal(true); }}>🔐</button>
+                    <button className="btn btn-secondary btn-sm btn-icon-only" title="Reset Password" onClick={() => { setPasswordForm({ id: m._id, newPassword: '' }); setShowPwModal(true); }}>
+                      <HiKey />
+                    </button>
                   </div>
                 </td>
               </tr>

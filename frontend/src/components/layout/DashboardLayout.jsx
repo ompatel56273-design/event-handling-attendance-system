@@ -125,52 +125,22 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
             
             {/* Theme Selector Palette Button */}
             <button
-              className="notif-bell-btn"
-              title={`Active Theme: ${activeThemeConfig.name} (Click to change)`}
+              className="theme-pill-btn"
+              title={`Active Theme: ${activeThemeConfig.name} (Click to switch)`}
               onClick={() => setShowThemeModal(true)}
-              style={{
-                borderColor: 'var(--primary)',
-                boxShadow: 'var(--primary-glow)',
-                gap: 6,
-                padding: '0 12px',
-                width: 'auto',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
             >
-              <span style={{ fontSize: '1.1rem', display: 'inline-flex', alignItems: 'center' }}>{activeThemeConfig.icon}</span>
-              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#FFFFFF' }}>
-                {activeThemeConfig.name.split(' ')[0]}
-              </span>
+              <span className="theme-icon">{activeThemeConfig.icon}</span>
+              <span className="theme-label">{activeThemeConfig.name.split(' ')[0]}</span>
             </button>
 
             <button
               className="notif-bell-btn"
               title="Campus Announcements"
               onClick={() => setShowNotifDrawer(true)}
-              style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <HiBell style={{ fontSize: '1.25rem' }} />
+              <HiBell style={{ fontSize: '1.3rem' }} />
               {unreadCount > 0 && (
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: -2,
-                    right: -2,
-                    background: '#EF4444',
-                    color: '#FFFFFF',
-                    fontSize: '0.6rem',
-                    fontWeight: 900,
-                    width: 17,
-                    height: 17,
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 0 8px #EF4444',
-                  }}
-                >
+                <span className="notif-badge-pill">
                   {unreadCount}
                 </span>
               )}
