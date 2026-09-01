@@ -7,8 +7,47 @@
    1. FIVE NEXT-GEN ENTERPRISE & CYBER-LUXURY PALETTES
    -------------------------------------------------------------------------- */
 
-/* --- THEME 1: TITANIUM INDIGO (DEFAULT) --- */
-:root, [data-theme="titanium"], [data-theme="spiderman"] {
+/* --- THEME 1: EXECUTIVE MONOCHROME BLACK & WHITE (DEFAULT) --- */
+:root, [data-theme="monochrome"], [data-theme="black-white"], [data-theme="professional"] {
+  --primary: #F8FAFC;
+  --primary-hover: #FFFFFF;
+  --primary-dark: #E2E8F0;
+  --primary-gradient: linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 100%);
+  --primary-light: rgba(255, 255, 255, 0.12);
+  --primary-subtle: rgba(255, 255, 255, 0.06);
+  --primary-glow: 0 0 30px rgba(255, 255, 255, 0.35);
+  --primary-border: rgba(255, 255, 255, 0.3);
+  --accent-cyan: #94A3B8;
+  --accent-cyan-glow: 0 0 25px rgba(148, 163, 184, 0.3);
+  --text-primary-accent: #F8FAFC;
+  --shadow-primary: 0 8px 25px rgba(255, 255, 255, 0.2);
+  --shadow-hover: 0 16px 45px rgba(255, 255, 255, 0.3);
+  --shadow-qr: 0 0 35px rgba(255, 255, 255, 0.4);
+  
+  --bg-app: #040508;
+  --bg-surface: #0B0D14;
+  --bg-card: rgba(15, 17, 26, 0.78);
+  --bg-card-hover: rgba(23, 26, 38, 0.92);
+  --bg-input: #080A10;
+  --bg-modal: #0D0F18;
+  --sidebar-bg: #030406;
+}
+
+/* High-Contrast Crisp Black Text on White Primary Buttons for Monochrome */
+:root .btn-primary,
+[data-theme="monochrome"] .btn-primary,
+[data-theme="black-white"] .btn-primary,
+[data-theme="professional"] .btn-primary,
+:root .sidebar-nav-item.active,
+[data-theme="monochrome"] .sidebar-nav-item.active,
+[data-theme="black-white"] .sidebar-nav-item.active,
+[data-theme="professional"] .sidebar-nav-item.active {
+  color: #05070E !important;
+  font-weight: 800 !important;
+}
+
+/* --- THEME 2: TITANIUM INDIGO --- */
+[data-theme="titanium"], [data-theme="spiderman"] {
   --primary: #6366F1;
   --primary-hover: #818CF8;
   --primary-dark: #4F46E5;

@@ -4,8 +4,18 @@ const ThemeContext = createContext(null);
 
 export const THEMES = [
   {
+    id: 'monochrome',
+    name: 'Executive Black & White (Default)',
+    icon: '🖤',
+    primary: '#FFFFFF',
+    secondary: '#CBD5E1',
+    accent: '#94A3B8',
+    bg: '#040508',
+    description: 'Ultra-Clean High-Contrast Executive Noir with Pristine White & Platinum Silver Accents',
+  },
+  {
     id: 'titanium',
-    name: 'Titanium Indigo (Default)',
+    name: 'Titanium Indigo',
     icon: '⚡',
     primary: '#6366F1',
     secondary: '#06B6D4',
@@ -64,7 +74,7 @@ export const useTheme = () => {
 export const ThemeProvider = ({ children }) => {
   const [currentTheme, setCurrentTheme] = useState(() => {
     const saved = localStorage.getItem('app_theme');
-    if (!saved || saved === 'spiderman') return 'titanium';
+    if (!saved || saved === 'spiderman') return 'monochrome';
     if (saved === 'cyberpunk') return 'arctic';
     if (saved === 'purple') return 'aurora';
     if (saved === 'solar') return 'gold';

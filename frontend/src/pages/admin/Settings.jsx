@@ -13,7 +13,7 @@ const AdminSettings = () => {
       <div className="card" style={{ marginBottom: 24 }}>
         <h3 style={{ marginBottom: 6 }}>🎨 Global Dashboard Theme Combos</h3>
         <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 18 }}>
-          Select a system-wide theme palette. The Spider-Man Cyber Red theme is active by default.
+          Select a system-wide theme palette. The Executive Black & White theme is active by default.
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
