@@ -632,6 +632,12 @@ a {
   margin-left: auto;
 }
 
+.desktop-header-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .theme-pill-btn {
   height: 44px;
   padding: 0 16px;
@@ -1503,10 +1509,6 @@ select option:checked, select option:hover, select option:focus {
   display: none;
 }
 
-.mobile-bottom-nav {
-  display: none;
-}
-
 @media (max-width: 768px) {
   /* Hide sidebar offscreen on mobile */
   .sidebar {
@@ -1548,7 +1550,7 @@ select option:checked, select option:hover, select option:focus {
     margin-left: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    padding: 76px 14px 90px !important;
+    padding: 76px 14px 30px !important;
     box-sizing: border-box;
     overflow-x: hidden;
   }
@@ -1592,6 +1594,20 @@ select option:checked, select option:hover, select option:focus {
     color: #FFFFFF;
   }
 
+  .mobile-theme-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+  }
+
   /* Page Top Header Bar */
   .top-app-header, .dashboard-top-header {
     flex-direction: column;
@@ -1625,6 +1641,11 @@ select option:checked, select option:hover, select option:focus {
     margin-left: 0;
   }
 
+  /* Hide duplicate theme, bell, and avatar controls inside page content on mobile */
+  .desktop-header-controls {
+    display: none !important;
+  }
+
   .header-actions > * {
     flex-shrink: 0;
   }
@@ -1636,44 +1657,6 @@ select option:checked, select option:hover, select option:focus {
 
   .search-input input {
     width: 100% !important;
-  }
-
-  /* Mobile Bottom Navigation Bar */
-  .mobile-bottom-nav {
-    display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 64px;
-    background: rgba(4, 6, 12, 0.95);
-    backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border-color);
-    z-index: 990;
-    align-items: center;
-    justify-content: space-around;
-    padding: 0 8px;
-    box-sizing: border-box;
-  }
-
-  .mobile-nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    font-size: 0.68rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    transition: all var(--trans-fast);
-  }
-
-  .mobile-nav-item.active {
-    color: var(--primary);
-    transform: translateY(-2px);
-  }
-
-  .mobile-nav-item svg {
-    font-size: 1.35rem;
   }
 
   /* Cards & Forms on Mobile */

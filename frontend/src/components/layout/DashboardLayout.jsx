@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
-import MobileBottomNav from './MobileBottomNav';
 import NotificationDrawer from '../common/NotificationDrawer';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -80,10 +79,10 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
                   right: -2,
                   background: '#EF4444',
                   color: '#FFFFFF',
-                  fontSize: '0.55rem',
+                  fontSize: '0.58rem',
                   fontWeight: 900,
-                  width: 15,
-                  height: 15,
+                  width: 16,
+                  height: 16,
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
@@ -110,8 +109,8 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
       <main className="main-content">
-        {/* Desktop Top Header Bar */}
-        <div className="top-app-header desktop-only-header">
+        {/* Top Header Bar */}
+        <div className="top-app-header">
           <div className="greeting-title">
             <h1>
               <span style={{ fontSize: '1.4rem', display: 'inline-flex', alignItems: 'center' }}>{activeThemeConfig.icon}</span>
@@ -123,36 +122,38 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
           <div className="header-actions">
             {headerActions}
             
-            {/* Theme Selector Palette Button */}
-            <button
-              className="theme-pill-btn"
-              title={`Active Theme: ${activeThemeConfig.name} (Click to switch)`}
-              onClick={() => setShowThemeModal(true)}
-            >
-              <span className="theme-icon">{activeThemeConfig.icon}</span>
-              <span className="theme-label">{activeThemeConfig.name.split(' ')[0]}</span>
-            </button>
+            {/* Desktop-Only Header Controls (Theme, Bell, Profile) */}
+            <div className="desktop-header-controls">
+              <button
+                className="theme-pill-btn"
+                title={`Active Theme: ${activeThemeConfig.name} (Click to switch)`}
+                onClick={() => setShowThemeModal(true)}
+              >
+                <span className="theme-icon">{activeThemeConfig.icon}</span>
+                <span className="theme-label">{activeThemeConfig.name.split(' ')[0]}</span>
+              </button>
 
-            <button
-              className="notif-bell-btn"
-              title="Campus Announcements"
-              onClick={() => setShowNotifDrawer(true)}
-            >
-              <HiBell style={{ fontSize: '1.3rem' }} />
-              {unreadCount > 0 && (
-                <span className="notif-badge-pill">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
+              <button
+                className="notif-bell-btn"
+                title="Campus Announcements"
+                onClick={() => setShowNotifDrawer(true)}
+              >
+                <HiBell style={{ fontSize: '1.3rem' }} />
+                {unreadCount > 0 && (
+                  <span className="notif-badge-pill">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
 
-            <Link to={profileLink} className="top-avatar-pill" title="My Profile">
-              {avatarUrl ? (
-                <img src={avatarUrl} alt={firstName} className="top-avatar-img" />
-              ) : (
-                <div className="top-avatar-initials">{initials}</div>
-              )}
-            </Link>
+              <Link to={profileLink} className="top-avatar-pill" title="My Profile">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt={firstName} className="top-avatar-img" />
+                ) : (
+                  <div className="top-avatar-initials">{initials}</div>
+                )}
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -254,9 +255,6 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
           </div>
         )}
       </main>
-
-      {/* Mobile Bottom App Navigation Bar */}
-      <MobileBottomNav />
     </div>
   );
 };
