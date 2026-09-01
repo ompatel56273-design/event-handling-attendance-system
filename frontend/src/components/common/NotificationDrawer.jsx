@@ -66,61 +66,63 @@ const NotificationDrawer = ({
         className="modal"
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: '460px',
-          width: '92%',
-          background: '#0B0D15',
-          borderRadius: '20px',
+          maxWidth: '680px',
+          width: '94%',
+          background: 'var(--bg-modal)',
+          borderRadius: '24px',
           border: '1px solid var(--border-color)',
-          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8)',
-          maxHeight: '85vh',
+          boxShadow: '0 24px 60px rgba(0, 0, 0, 0.9), 0 0 35px var(--primary-subtle)',
+          maxHeight: '88vh',
           display: 'flex',
           flexDirection: 'column',
+          padding: '0',
+          overflow: 'hidden',
         }}
       >
         {/* Header */}
-        <div className="modal-header" style={{ padding: '18px 22px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: '1.3rem' }}>🔔</span>
+        <div className="modal-header" style={{ padding: '22px 28px', borderBottom: '1px solid var(--border-color)', marginBottom: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <span style={{ fontSize: '1.8rem', display: 'inline-flex' }}>🔔</span>
             <div>
-              <h2>Notifications & Broadcasts</h2>
-              <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                Campus announcements and real-time updates
+              <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#FFFFFF' }}>Notifications & Broadcasts</h2>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                Campus announcements and real-time event updates
               </p>
             </div>
           </div>
-          <button className="modal-close" onClick={onClose} aria-label="Close">
+          <button className="modal-close" onClick={onClose} aria-label="Close" style={{ fontSize: '1.6rem' }}>
             <HiX />
           </button>
         </div>
 
         {/* Action Controls */}
-        <div style={{ padding: '10px 22px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ padding: '14px 28px', borderBottom: '1px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.02)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <button
             className="btn btn-secondary btn-sm"
-            style={{ fontSize: '0.72rem', padding: '4px 10px' }}
+            style={{ fontSize: '0.86rem', padding: '8px 16px', display: 'inline-flex', alignItems: 'center', gap: 6 }}
             onClick={handleMarkAllRead}
           >
-            <HiCheck /> Mark All Read
+            <HiCheck style={{ fontSize: '1.1rem' }} /> Mark All Read
           </button>
 
           {canBroadcast && (
             <button
               className="btn btn-primary btn-sm"
-              style={{ fontSize: '0.72rem', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 4 }}
+              style={{ fontSize: '0.86rem', padding: '8px 18px', display: 'inline-flex', alignItems: 'center', gap: 6 }}
               onClick={() => setShowBroadcastModal(true)}
             >
-              <HiPlus /> New Broadcast
+              <HiPlus style={{ fontSize: '1.1rem' }} /> New Broadcast
             </button>
           )}
         </div>
 
         {/* List of Announcements */}
-        <div style={{ padding: '16px 22px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ padding: '22px 28px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
           {announcements.length === 0 ? (
-            <div className="empty-state" style={{ padding: '30px 10px' }}>
-              <div className="empty-icon">🔕</div>
-              <h3>No Notifications</h3>
-              <p>You're all caught up with campus events and announcements.</p>
+            <div className="empty-state" style={{ padding: '40px 10px' }}>
+              <div className="empty-icon" style={{ fontSize: '2.5rem' }}>🔕</div>
+              <h3 style={{ fontSize: '1.2rem', marginTop: 10 }}>No Notifications</h3>
+              <p style={{ fontSize: '0.9rem' }}>You're all caught up with campus events and announcements.</p>
             </div>
           ) : (
             announcements.map((a) => {
@@ -130,47 +132,52 @@ const NotificationDrawer = ({
                   key={a._id}
                   onClick={() => !a.isRead && handleMarkSingleRead(a._id)}
                   style={{
-                    padding: '14px 16px',
-                    borderRadius: '14px',
-                    background: a.isRead ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.06)',
-                    border: a.isRead ? '1px solid var(--border-color)' : `1px solid ${badge.color}60`,
-                    boxShadow: !a.isRead ? `0 0 14px ${badge.color}20` : 'none',
+                    padding: '18px 20px',
+                    borderRadius: '16px',
+                    background: a.isRead ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.05)',
+                    border: a.isRead ? '1px solid var(--border-color)' : `1px solid ${badge.color}80`,
+                    boxShadow: !a.isRead ? `0 0 16px ${badge.color}25` : 'none',
                     cursor: a.isRead ? 'default' : 'pointer',
                     transition: 'all 200ms ease',
                     position: 'relative',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                     <span
                       style={{
-                        fontSize: '0.62rem',
+                        fontSize: '0.74rem',
                         fontWeight: 800,
-                        padding: '2px 8px',
-                        borderRadius: '12px',
+                        padding: '3px 10px',
+                        borderRadius: 'var(--radius-pill)',
                         background: badge.bg,
                         color: badge.color,
                         border: badge.border,
+                        letterSpacing: '0.5px',
                       }}
                     >
                       {badge.label}
                     </span>
 
-                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                      {new Date(a.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      {new Date(a.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
 
-                  <h4 style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF', marginBottom: 4 }}>
+                  <h4 style={{ fontSize: '1.08rem', fontWeight: 800, color: '#FFFFFF', marginBottom: 6 }}>
                     {a.title}
                   </h4>
 
-                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                  <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                     {a.message}
                   </p>
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, fontSize: '0.68rem', color: 'var(--primary)' }}>
-                    <span>📢 By {a.createdByName}</span>
-                    {!a.isRead && <span style={{ color: '#00D27A', fontWeight: 700 }}>● New</span>}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, fontSize: '0.8rem', color: 'var(--primary)' }}>
+                    <span style={{ fontWeight: 600 }}>📢 By {a.createdByName}</span>
+                    {!a.isRead && (
+                      <span style={{ color: '#10B981', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} /> New
+                      </span>
+                    )}
                   </div>
                 </div>
               );
@@ -178,73 +185,93 @@ const NotificationDrawer = ({
           )}
         </div>
 
-        {/* Broadcast Modal Dialog */}
+        {/* Broadcast Modal Overlay */}
         {showBroadcastModal && (
           <div className="modal-overlay" onClick={() => setShowBroadcastModal(false)} style={{ zIndex: 1100 }}>
-            <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 440 }}>
+            <div
+              className="modal"
+              onClick={(e) => e.stopPropagation()}
+              style={{ maxWidth: '580px', width: '92%', borderRadius: '20px', padding: '24px' }}
+            >
               <div className="modal-header">
-                <h2>📢 Broadcast Announcement</h2>
+                <h2>📢 Broadcast Campus Announcement</h2>
                 <button className="modal-close" onClick={() => setShowBroadcastModal(false)}>✕</button>
               </div>
 
-              <form onSubmit={handleBroadcast} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label>Announcement Title</label>
-                  <input
-                    className="form-control"
-                    placeholder="e.g., Venue Change for Hackathon"
-                    value={form.title}
-                    onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    required
-                  />
+              {msg.text && (
+                <div className={`alert alert-${msg.type}`}>
+                  {msg.text}
                 </div>
+              )}
 
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label>Message Content</label>
-                  <textarea
-                    className="form-control"
-                    rows={3}
-                    placeholder="Provide details about schedule, venue, or urgent campus updates..."
-                    value={form.message}
-                    onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div className="form-row" style={{ marginBottom: 0 }}>
-                  <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-                    <label>Urgency Level</label>
-                    <select
+              <form onSubmit={handleBroadcast}>
+                <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div className="form-group">
+                    <label>Announcement Headline</label>
+                    <input
                       className="form-control"
-                      value={form.urgency}
-                      onChange={(e) => setForm({ ...form, urgency: e.target.value })}
-                    >
-                      <option value="INFO">ℹ️ General Info</option>
-                      <option value="WARNING">⚠️ Important Notice</option>
-                      <option value="URGENT">🚨 Urgent Alert</option>
-                    </select>
+                      placeholder="e.g. Schedule Update for Workshop"
+                      value={form.title}
+                      onChange={(e) => setForm({ ...form, title: e.target.value })}
+                      required
+                    />
                   </div>
 
-                  <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-                    <label>Target Audience</label>
-                    <select
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Urgency Level</label>
+                      <select
+                        className="form-control"
+                        value={form.urgency}
+                        onChange={(e) => setForm({ ...form, urgency: e.target.value })}
+                      >
+                        <option value="INFO">Information (Normal)</option>
+                        <option value="WARNING">Important Notice</option>
+                        <option value="URGENT">Urgent Alert</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Target Audience</label>
+                      <select
+                        className="form-control"
+                        value={form.targetAudience}
+                        onChange={(e) => setForm({ ...form, targetAudience: e.target.value })}
+                      >
+                        <option value="ALL">Everyone</option>
+                        <option value="STUDENTS">Students Only</option>
+                        <option value="EVENT_MEMBERS">Event Coordinators</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Broadcast Message Body</label>
+                    <textarea
                       className="form-control"
-                      value={form.targetAudience}
-                      onChange={(e) => setForm({ ...form, targetAudience: e.target.value })}
-                    >
-                      <option value="ALL">Everyone</option>
-                      <option value="STUDENTS">Students Only</option>
-                      <option value="EVENT_MEMBERS">Event Members</option>
-                    </select>
+                      rows={4}
+                      placeholder="Write your broadcast update message here..."
+                      value={form.message}
+                      onChange={(e) => setForm({ ...form, message: e.target.value })}
+                      required
+                    />
                   </div>
                 </div>
 
-                <div className="modal-footer" style={{ marginTop: 10 }}>
-                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowBroadcastModal(false)}>
+                <div className="modal-footer" style={{ gap: 12, marginTop: 20 }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowBroadcastModal(false)}
+                  >
                     Cancel
                   </button>
-                  <button type="submit" className="btn btn-primary btn-sm" disabled={broadcasting}>
-                    {broadcasting ? 'Broadcasting...' : 'Push Announcement'}
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={broadcasting}
+                  >
+                    {broadcasting ? 'Broadcasting...' : '📢 Publish Broadcast'}
                   </button>
                 </div>
               </form>
