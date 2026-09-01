@@ -1737,6 +1737,39 @@ select option:checked, select option:hover, select option:focus {
   border: 1px solid var(--border-color);
 }
 
+/* Unique Cyberpunk Live QR Scanner Aesthetics */
+.scanner-corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-color: var(--primary);
+  border-style: solid;
+  border-width: 0;
+  filter: drop-shadow(0 0 8px var(--primary));
+}
+
+.scanner-corner.tl { top: 20px; left: 20px; border-top-width: 4px; border-left-width: 4px; border-top-left-radius: 8px; }
+.scanner-corner.tr { top: 20px; right: 20px; border-top-width: 4px; border-right-width: 4px; border-top-right-radius: 8px; }
+.scanner-corner.bl { bottom: 20px; left: 20px; border-bottom-width: 4px; border-left-width: 4px; border-bottom-left-radius: 8px; }
+.scanner-corner.br { bottom: 20px; right: 20px; border-bottom-width: 4px; border-right-width: 4px; border-bottom-right-radius: 8px; }
+
+.scanner-laser-line {
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 3px;
+  background: var(--primary);
+  box-shadow: 0 0 16px var(--primary), 0 0 30px var(--primary);
+  animation: laserScan 2s ease-in-out infinite alternate;
+}
+
+@keyframes laserScan {
+  0% { top: 15%; opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { top: 85%; opacity: 0.8; }
+}
+
 /* --------------------------------------------------------------------------
    14. COMPREHENSIVE RESPONSIVE DESIGN (MOBILE 320px - 768px & DESKTOP WINDOWS)
    -------------------------------------------------------------------------- */

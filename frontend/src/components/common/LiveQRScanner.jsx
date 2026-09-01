@@ -204,7 +204,18 @@ const LiveQRScanner = ({ onScan, placeholder = 'Point camera at QR code or paste
   };
 
   return (
-    <div className="card live-scanner-card" style={{ textAlign: 'center', background: '#FFFFFF' }}>
+    <div
+      className="card live-scanner-card"
+      style={{
+        textAlign: 'center',
+        background: 'var(--bg-card)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '24px',
+        padding: '24px',
+        boxShadow: '0 20px 50px rgba(0, 0, 0, 0.7), var(--primary-subtle)',
+      }}
+    >
       {/* Hidden processing canvas */}
       <canvas ref={canvasRef} style={{ display: 'none' }} />
 
@@ -213,13 +224,14 @@ const LiveQRScanner = ({ onScan, placeholder = 'Point camera at QR code or paste
         style={{
           position: 'relative',
           width: '100%',
-          maxWidth: '380px',
-          height: '280px',
-          margin: '0 auto 16px',
-          borderRadius: '16px',
+          maxWidth: '420px',
+          height: '290px',
+          margin: '0 auto 18px',
+          borderRadius: '20px',
           overflow: 'hidden',
-          background: '#0C1033',
-          boxShadow: '0 8px 24px rgba(12, 16, 51, 0.25)',
+          background: 'radial-gradient(ellipse at center, rgba(30, 41, 59, 0.4) 0%, #060913 100%)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: 'inset 0 0 30px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0, 0, 0, 0.6)',
         }}
       >
         {/* Actual Live Video Feed */}
@@ -261,26 +273,28 @@ const LiveQRScanner = ({ onScan, placeholder = 'Point camera at QR code or paste
               <span
                 style={{
                   position: 'absolute',
-                  bottom: 14,
-                  background: 'rgba(12, 16, 51, 0.75)',
+                  bottom: 16,
+                  background: 'rgba(0, 0, 0, 0.8)',
                   color: '#FFFFFF',
-                  padding: '4px 14px',
+                  padding: '6px 16px',
                   borderRadius: 20,
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
                   letterSpacing: '0.5px',
-                  backdropFilter: 'blur(4px)',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid var(--primary-border)',
+                  boxShadow: '0 0 12px var(--primary-glow)',
                 }}
               >
                 ● Scanning Live Camera...
               </span>
             </>
           ) : (
-            <div style={{ color: '#94A3B8', padding: '0 20px' }}>
-              <HiCamera style={{ fontSize: '3.2rem', color: '#5C33CF', marginBottom: 6 }} />
-              <p style={{ fontSize: '0.88rem', fontWeight: 700, color: '#F1F5F9' }}>Camera Standby</p>
-              <p style={{ fontSize: '0.74rem', color: '#94A3B8', marginTop: 4 }}>
-                Click <strong>"Start Camera"</strong> to view real-time camera feed
+            <div style={{ color: 'var(--text-muted)', padding: '0 20px' }}>
+              <HiCamera style={{ fontSize: '3.4rem', color: 'var(--primary)', marginBottom: 8, filter: 'drop-shadow(0 0 12px var(--primary))' }} />
+              <p style={{ fontSize: '1rem', fontWeight: 800, color: '#FFFFFF' }}>Camera Standby</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                Click <strong style={{ color: 'var(--primary)' }}>"Start Camera"</strong> to activate real-time scanner
               </p>
             </div>
           )}
@@ -288,30 +302,30 @@ const LiveQRScanner = ({ onScan, placeholder = 'Point camera at QR code or paste
       </div>
 
       {cameraError && (
-        <div className="alert alert-error" style={{ marginBottom: 16, fontSize: '0.82rem' }}>
+        <div className="alert alert-error" style={{ marginBottom: 16, fontSize: '0.84rem' }}>
           {cameraError}
         </div>
       )}
 
       {/* Camera Interactive Action Controls */}
-      <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginBottom: 18, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginBottom: 20, flexWrap: 'wrap' }}>
         <button
           type="button"
           className={`btn ${isScanning ? 'btn-danger' : 'btn-primary'} btn-sm`}
           onClick={handleToggleCamera}
-          style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 18px', fontSize: '0.88rem' }}
         >
-          {isScanning ? <><HiStop /> Stop Camera</> : <><HiPlay /> Start Camera</>}
+          {isScanning ? <><HiStop style={{ fontSize: '1.1rem' }} /> Stop Camera</> : <><HiPlay style={{ fontSize: '1.1rem' }} /> Start Camera</>}
         </button>
 
         <button
           type="button"
           className="btn btn-secondary btn-sm"
           onClick={handleSwitchCamera}
-          style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', fontSize: '0.88rem' }}
           title="Switch between front and back camera"
         >
-          <HiRefresh /> Switch ({currentFacingMode === 'environment' ? 'Rear' : 'Front'})
+          <HiRefresh style={{ fontSize: '1.1rem' }} /> Switch ({currentFacingMode === 'environment' ? 'Rear' : 'Front'})
         </button>
 
         {torchSupported && isScanning && (
@@ -319,17 +333,17 @@ const LiveQRScanner = ({ onScan, placeholder = 'Point camera at QR code or paste
             type="button"
             className={`btn ${torchOn ? 'btn-primary' : 'btn-secondary'} btn-sm`}
             onClick={handleToggleTorch}
-            style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', fontSize: '0.88rem' }}
           >
-            <HiLightningBolt /> {torchOn ? 'Flash On' : 'Flash Off'}
+            <HiLightningBolt style={{ fontSize: '1.1rem' }} /> {torchOn ? 'Flash On' : 'Flash Off'}
           </button>
         )}
       </div>
 
       {/* Manual Input Fallback */}
       <form onSubmit={handleManualSubmit}>
-        <div className="form-group" style={{ textAlign: 'left', marginBottom: 10 }}>
-          <label style={{ fontSize: '0.76rem', color: '#64748B' }}>
+        <div className="form-group" style={{ textAlign: 'left', marginBottom: 14 }}>
+          <label style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 6 }}>
             Manual {modeLabel} Input / Scanner Token
           </label>
           <input
@@ -342,8 +356,9 @@ const LiveQRScanner = ({ onScan, placeholder = 'Point camera at QR code or paste
 
         <button
           type="submit"
-          className="btn btn-secondary btn-full"
+          className={`btn ${manualText.trim() ? 'btn-primary' : 'btn-secondary'} btn-full`}
           disabled={!manualText.trim()}
+          style={{ padding: '12px 18px', fontWeight: 700, fontSize: '0.92rem' }}
         >
           Verify & Process {modeLabel}
         </button>
