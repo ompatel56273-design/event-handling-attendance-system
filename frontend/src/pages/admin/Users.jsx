@@ -112,24 +112,22 @@ const AdminUsers = () => {
   if (loading) return <DashboardLayout><div className="loading-center"><div className="spinner"></div></div></DashboardLayout>;
 
   return (
-    <DashboardLayout>
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: 12 }}>
-        <div>
-          <h1>User Management</h1>
-          <p>View, add, and manage student accounts</p>
+    <DashboardLayout
+      title="User Management"
+      subtitle="View, add, and manage student accounts"
+      headerActions={
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <form onSubmit={handleSearch} className="search-input" style={{ width: 260 }}>
+            <HiSearch className="search-icon" />
+            <input placeholder="Search users by name, ID, email..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          </form>
+          <button className="btn btn-primary btn-sm" onClick={() => { setShowAddModal(true); setMsg({ type: '', text: '' }); }}>
+            + Add User
+          </button>
         </div>
-        <button className="btn btn-primary" onClick={() => { setShowAddModal(true); setMsg({ type: '', text: '' }); }}>
-          + Add User
-        </button>
-      </div>
+      }
+    >
       {msg.text && <div className={`alert alert-${msg.type}`}>{msg.text}</div>}
-
-      <div className="search-filter-bar">
-        <form onSubmit={handleSearch} className="search-input">
-          <HiSearch className="search-icon" />
-          <input placeholder="Search by name, email, ID, roll..." value={search} onChange={(e) => setSearch(e.target.value)} />
-        </form>
-      </div>
 
       {/* Add User Modal */}
       {showAddModal && (

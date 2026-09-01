@@ -52,11 +52,15 @@ const AdminEventMembers = () => {
   if (loading) return <DashboardLayout><div className="loading-center"><div className="spinner"></div></div></DashboardLayout>;
 
   return (
-    <DashboardLayout>
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-        <div><h1>Event Member Management</h1><p>Manage event handling members</p></div>
-        <button className="btn btn-primary" onClick={() => setShowCreate(true)}>+ Create Member</button>
-      </div>
+    <DashboardLayout
+      title="Event Member Management"
+      subtitle="Manage event coordinator and volunteer credentials"
+      headerActions={
+        <button className="btn btn-primary btn-sm" onClick={() => setShowCreate(true)}>
+          + Create Member
+        </button>
+      }
+    >
       {msg.text && <div className={`alert alert-${msg.type}`}>{msg.text}</div>}
 
       {showCreate && (

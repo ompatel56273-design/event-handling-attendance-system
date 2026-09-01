@@ -221,8 +221,8 @@ const AdminWinners = () => {
                   {w.userId?.department} | Roll: {w.userId?.rollNumber}
                 </p>
 
-                <div style={{ background: '#F8FAFC', padding: '12px', borderRadius: '10px', marginTop: 14, marginBottom: 14 }}>
-                  <p style={{ fontWeight: 600, fontSize: '0.84rem', color: 'var(--text-main)' }}>{w.eventId?.name}</p>
+                <div style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid var(--border-color)', padding: '12px', borderRadius: '10px', marginTop: 14, marginBottom: 14 }}>
+                  <p style={{ fontWeight: 600, fontSize: '0.84rem', color: '#FFFFFF' }}>{w.eventId?.name}</p>
                   <p style={{ fontSize: '0.76rem', color: 'var(--primary)', fontWeight: 700, marginTop: 2 }}>
                     Final Score: {w.marks} / 100
                   </p>

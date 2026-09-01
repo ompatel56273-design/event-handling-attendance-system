@@ -132,9 +132,9 @@ const AdminMarks = () => {
                 </div>
               ))}
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: '#F3F0FF', borderRadius: '10px', marginTop: 12 }}>
-                <strong style={{ color: 'var(--primary)' }}>Total Score:</strong>
-                <strong style={{ color: 'var(--primary)', fontSize: '1.1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'var(--primary-subtle)', border: '1px solid var(--primary-border)', borderRadius: '10px', marginTop: 12 }}>
+                <strong style={{ color: 'var(--text-primary-accent)' }}>Total Score:</strong>
+                <strong style={{ color: 'var(--text-primary-accent)', fontSize: '1.1rem' }}>
                   {editingMark.criteria.reduce((s, c) => s + (Number(c.marks) || 0), 0)} / {editingMark.criteria.reduce((s, c) => s + (Number(c.maxMarks) || 0), 0)}
                 </strong>
               </div>

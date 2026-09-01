@@ -114,8 +114,8 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
         <div className="top-app-header desktop-only-header">
           <div className="greeting-title">
             <h1>
-              <span style={{ fontSize: '1.6rem' }}>{activeThemeConfig.icon}</span>
-              {title || `Hello, ${firstName}!`}
+              <span style={{ fontSize: '1.4rem', display: 'inline-flex', alignItems: 'center' }}>{activeThemeConfig.icon}</span>
+              <span>{title || `Hello, ${firstName}!`}</span>
             </h1>
             <p>{subtitle || "Here's what happening with your events."}</p>
           </div>
@@ -134,9 +134,12 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
                 gap: 6,
                 padding: '0 12px',
                 width: 'auto',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              <span style={{ fontSize: '1.15rem' }}>{activeThemeConfig.icon}</span>
+              <span style={{ fontSize: '1.1rem', display: 'inline-flex', alignItems: 'center' }}>{activeThemeConfig.icon}</span>
               <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#FFFFFF' }}>
                 {activeThemeConfig.name.split(' ')[0]}
               </span>
@@ -146,9 +149,9 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
               className="notif-bell-btn"
               title="Campus Announcements"
               onClick={() => setShowNotifDrawer(true)}
-              style={{ position: 'relative' }}
+              style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <HiBell />
+              <HiBell style={{ fontSize: '1.25rem' }} />
               {unreadCount > 0 && (
                 <span
                   style={{

@@ -358,16 +358,16 @@ const AdminAttendance = () => {
             <div className="attendance-qr-container">
               {activeRegistration?.attendanceQrGenerated && activeRegistration?.attendanceQrToken ? (
                 <>
-                  <div style={{ background: '#fff', padding: '4px', borderRadius: '6px' }}>
-                    <QRCode value={activeRegistration.attendanceQrToken} size={96} />
+                  <div className="cyber-qr-stand" style={{ padding: 8 }}>
+                    <QRCode value={activeRegistration.attendanceQrToken} size={90} />
                   </div>
-                  <p>Attendance QR</p>
-                  <span style={{ fontSize: '0.55rem', color: '#94A3B8' }}>(For this event only)</span>
+                  <p style={{ fontSize: '0.74rem', fontWeight: 700, marginTop: 4 }}>Attendance QR</p>
+                  <span style={{ fontSize: '0.58rem', color: '#94A3B8' }}>(For this event only)</span>
                 </>
               ) : (
-                <div style={{ padding: '14px 10px', background: '#F8FAFC', borderRadius: '8px', border: '1px dashed #CBD5E1', textAlign: 'center', width: '110px' }}>
+                <div style={{ padding: '14px 10px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: '12px', border: '1px dashed var(--border-color)', textAlign: 'center', width: '110px' }}>
                   <p style={{ color: '#F59E0B', fontSize: '0.72rem', fontWeight: 700 }}>No QR</p>
-                  <span style={{ fontSize: '0.6rem', color: '#64748B' }}>Click Generate</span>
+                  <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>Click Generate</span>
                 </div>
               )}
             </div>

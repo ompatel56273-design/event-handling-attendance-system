@@ -100,21 +100,9 @@ const AdminRegistrations = () => {
     >
       {msg.text && <div className={`alert alert-${msg.type}`}>{msg.text}</div>}
 
-      <div className="card" style={{ padding: '16px 20px', marginBottom: 20 }}>
+      <div className="card" style={{ padding: '14px 20px', marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
-          <form onSubmit={handleSearch} style={{ display: 'flex', gap: 10, flex: 1, maxWidth: 360 }}>
-            <input
-              className="form-control"
-              placeholder="Search by student name, roll number, email..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <button type="submit" className="btn btn-secondary btn-sm">
-              <HiSearch /> Search
-            </button>
-          </form>
-
-          <div style={{ minWidth: 220 }}>
+          <div style={{ minWidth: 240 }}>
             <select
               className="form-control"
               value={selectedEvent}
@@ -124,6 +112,15 @@ const AdminRegistrations = () => {
               {events.map(e => <option key={e._id} value={e._id}>{e.name}</option>)}
             </select>
           </div>
+
+          <form onSubmit={handleSearch} className="search-input" style={{ width: 320, marginLeft: 'auto' }}>
+            <HiSearch className="search-icon" />
+            <input
+              placeholder="Search student, roll, email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </form>
         </div>
       </div>
 
