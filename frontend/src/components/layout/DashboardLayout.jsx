@@ -4,12 +4,12 @@ import NotificationDrawer from '../common/NotificationDrawer';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { HiBell, HiMail, HiCheck, HiX, HiMenu } from 'react-icons/hi';
+import { HiBell, HiMail, HiCheck, HiX, HiMenu, HiSun, HiMoon } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 
 const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
   const { user, role } = useAuth();
-  const { theme, setTheme, themes, activeThemeConfig } = useTheme();
+  const { theme, setTheme, mode, toggleMode, themes, activeThemeConfig } = useTheme();
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [showNotifDrawer, setShowNotifDrawer] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -38,39 +38,52 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
 
   return (
     <div className="app-layout">
-      {/* Mobile Top App Bar (Only visible on screens <= 768px) */}
+      {/* Mobile Top Header (320px - 768px) */}
       <div className="mobile-app-header">
         <button
           className="mobile-hamburger-btn"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
+          onClick={() => setSidebarOpen(true)}
           aria-label="Open Navigation Menu"
         >
           <HiMenu />
         </button>
 
-        <div className="mobile-header-brand">
-          <span style={{ fontSize: '1.2rem' }}>{activeThemeConfig.icon}</span>
-          <span style={{ fontWeight: 800, fontSize: '0.95rem', letterSpacing: '0.6px', color: '#FFFFFF' }}>
-            EVENTHUB
-          </span>
+        <div className="mobile-brand-logo">
+          <span className="mobile-logo-icon">⚡</span>
+          <span className="mobile-logo-text">EVENTHUB</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Mobile Dark/Light Mode Toggle */}
           <button
-            className="mobile-theme-btn"
-            title="Switch Theme"
-            onClick={() => setShowThemeModal(true)}
+            className="mode-toggle-btn"
+            onClick={toggleMode}
+            title={`Switch to ${mode === 'dark' ? 'Light' : 'Dark'} Mode`}
+            style={{ width: 34, height: 34, padding: 0, justifyContent: 'center' }}
           >
-            {activeThemeConfig.icon}
+            {mode === 'dark' ? (
+              <HiSun style={{ fontSize: '1.15rem', color: '#F59E0B' }} />
+            ) : (
+              <HiMoon style={{ fontSize: '1.15rem', color: '#6366F1' }} />
+            )}
           </button>
 
           <button
-            className="mobile-theme-btn"
-            title="Notifications"
-            onClick={() => setShowNotifDrawer(true)}
-            style={{ position: 'relative' }}
+            className="theme-pill-btn"
+            style={{ width: 34, height: 34, padding: 0, justifyContent: 'center' }}
+            title={`Active Theme: ${activeThemeConfig.name}`}
+            onClick={() => setShowThemeModal(true)}
           >
-            <HiBell style={{ fontSize: '1.1rem' }} />
+            <span className="theme-icon" style={{ fontSize: '1rem' }}>{activeThemeConfig.icon}</span>
+          </button>
+
+          <button
+            className="notif-bell-btn"
+            style={{ width: 34, height: 34, fontSize: '1.1rem' }}
+            onClick={() => setShowNotifDrawer(true)}
+            aria-label="Notifications"
+          >
+            <HiBell />
             {unreadCount > 0 && (
               <span
                 style={{
@@ -79,7 +92,7 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
                   right: -2,
                   background: '#EF4444',
                   color: '#FFFFFF',
-                  fontSize: '0.58rem',
+                  fontSize: '0.6rem',
                   fontWeight: 900,
                   width: 16,
                   height: 16,
@@ -122,8 +135,22 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
           <div className="header-actions">
             {headerActions}
             
-            {/* Desktop-Only Header Controls (Theme, Bell, Profile) */}
+            {/* Desktop-Only Header Controls (Mode, Theme, Bell, Profile) */}
             <div className="desktop-header-controls">
+              {/* Dark / Light Mode Switcher */}
+              <button
+                className="mode-toggle-btn"
+                title={`Switch to ${mode === 'dark' ? 'Light' : 'Dark'} Mode`}
+                onClick={toggleMode}
+              >
+                {mode === 'dark' ? (
+                  <HiSun style={{ fontSize: '1.25rem', color: '#F59E0B' }} />
+                ) : (
+                  <HiMoon style={{ fontSize: '1.25rem', color: '#6366F1' }} />
+                )}
+                <span className="mode-label">{mode === 'dark' ? 'Dark' : 'Light'}</span>
+              </button>
+
               <button
                 className="theme-pill-btn"
                 title={`Active Theme: ${activeThemeConfig.name} (Click to switch)`}
@@ -178,7 +205,7 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
                 <div>
                   <h2>🎨 Dashboard Color Themes</h2>
                   <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 2 }}>
-                    Select a color combo across the entire application
+                    Switch system-wide theme palette across your workspace
                   </p>
                 </div>
                 <button className="modal-close" onClick={() => setShowThemeModal(false)}>
@@ -186,13 +213,16 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
                 </button>
               </div>
 
-              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, margin: '18px 0' }}>
                 {themes.map((t) => {
                   const isSelected = theme === t.id;
                   return (
                     <div
                       key={t.id}
-                      onClick={() => setTheme(t.id)}
+                      onClick={() => {
+                        setTheme(t.id);
+                        setShowThemeModal(false);
+                      }}
                       style={{
                         padding: '14px 18px',
                         borderRadius: '14px',
@@ -210,8 +240,8 @@ const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
                         <span style={{ fontSize: '1.6rem' }}>{t.icon}</span>
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <strong style={{ fontSize: '0.92rem', color: '#FFFFFF' }}>{t.name}</strong>
-                            {t.id === 'titanium' && (
+                            <strong style={{ fontSize: '0.92rem', color: 'var(--text-main)' }}>{t.name}</strong>
+                            {t.id === 'monochrome' && (
                               <span className="badge badge-primary" style={{ fontSize: '0.6rem', padding: '2px 6px' }}>
                                 DEFAULT
                               </span>

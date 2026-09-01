@@ -81,10 +81,24 @@ export const ThemeProvider = ({ children }) => {
     return saved;
   });
 
+  const [currentMode, setCurrentMode] = useState(() => {
+    const savedMode = localStorage.getItem('app_mode');
+    return savedMode === 'light' ? 'light' : 'dark';
+  });
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', currentTheme);
     localStorage.setItem('app_theme', currentTheme);
   }, [currentTheme]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-mode', currentMode);
+    localStorage.setItem('app_mode', currentMode);
+  }, [currentMode]);
+
+  const toggleMode = () => {
+    setCurrentMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   const activeThemeConfig = THEMES.find((t) => t.id === currentTheme) || THEMES[0];
 
@@ -93,6 +107,9 @@ export const ThemeProvider = ({ children }) => {
       value={{
         theme: currentTheme,
         setTheme: setCurrentTheme,
+        mode: currentMode,
+        setMode: setCurrentMode,
+        toggleMode,
         themes: THEMES,
         activeThemeConfig,
       }}

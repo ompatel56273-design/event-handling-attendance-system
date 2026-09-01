@@ -7,19 +7,24 @@ import { HiCheck } from 'react-icons/hi';
 
 const Settings = () => {
   const { user, logout } = useAuth();
-  const { theme, setTheme, themes } = useTheme();
+  const { theme, setTheme, mode, setMode, themes } = useTheme();
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmNew: '' });
-  const [msg, setMsg] = useState({ type: '', text: '' });
   const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState({ type: '', text: '' });
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    if (pwForm.newPassword.length < 6) { setMsg({ type: 'error', text: 'Password must be at least 6 characters.' }); return; }
-    if (pwForm.newPassword !== pwForm.confirmNew) { setMsg({ type: 'error', text: 'Passwords do not match.' }); return; }
+    if (pwForm.newPassword !== pwForm.confirmNew) {
+      setMsg({ type: 'error', text: 'New passwords do not match.' });
+      return;
+    }
     setLoading(true);
     try {
-      await api.put('/users/me/password', { currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword });
-      setMsg({ type: 'success', text: 'Password changed successfully!' });
+      await api.put('/users/me/password', {
+        currentPassword: pwForm.currentPassword,
+        newPassword: pwForm.newPassword,
+      });
+      setMsg({ type: 'success', text: 'Password updated successfully!' });
       setPwForm({ currentPassword: '', newPassword: '', confirmNew: '' });
     } catch (err) {
       setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to change password.' });
@@ -29,6 +34,76 @@ const Settings = () => {
   return (
     <DashboardLayout title="Settings" subtitle="Manage your dashboard theme & account security">
       {msg.text && <div className={`alert alert-${msg.type}`}>{msg.text}</div>}
+
+      {/* Global Display Mode (Dark vs Light) */}
+      <div className="card" style={{ marginBottom: 24 }}>
+        <h3 style={{ marginBottom: 6 }}>🌓 Global Display Mode (Light / Dark)</h3>
+        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 18 }}>
+          Choose between immersive Dark Mode or clean high-contrast Light Mode.
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+          {/* Dark Mode Card */}
+          <div
+            onClick={() => setMode('dark')}
+            style={{
+              padding: '18px 20px',
+              borderRadius: '16px',
+              background: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.02)',
+              border: mode === 'dark' ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+              boxShadow: mode === 'dark' ? '0 0 20px var(--primary-glow)' : 'none',
+              cursor: 'pointer',
+              transition: 'all 200ms ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <span style={{ fontSize: '2rem' }}>🌙</span>
+              <div>
+                <strong style={{ fontSize: '0.96rem', color: 'var(--text-main)', display: 'block' }}>Dark Mode (Default)</strong>
+                <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: 2 }}>Deep obsidian void with frosted glass</p>
+              </div>
+            </div>
+            {mode === 'dark' && (
+              <span style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '0.84rem', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <HiCheck /> Active
+              </span>
+            )}
+          </div>
+
+          {/* Light Mode Card */}
+          <div
+            onClick={() => setMode('light')}
+            style={{
+              padding: '18px 20px',
+              borderRadius: '16px',
+              background: mode === 'light' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.02)',
+              border: mode === 'light' ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+              boxShadow: mode === 'light' ? '0 0 20px var(--primary-glow)' : 'none',
+              cursor: 'pointer',
+              transition: 'all 200ms ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <span style={{ fontSize: '2rem' }}>☀️</span>
+              <div>
+                <strong style={{ fontSize: '0.96rem', color: 'var(--text-main)', display: 'block' }}>Light Mode</strong>
+                <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: 2 }}>Pristine high-contrast clean daylight</p>
+              </div>
+            </div>
+            {mode === 'light' && (
+              <span style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '0.84rem', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <HiCheck /> Active
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Global Dashboard Theme Combos */}
       <div className="card" style={{ marginBottom: 24 }}>
@@ -67,7 +142,14 @@ const Settings = () => {
                 </div>
 
                 <div>
-                  <strong style={{ fontSize: '0.92rem', color: '#FFFFFF', display: 'block' }}>{t.name}</strong>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <strong style={{ fontSize: '0.92rem', color: 'var(--text-main)', display: 'block' }}>{t.name}</strong>
+                    {t.id === 'monochrome' && (
+                      <span className="badge badge-primary" style={{ fontSize: '0.58rem', padding: '1px 5px' }}>
+                        DEFAULT
+                      </span>
+                    )}
+                  </div>
                   <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: 4 }}>{t.description}</p>
                 </div>
 
