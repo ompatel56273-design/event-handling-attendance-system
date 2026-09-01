@@ -1484,6 +1484,88 @@ select option:checked, select option:hover, select option:focus {
   flex-shrink: 0;
 }
 
+/* Upcoming Events Grid & Glass Cards */
+.upcoming-events-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: 10px;
+}
+
+.upcoming-mini-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(16px);
+  transition: all var(--trans-normal);
+  position: relative;
+}
+
+.upcoming-mini-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--primary-border);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), var(--primary-glow);
+}
+
+.upcoming-mini-thumb {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.upcoming-mini-body {
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.upcoming-mini-body h4 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.3;
+}
+
+.upcoming-mini-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+}
+
+.upcoming-mini-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.upcoming-mini-meta span svg {
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.upcoming-mini-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  align-self: flex-start;
+  margin-top: auto;
+}
+
 /* --------------------------------------------------------------------------
    13. ATTENDANCE MANAGEMENT & E-CARD STYLES
    -------------------------------------------------------------------------- */

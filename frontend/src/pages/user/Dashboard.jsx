@@ -152,14 +152,6 @@ const UserDashboard = () => {
           1. MODERN CLASSIC EXECUTIVE IDENTITY PASSPORT (HERO E-CARD)
           ========================================================================= */}
       <div className="identity-hero-card hover-lift glow-border">
-        {/* Top Header Tag */}
-        <div className="identity-hero-top-badge">
-          <span className="badge badge-primary" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.68rem', letterSpacing: '1px' }}>
-            <span className="pulse-beacon" />
-            <HiShieldCheck style={{ fontSize: '0.9rem' }} /> OFFICIAL CAMPUS IDENTITY PASSPORT
-          </span>
-        </div>
-
         {/* Student Avatar with Metallic Ring */}
         <div className="identity-hero-avatar-wrap">
           {data?.profileImage?.url ? (
@@ -180,6 +172,13 @@ const UserDashboard = () => {
 
         {/* Student Profile Info */}
         <div className="identity-hero-details">
+          <div style={{ marginBottom: 10 }}>
+            <span className="badge badge-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.74rem', letterSpacing: '0.8px', padding: '4px 12px' }}>
+              <span className="pulse-beacon" />
+              <HiShieldCheck style={{ fontSize: '1rem' }} /> OFFICIAL CAMPUS IDENTITY PASSPORT
+            </span>
+          </div>
+
           <h2>{fullName}</h2>
 
           <div className="identity-hero-id-row">
