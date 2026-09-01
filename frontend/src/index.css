@@ -138,7 +138,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   2. CORE SYSTEM CONSTANTS & TOKENS
+   2. CORE SYSTEM CONSTANTS & TOKENS (BIGGER GLOBAL SCALE)
    -------------------------------------------------------------------------- */
 :root {
   --accent-purple: #8B5CF6;
@@ -159,12 +159,12 @@
   --border-color: rgba(255, 255, 255, 0.08);
   --border-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.02) 100%);
   
-  --sidebar-width: 260px;
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 18px;
-  --radius-xl: 24px;
+  --sidebar-width: 280px;
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
   --radius-pill: 9999px;
 
   --trans-fast: 160ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -173,7 +173,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   3. RESET & FUTURISTIC BASE (NO SCROLLBARS)
+   3. RESET & FUTURISTIC BASE (BIGGER BASE FONT & NO SCROLLBARS)
    -------------------------------------------------------------------------- */
 *, *::before, *::after {
   margin: 0;
@@ -190,7 +190,7 @@
 }
 
 html {
-  font-size: 15px;
+  font-size: 17px;
   scroll-behavior: smooth;
   color-scheme: dark;
   scrollbar-width: none !important;
@@ -281,8 +281,8 @@ a {
 /* Radar Pulse Beacon */
 .pulse-beacon {
   display: inline-block;
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background-color: var(--primary);
   box-shadow: 0 0 0 0 var(--primary-glow);
@@ -291,20 +291,20 @@ a {
 
 @keyframes pulseBeacon {
   0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
-  70% { box-shadow: 0 0 0 9px rgba(99, 102, 241, 0); }
+  70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
   100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
 }
 
 /* --------------------------------------------------------------------------
-   5. NEXT-GEN BUTTON SYSTEM & LASER SHIMMER SWEEPS
+   5. NEXT-GEN BUTTON SYSTEM & LASER SHIMMER SWEEPS (BIGGER PROPORTIONS)
    -------------------------------------------------------------------------- */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 20px;
-  font-size: 0.88rem;
+  gap: 10px;
+  padding: 12px 24px;
+  font-size: 0.95rem;
   font-weight: 600;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
@@ -324,6 +324,7 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.15rem;
   flex-shrink: 0;
   vertical-align: middle;
 }
@@ -394,14 +395,14 @@ a {
 }
 
 .btn-sm {
-  padding: 6px 14px;
-  font-size: 0.78rem;
+  padding: 8px 16px;
+  font-size: 0.84rem;
   border-radius: var(--radius-xs);
 }
 
 .btn-lg {
-  padding: 14px 28px;
-  font-size: 1rem;
+  padding: 16px 32px;
+  font-size: 1.1rem;
   border-radius: var(--radius-md);
 }
 
@@ -411,8 +412,8 @@ a {
 .cyber-qr-stand {
   position: relative;
   background: #FFFFFF;
-  padding: 16px;
-  border-radius: 18px;
+  padding: 18px;
+  border-radius: 20px;
   border: 3px solid var(--primary);
   box-shadow: var(--shadow-qr);
   display: inline-flex;
@@ -430,8 +431,8 @@ a {
 .cyber-qr-stand::before, .cyber-qr-stand::after {
   content: '';
   position: absolute;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-color: var(--primary);
   pointer-events: none;
 }
@@ -441,7 +442,7 @@ a {
   left: -6px;
   border-top: 3px solid var(--primary);
   border-left: 3px solid var(--primary);
-  border-top-left-radius: 6px;
+  border-top-left-radius: 8px;
 }
 
 .cyber-qr-stand::after {
@@ -449,11 +450,11 @@ a {
   right: -6px;
   border-bottom: 3px solid var(--primary);
   border-right: 3px solid var(--primary);
-  border-bottom-right-radius: 6px;
+  border-bottom-right-radius: 8px;
 }
 
 /* --------------------------------------------------------------------------
-   7. LAYOUT & SIDEBAR (NO SCROLLBARS, NO TOP CANCEL BUTTON ON DESKTOP)
+   7. LAYOUT & SIDEBAR (BIGGER ELEMENTS, NO SCROLLBARS)
    -------------------------------------------------------------------------- */
 .app-layout {
   display: flex;
@@ -464,9 +465,9 @@ a {
 .main-content {
   flex: 1;
   margin-left: var(--sidebar-width);
-  padding: 30px 40px 60px;
+  padding: 34px 44px 70px;
   min-width: 0;
-  max-width: 1440px;
+  max-width: 1560px;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
@@ -482,7 +483,7 @@ a {
   top: 0;
   left: 0;
   z-index: 100;
-  padding: 24px 18px 20px;
+  padding: 26px 20px 22px;
   box-shadow: 6px 0 30px rgba(0, 0, 0, 0.7);
   overflow-x: hidden;
   scrollbar-width: none !important;
@@ -501,21 +502,21 @@ a {
 .sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 8px 22px;
+  gap: 14px;
+  padding: 0 8px 24px;
   border-bottom: 1px solid var(--sidebar-border);
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 
 .sidebar-logo-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
   background: var(--primary-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   color: #FFFFFF;
   box-shadow: var(--primary-glow);
   flex-shrink: 0;
@@ -523,7 +524,7 @@ a {
 }
 
 .sidebar-brand-text h2 {
-  font-size: 1.22rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: #FFFFFF;
   letter-spacing: 0.8px;
@@ -532,28 +533,28 @@ a {
 }
 
 .sidebar-brand-text p {
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   color: var(--primary);
   font-weight: 800;
-  letter-spacing: 1.2px;
+  letter-spacing: 1.4px;
   text-transform: uppercase;
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 .sidebar-section-tag {
-  font-size: 0.66rem;
+  font-size: 0.72rem;
   font-weight: 800;
   color: #64748B;
   text-transform: uppercase;
-  letter-spacing: 1.4px;
-  padding: 0 14px;
-  margin-bottom: 10px;
+  letter-spacing: 1.6px;
+  padding: 0 16px;
+  margin-bottom: 12px;
 }
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
@@ -568,10 +569,10 @@ a {
 .sidebar-nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 11px 16px;
+  gap: 14px;
+  padding: 13px 18px;
   border-radius: var(--radius-sm);
-  font-size: 0.88rem;
+  font-size: 0.96rem;
   font-weight: 500;
   color: var(--sidebar-text);
   transition: all var(--trans-fast);
@@ -579,7 +580,7 @@ a {
 }
 
 .sidebar-nav-item svg {
-  font-size: 1.15rem;
+  font-size: 1.35rem;
   flex-shrink: 0;
 }
 
@@ -603,23 +604,23 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 26px;
-  gap: 20px;
+  margin-bottom: 30px;
+  gap: 24px;
   flex-wrap: wrap;
 }
 
 .greeting-title h1 {
-  font-size: 1.65rem;
+  font-size: 1.85rem;
   font-weight: 800;
   color: #FFFFFF;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   line-height: 1.2;
 }
 
 .greeting-title p {
-  font-size: 0.84rem;
+  font-size: 0.92rem;
   color: var(--text-muted);
   margin-top: 4px;
 }
@@ -627,7 +628,7 @@ a {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   margin-left: auto;
 }
 
@@ -639,12 +640,12 @@ a {
 
 .search-input input {
   width: 100%;
-  padding: 8px 14px 8px 36px;
+  padding: 10px 16px 10px 42px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   color: #FFFFFF;
-  font-size: 0.84rem;
+  font-size: 0.92rem;
   transition: all var(--trans-fast);
 }
 
@@ -657,60 +658,60 @@ a {
 
 .search-input .search-icon {
   position: absolute;
-  left: 12px;
+  left: 14px;
   color: var(--text-muted);
-  font-size: 1rem;
+  font-size: 1.15rem;
   pointer-events: none;
 }
 
 .sidebar-user-footer {
   margin-top: auto;
-  padding-top: 16px;
+  padding-top: 18px;
   border-top: 1px solid var(--sidebar-border);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .sidebar-user-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
+  gap: 14px;
+  padding: 12px 14px;
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-color);
 }
 
 .sidebar-user-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   object-fit: cover;
   border: 1px solid var(--primary);
 }
 
 .sidebar-user-initial {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   background: var(--primary-gradient);
   color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 1.15rem;
 }
 
 .sidebar-user-meta h4 {
-  font-size: 0.86rem;
+  font-size: 0.94rem;
   font-weight: 700;
   color: #FFFFFF;
 }
 
 .sidebar-user-meta p {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-family: monospace;
   color: var(--primary);
   font-weight: 700;
@@ -722,12 +723,12 @@ a {
   justify-content: center;
   gap: 8px;
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: #EF4444;
   border-radius: var(--radius-sm);
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 700;
   cursor: pointer;
   transition: all var(--trans-fast);
@@ -740,45 +741,45 @@ a {
 }
 
 /* --------------------------------------------------------------------------
-   8. CARDS, GRIDS & DATA TABLES
+   8. CARDS, GRIDS & DATA TABLES (BIGGER PROPORTIONS)
    -------------------------------------------------------------------------- */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 24px;
+  border-radius: var(--radius-lg);
+  padding: 28px;
   backdrop-filter: blur(16px);
   position: relative;
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
-  margin-bottom: 26px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 22px;
+  margin-bottom: 28px;
 }
 
 .stat-card-clean {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 20px 22px;
+  padding: 24px 26px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
   backdrop-filter: blur(16px);
   position: relative;
   overflow: hidden;
 }
 
 .stat-card-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   flex-shrink: 0;
 }
 
@@ -788,23 +789,23 @@ a {
 .stat-card-icon.orange { background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.3); }
 
 .stat-card-content p {
-  font-size: 0.76rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  font-weight: 600;
+  letter-spacing: 0.8px;
+  font-weight: 700;
   margin-bottom: 4px;
 }
 
 .stat-card-content h3 {
-  font-size: 1.6rem;
-  font-weight: 800;
+  font-size: 1.95rem;
+  font-weight: 900;
   color: #FFFFFF;
   line-height: 1.1;
 }
 
 .stat-badge-green {
-  font-size: 0.7rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: #10B981;
   display: inline-block;
@@ -814,33 +815,33 @@ a {
 .growth-rate {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.72rem;
+  gap: 6px;
+  font-size: 0.78rem;
   font-weight: 700;
   color: var(--primary);
   margin-top: 4px;
 }
 
 /* --------------------------------------------------------------------------
-   9. IDENTITY HERO E-CARD (PASSPORT)
+   9. IDENTITY HERO E-CARD (PASSPORT) (EXPANDED PROPORTIONS)
    -------------------------------------------------------------------------- */
 .identity-hero-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 26px 30px;
+  border-radius: var(--radius-xl);
+  padding: 32px 36px;
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 32px;
   position: relative;
   backdrop-filter: blur(20px);
-  margin-bottom: 26px;
+  margin-bottom: 28px;
 }
 
 .identity-hero-top-badge {
   position: absolute;
-  top: 16px;
-  right: 20px;
+  top: 18px;
+  right: 24px;
 }
 
 .identity-hero-avatar-wrap {
@@ -849,23 +850,23 @@ a {
 }
 
 .identity-hero-avatar {
-  width: 90px;
-  height: 90px;
-  border-radius: 20px;
+  width: 100px;
+  height: 100px;
+  border-radius: 22px;
   object-fit: cover;
   border: 2px solid var(--primary);
   box-shadow: 0 0 20px var(--primary-subtle);
 }
 
 .identity-hero-avatar-placeholder {
-  width: 90px;
-  height: 90px;
-  border-radius: 20px;
+  width: 100px;
+  height: 100px;
+  border-radius: 22px;
   background: var(--primary-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   font-weight: 800;
   color: #FFFFFF;
   box-shadow: var(--primary-glow);
@@ -875,15 +876,15 @@ a {
   position: absolute;
   bottom: -4px;
   right: -4px;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: #10B981;
   color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: 0.82rem;
   font-weight: 900;
   border: 2px solid var(--bg-card);
 }
@@ -893,27 +894,27 @@ a {
 }
 
 .identity-hero-details h2 {
-  font-size: 1.6rem;
+  font-size: 1.85rem;
   font-weight: 800;
   color: #FFFFFF;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .identity-hero-id-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .user-id-chip {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--primary-border);
   color: var(--primary);
-  padding: 4px 12px;
+  padding: 6px 14px;
   border-radius: var(--radius-pill);
   font-family: monospace;
-  font-size: 0.84rem;
+  font-size: 0.92rem;
   font-weight: 800;
   cursor: pointer;
   transition: all var(--trans-fast);
@@ -929,30 +930,30 @@ a {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: var(--radius-pill);
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.8px;
 }
 
 .identity-hero-meta-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
 }
 
 .identity-meta-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.8rem;
+  gap: 10px;
+  font-size: 0.88rem;
   color: var(--text-secondary);
 }
 
 .identity-meta-item .meta-icon {
   color: var(--primary);
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   flex-shrink: 0;
 }
 
@@ -960,53 +961,53 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 .qr-code-white-frame {
   background: #FFFFFF;
-  padding: 10px;
-  border-radius: 14px;
+  padding: 12px;
+  border-radius: 16px;
   border: 2px solid var(--primary);
   box-shadow: var(--shadow-qr);
 }
 
 .qr-label {
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #FFFFFF;
 }
 
 .qr-sublabel {
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   color: var(--text-muted);
-  letter-spacing: 0.8px;
+  letter-spacing: 1px;
 }
 
 /* --------------------------------------------------------------------------
-   10. FORMS & INPUTS
+   10. FORMS & INPUTS (EXPANDED PROPORTIONS)
    -------------------------------------------------------------------------- */
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.86rem;
   font-weight: 600;
   color: var(--text-secondary);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .form-control {
   width: 100%;
-  padding: 10px 14px;
+  padding: 12px 16px;
   background: var(--bg-input);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   color: #FFFFFF;
-  font-size: 0.88rem;
+  font-size: 0.95rem;
   font-family: inherit;
   transition: all var(--trans-fast);
 }
@@ -1019,7 +1020,7 @@ a {
 }
 
 /* --------------------------------------------------------------------------
-   11. DATA TABLES & MODALS
+   11. DATA TABLES & MODALS (BIGGER PROPORTIONS)
    -------------------------------------------------------------------------- */
 .data-table-container {
   overflow-x: auto;
@@ -1036,19 +1037,19 @@ a {
 }
 
 .data-table th {
-  padding: 14px 18px;
-  font-size: 0.74rem;
+  padding: 16px 20px;
+  font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 1px;
   color: var(--text-muted);
   border-bottom: 1px solid var(--border-color);
   background: rgba(255, 255, 255, 0.02);
 }
 
 .data-table td {
-  padding: 14px 18px;
-  font-size: 0.84rem;
+  padding: 16px 20px;
+  font-size: 0.92rem;
   color: var(--text-secondary);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   transition: all var(--trans-fast);
@@ -1340,49 +1341,6 @@ a {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.notif-bell-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: #FFFFFF;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: all var(--trans-fast);
-}
-
-.notif-bell-btn:hover {
-  border-color: var(--primary);
-  box-shadow: var(--primary-glow);
-  transform: translateY(-2px);
-}
-
-.top-avatar-pill {
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-sm);
-  background: var(--primary-gradient);
-  color: #FFFFFF;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 1.1rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: var(--shadow-primary);
-  overflow: hidden;
-  transition: all var(--trans-fast);
-}
-
-.top-avatar-pill:hover {
-  transform: scale(1.05);
-  box-shadow: var(--primary-glow);
 }
 
 .top-avatar-img {

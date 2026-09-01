@@ -197,39 +197,40 @@ const AdminWinners = () => {
           <p>Click "+ Add Winner" to record podium finishers for completed events.</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
           {winners.map(w => {
             const badge = getPositionBadge(w.position);
             return (
-              <div key={w._id} className="card" style={{ textAlign: 'center', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: 16, right: 16, background: badge.bg, color: badge.color, padding: '4px 12px', borderRadius: 9999, fontSize: '0.74rem', fontWeight: 700 }}>
+              <div key={w._id} className="card hover-lift" style={{ width: '360px', maxWidth: '100%', textAlign: 'center', position: 'relative' }}>
+                <div style={{ position: 'absolute', top: 16, right: 16, background: badge.bg, color: badge.color, padding: '4px 12px', borderRadius: 9999, fontSize: '0.78rem', fontWeight: 700 }}>
                   {badge.label}
                 </div>
 
                 {w.userId?.profileImage?.url ? (
-                  <img src={w.userId.profileImage.url} alt="" style={{ width: 75, height: 75, borderRadius: '50%', objectFit: 'cover', margin: '10px auto 14px' }} />
+                  <img src={w.userId.profileImage.url} alt="" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', margin: '10px auto 14px' }} />
                 ) : (
-                  <div className="identity-hero-avatar-placeholder" style={{ width: 75, height: 75, margin: '10px auto 14px', fontSize: '1.6rem' }}>
+                  <div className="identity-hero-avatar-placeholder" style={{ width: 80, height: 80, margin: '10px auto 14px', fontSize: '1.8rem' }}>
                     {w.userId?.firstName ? w.userId.firstName[0] : 'W'}
                   </div>
                 )}
 
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>
                   {w.userId?.firstName} {w.userId?.lastName}
                 </h3>
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
                   {w.userId?.department} | Roll: {w.userId?.rollNumber}
                 </p>
 
-                <div style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid var(--border-color)', padding: '12px', borderRadius: '10px', marginTop: 14, marginBottom: 14 }}>
-                  <p style={{ fontWeight: 600, fontSize: '0.84rem', color: '#FFFFFF' }}>{w.eventId?.name}</p>
-                  <p style={{ fontSize: '0.76rem', color: 'var(--primary)', fontWeight: 700, marginTop: 2 }}>
+                <div style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid var(--border-color)', padding: '14px', borderRadius: '12px', marginTop: 16, marginBottom: 16 }}>
+                  <p style={{ fontWeight: 600, fontSize: '0.9rem', color: '#FFFFFF' }}>{w.eventId?.name}</p>
+                  <p style={{ fontSize: '0.84rem', color: 'var(--primary)', fontWeight: 800, marginTop: 4 }}>
                     Final Score: {w.marks} / 100
                   </p>
                 </div>
 
                 <button
-                  className="btn btn-danger btn-sm btn-full"
+                  className="btn btn-danger btn-sm"
+                  style={{ width: '100%' }}
                   onClick={() => handleDelete(w._id)}
                 >
                   Remove Winner
