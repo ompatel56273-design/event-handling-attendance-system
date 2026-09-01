@@ -86,7 +86,7 @@ const Settings = () => {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+      <div className="settings-grid">
         <div className="card">
           <h3 style={{ marginBottom: 16 }}>Change Password</h3>
           <form onSubmit={handleChangePassword}>
