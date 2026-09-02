@@ -6,8 +6,12 @@ const { generateUserId, generateToken } = require('../utils/generateId');
 const { sendVerificationEmail, sendPasswordResetEmail } = require('../services/email.service');
 
 // Generate JWT token
-const signToken = (id, role) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, {
+const signToken = (id, role, sessionId = null) => {
+  const payload = { id, role };
+  if (sessionId) {
+    payload.sessionId = sessionId;
+  }
+  return jwt.sign(payload, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   });
 };
@@ -21,6 +25,7 @@ exports.getMe = async (req, res, next) => {
     res.json({
       role: req.userRole,
       user: req.user,
+      sessionId: req.user?.activeSessionId || null,
     });
   } catch (error) {
     next(error);
@@ -130,11 +135,20 @@ exports.login = async (req, res, next) => {
       });
     }
 
-    const token = signToken(account._id, role);
+    // Enforce Single Active Session ID for SUPER_ADMIN
+    let sessionId = null;
+    if (role === 'SUPER_ADMIN') {
+      sessionId = `ADM-SESS-${Date.now()}-${crypto.randomBytes(12).toString('hex')}`;
+      account.activeSessionId = sessionId;
+      await account.save();
+    }
+
+    const token = signToken(account._id, role, sessionId);
 
     const responseData = {
       token,
       role,
+      sessionId,
       user: model === 'User' ? {
         _id: account._id,
         userId: account.userId,
@@ -148,6 +162,7 @@ exports.login = async (req, res, next) => {
         mobile: account.mobile,
         profileImage: account.profileImage,
         role: account.role,
+        activeSessionId: account.activeSessionId,
       } : {
         _id: account._id,
         name: account.name,

@@ -76,6 +76,10 @@ const userSchema = new mongoose.Schema({
     enum: ['ACTIVE', 'SUSPENDED'],
     default: 'ACTIVE',
   },
+  activeSessionId: {
+    type: String,
+    default: null,
+  },
 }, {
   timestamps: true,
 });

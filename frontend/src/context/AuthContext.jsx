@@ -16,11 +16,14 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [sessionId, setSessionId] = useState(null);
+
   useEffect(() => {
     const initAuth = async () => {
       const savedToken = localStorage.getItem('token');
       const savedUser = localStorage.getItem('user');
       const savedRole = localStorage.getItem('role');
+      const savedSessionId = localStorage.getItem('sessionId');
 
       if (savedToken) {
         try {
@@ -28,20 +31,31 @@ export const AuthProvider = ({ children }) => {
           setToken(savedToken);
           setUser(res.data.user);
           setRole(res.data.role);
+          if (res.data.sessionId) {
+            setSessionId(res.data.sessionId);
+            localStorage.setItem('sessionId', res.data.sessionId);
+          }
           localStorage.setItem('user', JSON.stringify(res.data.user));
           localStorage.setItem('role', res.data.role);
         } catch (err) {
-          // Token invalid or user not in DB anymore
+          // Token invalid or session superseded
+          const isSuperseded = err.response?.data?.code === 'SESSION_SUPERSEDED';
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           localStorage.removeItem('role');
+          localStorage.removeItem('sessionId');
           setToken(null);
           setUser(null);
           setRole(null);
+          setSessionId(null);
+          if (isSuperseded && window.location.pathname !== '/login') {
+            window.location.href = '/login?reason=session_superseded';
+          }
         }
       } else if (savedUser && savedRole) {
-        setUser(JSON.parse(savedUser));
+        try { setUser(JSON.parse(savedUser)); } catch (e) {}
         setRole(savedRole);
+        if (savedSessionId) setSessionId(savedSessionId);
       }
       setLoading(false);
     };
@@ -51,10 +65,20 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email, password });
-    const { token: newToken, role: newRole, user: userData } = res.data;
+    const { token: newToken, role: newRole, user: userData, sessionId: newSessionId } = res.data;
     localStorage.setItem('token', newToken);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('role', newRole);
+    if (newSessionId) {
+      localStorage.setItem('sessionId', newSessionId);
+      setSessionId(newSessionId);
+      // Broadcast to all other tabs to terminate old admin sessions
+      try {
+        const channel = new BroadcastChannel('admin_single_session_channel');
+        channel.postMessage({ type: 'ADMIN_SESSION_STARTED', sessionId: newSessionId });
+        channel.close();
+      } catch (e) {}
+    }
     setToken(newToken);
     setUser(userData);
     setRole(newRole);
@@ -70,9 +94,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('role');
+    localStorage.removeItem('sessionId');
     setToken(null);
     setUser(null);
     setRole(null);
+    setSessionId(null);
   };
 
   // 15-minute Inactivity Auto-Logout for SuperAdmin on dashboard
@@ -107,6 +133,54 @@ export const AuthProvider = ({ children }) => {
     };
   }, [token, role]);
 
+  // Single Active Admin Session Conflict Listener (BroadcastChannel & Storage Event)
+  useEffect(() => {
+    if (role !== 'SUPER_ADMIN' || !token) return;
+
+    let channel;
+    try {
+      channel = new BroadcastChannel('admin_single_session_channel');
+      channel.onmessage = (event) => {
+        if (event.data?.type === 'ADMIN_SESSION_STARTED') {
+          const incomingSessionId = event.data.sessionId;
+          const currentSessionId = localStorage.getItem('sessionId') || sessionId;
+          if (incomingSessionId && currentSessionId && incomingSessionId !== currentSessionId) {
+            // Another tab or device started a newer admin session!
+            logout();
+            if (window.location.pathname !== '/login') {
+              window.location.href = '/login?reason=session_superseded';
+            }
+          }
+        }
+      };
+    } catch (e) {}
+
+    // Verify session whenever window/tab regains focus (e.g. user switches back from phone/other app)
+    const handleWindowFocus = async () => {
+      const activeToken = localStorage.getItem('token');
+      const activeRole = localStorage.getItem('role');
+      if (activeToken && activeRole === 'SUPER_ADMIN') {
+        try {
+          await api.get('/auth/me');
+        } catch (err) {
+          if (err.response?.data?.code === 'SESSION_SUPERSEDED') {
+            logout();
+            if (window.location.pathname !== '/login') {
+              window.location.href = '/login?reason=session_superseded';
+            }
+          }
+        }
+      }
+    };
+
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      if (channel) channel.close();
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [role, token, sessionId]);
+
   // Cross-Tab Session Synchronization
   useEffect(() => {
     const handleStorageChange = (e) => {
@@ -116,15 +190,18 @@ export const AuthProvider = ({ children }) => {
           setToken(null);
           setUser(null);
           setRole(null);
+          setSessionId(null);
         } else {
           // Logged in in another tab
           setToken(e.newValue);
           const savedUser = localStorage.getItem('user');
           const savedRole = localStorage.getItem('role');
+          const savedSess = localStorage.getItem('sessionId');
           if (savedUser) {
             try { setUser(JSON.parse(savedUser)); } catch (err) {}
           }
           if (savedRole) setRole(savedRole);
+          if (savedSess) setSessionId(savedSess);
         }
       }
     };

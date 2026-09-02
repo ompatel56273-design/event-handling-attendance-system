@@ -21,6 +21,17 @@ const auth = async (req, res, next) => {
       if (user.accountStatus !== 'ACTIVE') {
         return res.status(403).json({ message: 'Account is suspended.' });
       }
+
+      // Enforce Single Active Session ID for SUPER_ADMIN
+      if (decoded.role === 'SUPER_ADMIN') {
+        if (user.activeSessionId && decoded.sessionId && user.activeSessionId !== decoded.sessionId) {
+          return res.status(401).json({
+            code: 'SESSION_SUPERSEDED',
+            message: 'Your session has ended because this admin account was logged into from another device or window.',
+          });
+        }
+      }
+
       req.user = user;
       req.userRole = user.role;
     } else if (decoded.role === 'EVENT_MEMBER') {

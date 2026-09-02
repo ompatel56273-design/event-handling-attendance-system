@@ -24,11 +24,13 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      const isSuperseded = error.response?.data?.code === 'SESSION_SUPERSEDED';
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('role');
+      localStorage.removeItem('sessionId');
       if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+        window.location.href = isSuperseded ? '/login?reason=session_superseded' : '/login';
       }
     }
     return Promise.reject(error);

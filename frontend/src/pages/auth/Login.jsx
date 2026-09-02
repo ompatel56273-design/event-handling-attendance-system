@@ -8,17 +8,18 @@ const Login = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isIdleLogout = searchParams.get('reason') === 'idle_timeout';
+  const isSessionSuperseded = searchParams.get('reason') === 'session_superseded';
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // If already authenticated and not an idle timeout redirect, automatically forward to user dashboard
+  // If already authenticated and not an idle timeout / session superseded redirect, forward to dashboard
   useEffect(() => {
-    if (!authLoading && isAuthenticated && role && !isIdleLogout) {
+    if (!authLoading && isAuthenticated && role && !isIdleLogout && !isSessionSuperseded) {
       navigate(getDashboardPath(role), { replace: true });
     }
-  }, [isAuthenticated, role, authLoading, isIdleLogout, navigate]);
+  }, [isAuthenticated, role, authLoading, isIdleLogout, isSessionSuperseded, navigate]);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -137,6 +138,31 @@ const Login = () => {
               </strong>
               <span style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', lineHeight: 1.35, display: 'block' }}>
                 You were automatically signed out due to inactivity on the dashboard. Please sign in again.
+              </span>
+            </div>
+          </div>
+        )}
+
+        {isSessionSuperseded && (
+          <div
+            style={{
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1.5px solid rgba(239, 68, 68, 0.35)',
+              borderRadius: 14,
+              padding: '14px 16px',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 12,
+            }}
+          >
+            <span style={{ fontSize: '1.4rem' }}>🛡️</span>
+            <div>
+              <strong style={{ color: '#EF4444', fontSize: '0.88rem', display: 'block', marginBottom: 2 }}>
+                Single Admin Session Enforced
+              </strong>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', lineHeight: 1.35, display: 'block' }}>
+                This Admin account was logged into from another device or browser. Only 1 concurrent active session is permitted for Super Admin security.
               </span>
             </div>
           </div>
