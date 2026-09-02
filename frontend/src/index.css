@@ -498,40 +498,62 @@ a {
 }
 
 /* --------------------------------------------------------------------------
-   7. LAYOUT & SIDEBAR (BIGGER ELEMENTS, NO SCROLLBARS)
+   7. LAYOUT & SIDEBAR (FULL VIEWPORT 100% WIDTH EDGE-TO-EDGE)
    -------------------------------------------------------------------------- */
 .app-layout {
   display: flex;
+  width: 100vw;
+  height: 100vh;
   min-height: 100vh;
+  max-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
   background-color: var(--bg-app);
 }
 
 .main-content {
+  display: flex;
+  flex-direction: column;
   flex: 1;
-  margin-left: var(--sidebar-width);
-  padding: 34px 44px 70px;
+  width: calc(100vw - 280px);
   min-width: 0;
-  max-width: 1560px;
+  max-width: 100% !important;
+  height: 100vh;
+  max-height: 100vh;
+  margin-left: 280px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: 0;
+  padding: 0 !important;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--bg-app);
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
 
 .sidebar {
-  width: var(--sidebar-width);
-  background: var(--sidebar-bg);
-  border-right: 1px solid var(--sidebar-border);
+  width: 280px;
+  min-width: 280px;
+  max-width: 280px;
+  height: 100vh;
+  background: var(--sidebar-bg, #040508);
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  height: 100vh;
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 100;
-  padding: 26px 20px 22px;
-  box-shadow: 6px 0 30px rgba(0, 0, 0, 0.7);
+  bottom: 0;
+  z-index: 1000;
+  padding: 24px 18px;
+  overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
+  margin: 0;
+  box-shadow: 6px 0 30px rgba(0, 0, 0, 0.7);
+  transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .sidebar::-webkit-scrollbar {
