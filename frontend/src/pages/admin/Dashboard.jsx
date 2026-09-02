@@ -6,9 +6,170 @@ import EventThumbnail from '../../components/common/EventThumbnail';
 import {
   HiUsers, HiCalendar, HiTicket, HiQrcode,
   HiPlus, HiArrowRight, HiChevronRight, HiEye,
-  HiShieldCheck, HiSparkles, HiDocumentText
+  HiShieldCheck, HiSparkles, HiDocumentText, HiDownload
 } from 'react-icons/hi';
 import { FaUserPlus, FaQrcode, FaUsersCog, FaPoll } from 'react-icons/fa';
+import { exportToCSV } from '../../utils/exportUtils';
+
+const MASTER_STUDENT_DATASET = [
+  {
+    userId: 'USR-102938',
+    studentName: 'John Doe',
+    email: 'john.doe@email.com',
+    mobile: '9876543210',
+    department: 'BCA',
+    year: '2',
+    className: 'A',
+    rollNumber: '21BCA102',
+    accountStatus: 'Active',
+    eventId: 'EVT-1004',
+    eventName: 'Code Carnival 2.0',
+    eventDate: '2026-07-25',
+    venue: 'Seminar Hall',
+    attendanceStatus: 'VERIFIED (Attended)',
+    checkInTime: '2026-07-25 09:15 AM',
+    criteria1: '38/40',
+    criteria2: '28/30',
+    criteria3: '19/20',
+    criteria4: '10/10',
+    totalMarks: '95/100',
+    percentage: '95%',
+    winnerStatus: '🥇 1st Place Gold Winner',
+    certificateId: 'CRT-102938',
+    verification: 'VERIFIED & CERTIFIED'
+  },
+  {
+    userId: 'USR-102939',
+    studentName: 'Alice Smith',
+    email: 'alice.smith@email.com',
+    mobile: '9876543211',
+    department: 'BSc CA & IT',
+    year: '3',
+    className: 'B',
+    rollNumber: '20BSc015',
+    accountStatus: 'Active',
+    eventId: 'EVT-1003',
+    eventName: 'UI/UX Design Challenge',
+    eventDate: '2026-07-10',
+    venue: 'Lab 3',
+    attendanceStatus: 'VERIFIED (Attended)',
+    checkInTime: '2026-07-10 09:45 AM',
+    criteria1: '36/40',
+    criteria2: '26/30',
+    criteria3: '17/20',
+    criteria4: '9/10',
+    totalMarks: '88/100',
+    percentage: '88%',
+    winnerStatus: '🥈 2nd Place Silver Medal',
+    certificateId: 'CRT-102939',
+    verification: 'VERIFIED & CERTIFIED'
+  },
+  {
+    userId: 'USR-102940',
+    studentName: 'Bob Johnson',
+    email: 'bob.johnson@email.com',
+    mobile: '9876543212',
+    department: 'BCA',
+    year: '1',
+    className: 'A',
+    rollNumber: '22BCA042',
+    accountStatus: 'Active',
+    eventId: 'EVT-1004',
+    eventName: 'Code Carnival 2.0',
+    eventDate: '2026-07-25',
+    venue: 'Seminar Hall',
+    attendanceStatus: 'REGISTERED (Pending Scan)',
+    checkInTime: '—',
+    criteria1: '32/40',
+    criteria2: '24/30',
+    criteria3: '16/20',
+    criteria4: '8/10',
+    totalMarks: '80/100',
+    percentage: '80%',
+    winnerStatus: '🥉 3rd Place Bronze Medal',
+    certificateId: 'CRT-102940',
+    verification: 'VERIFIED'
+  },
+  {
+    userId: 'USR-102941',
+    studentName: 'Charlie Brown',
+    email: 'charlie.brown@email.com',
+    mobile: '9876543213',
+    department: 'BCA',
+    year: '2',
+    className: 'C',
+    rollNumber: '21BCA088',
+    accountStatus: 'Active',
+    eventId: 'EVT-1001',
+    eventName: 'Poster Presentation',
+    eventDate: '2026-06-18',
+    venue: 'Auditorium',
+    attendanceStatus: 'VERIFIED (Attended)',
+    checkInTime: '2026-06-18 10:10 AM',
+    criteria1: '30/40',
+    criteria2: '22/30',
+    criteria3: '15/20',
+    criteria4: '8/10',
+    totalMarks: '75/100',
+    percentage: '75%',
+    winnerStatus: '🎖️ Top 5 Finalist',
+    certificateId: 'CRT-102941',
+    verification: 'VERIFIED'
+  },
+  {
+    userId: 'USR-102942',
+    studentName: 'Emma Wilson',
+    email: 'emma.wilson@email.com',
+    mobile: '9876543214',
+    department: 'BSc CA & IT',
+    year: '2',
+    className: 'A',
+    rollNumber: '21BSc019',
+    accountStatus: 'Active',
+    eventId: 'EVT-1002',
+    eventName: 'Debate Competition',
+    eventDate: '2026-06-30',
+    venue: 'Conference Hall',
+    attendanceStatus: 'REGISTERED (Pending Scan)',
+    checkInTime: '—',
+    criteria1: '35/40',
+    criteria2: '25/30',
+    criteria3: '18/20',
+    criteria4: '9/10',
+    totalMarks: '87/100',
+    percentage: '87%',
+    winnerStatus: '🥈 Runner-Up Award',
+    certificateId: 'CRT-102942',
+    verification: 'VERIFIED & CERTIFIED'
+  }
+];
+
+const MASTER_CSV_HEADERS = [
+  { key: 'userId', label: 'USER ID' },
+  { key: 'studentName', label: 'STUDENT NAME' },
+  { key: 'email', label: 'EMAIL ADDRESS' },
+  { key: 'mobile', label: 'MOBILE NUMBER' },
+  { key: 'department', label: 'DEPARTMENT' },
+  { key: 'year', label: 'YEAR' },
+  { key: 'className', label: 'CLASS / SECTION' },
+  { key: 'rollNumber', label: 'ROLL NUMBER' },
+  { key: 'accountStatus', label: 'ACCOUNT STATUS' },
+  { key: 'eventId', label: 'EVENT ID' },
+  { key: 'eventName', label: 'JOINED EVENT NAME' },
+  { key: 'eventDate', label: 'EVENT DATE' },
+  { key: 'venue', label: 'EVENT VENUE' },
+  { key: 'attendanceStatus', label: 'ATTENDANCE STATUS' },
+  { key: 'checkInTime', label: 'CHECK-IN TIME' },
+  { key: 'criteria1', label: 'CRITERIA 1: PROBLEM SOLVING' },
+  { key: 'criteria2', label: 'CRITERIA 2: LOGIC & APPROACH' },
+  { key: 'criteria3', label: 'CRITERIA 3: CODE/DESIGN QUALITY' },
+  { key: 'criteria4', label: 'CRITERIA 4: TIME MANAGEMENT' },
+  { key: 'totalMarks', label: 'TOTAL MARKS OBTAINED' },
+  { key: 'percentage', label: 'EVALUATION SCORE (%)' },
+  { key: 'winnerStatus', label: 'WINNER / PODIUM STATUS' },
+  { key: 'certificateId', label: 'CERTIFICATE ID' },
+  { key: 'verification', label: 'VERIFICATION STATUS' },
+];
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({ users: 5, events: 4, registrations: 7, attendance: 2 });
@@ -84,18 +245,44 @@ const AdminDashboard = () => {
     return name.slice(0, 2).toUpperCase();
   };
 
+  const handleMasterExportCSV = () => {
+    const filename = `CampusMaster_Students_Events_Marks_Directory_${new Date().toISOString().split('T')[0]}`;
+    exportToCSV(MASTER_CSV_HEADERS, MASTER_STUDENT_DATASET, filename);
+  };
+
   return (
     <DashboardLayout>
       {/* =========================================================================
-          GREETING HEADER
+          GREETING HEADER & GLOBAL MASTER CSV EXPORT (Exact Orange Box Position)
           ========================================================================= */}
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 6px 0' }}>
-          Welcome back, Super Admin! 👋
-        </h1>
-        <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', margin: 0 }}>
-          Here's what's happening in your campus today.
-        </p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
+        <div>
+          <h1 style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 6px 0' }}>
+            Welcome back, Super Admin! 👋
+          </h1>
+          <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', margin: 0 }}>
+            Here's what's happening in your campus today.
+          </p>
+        </div>
+
+        {/* Global Master Campus CSV Export Button */}
+        <button
+          onClick={handleMasterExportCSV}
+          className="btn btn-primary"
+          style={{
+            borderRadius: 14,
+            fontWeight: 800,
+            padding: '12px 22px',
+            fontSize: '0.92rem',
+            gap: 10,
+            display: 'inline-flex',
+            alignItems: 'center',
+            boxShadow: '0 4px 18px var(--primary-glow)',
+            cursor: 'pointer',
+          }}
+        >
+          <HiDownload style={{ fontSize: '1.2rem' }} /> Export Complete Campus Data (CSV)
+        </button>
       </div>
 
       {/* =========================================================================

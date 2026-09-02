@@ -88,36 +88,61 @@ export const exportToWord = (title, headers, rows, filename = 'export') => {
   const wordHtml = `
     <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
     <head>
+      <meta charset="utf-8">
       <title>${title}</title>
+      <!--[if gte mso 9]>
+      <xml>
+        <w:WordDocument>
+          <w:View>Print</w:View>
+          <w:Zoom>100</w:Zoom>
+          <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+      </xml>
+      <![endif]-->
       <style>
-        body { font-family: 'Segoe UI', Calibri, Arial, sans-serif; margin: 30px; color: #1E293B; }
-        h1 { color: #4338CA; font-size: 20pt; margin-bottom: 4px; }
-        p.subtitle { color: #6B7280; font-size: 10pt; margin-top: 0; margin-bottom: 20px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 15px; }
-        th { background-color: #4F46E5; color: white; padding: 10px; border: 1px solid #4338CA; text-align: left; font-size: 10.5pt; font-weight: bold; }
-        td { padding: 8px 10px; border: 1px solid #D1D5DB; font-size: 10pt; color: #1E293B; }
+        @page Section1 {
+          size: 841.9pt 595.3pt;
+          mso-page-orientation: landscape;
+          margin: 25pt 30pt 25pt 30pt;
+          mso-header-margin: 15pt;
+          mso-footer-margin: 15pt;
+        }
+        div.Section1 { page: Section1; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; color: #0F172A; background: #FFFFFF; }
+        .doc-header { border-bottom: 2.5pt solid #4F46E5; padding-bottom: 8pt; margin-bottom: 12pt; }
+        .brand-title { color: #4F46E5; font-size: 14pt; font-weight: bold; letter-spacing: 0.5pt; }
+        .doc-title { color: #0F172A; font-size: 16pt; font-weight: bold; margin-top: 2pt; margin-bottom: 2pt; }
+        .doc-meta { color: #64748B; font-size: 9pt; margin-top: 0; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        th { background-color: #4F46E5; color: #FFFFFF; padding: 8pt 10pt; border: 1pt solid #3730A3; text-align: left; font-size: 9pt; font-weight: bold; white-space: nowrap; }
+        td { padding: 7pt 10pt; border: 1pt solid #E2E8F0; font-size: 8.5pt; color: #0F172A; vertical-align: middle; }
         tr:nth-child(even) { background-color: #F8FAFC; }
-        .footer { margin-top: 30px; font-size: 9pt; color: #9CA3AF; text-align: center; border-top: 1px solid #E5E7EB; padding-top: 10px; }
+        .footer { margin-top: 20pt; font-size: 8pt; color: #94A3B8; text-align: center; border-top: 1pt solid #E2E8F0; padding-top: 8pt; }
       </style>
     </head>
     <body>
-      <h1>${title}</h1>
-      <p class="subtitle">CampusFlow / EventHub Official Export • Date: ${dateStr}</p>
-      <table>
-        <thead>
-          <tr>
-            ${headers.map(h => `<th>${(typeof h === 'object' ? h.label || h.key : h) || ''}</th>`).join('')}
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map(r => `
+      <div class="Section1">
+        <div class="doc-header">
+          <div class="brand-title">EVENTHUB ENTERPRISE SUITE</div>
+          <div class="doc-title">${title}</div>
+          <div class="doc-meta">CampusFlow Institutional Record • Date: ${dateStr} • Total Records: ${rows.length}</div>
+        </div>
+        <table border="1" cellpadding="0" cellspacing="0">
+          <thead>
             <tr>
-              ${headers.map((h, colIdx) => `<td>${getCellValue(r, h, colIdx)}</td>`).join('')}
+              ${headers.map(h => `<th>${(typeof h === 'object' ? h.label || h.key : h) || ''}</th>`).join('')}
             </tr>
-          `).join('')}
-        </tbody>
-      </table>
-      <div class="footer">Document certified by EventHub Institutional Verification System</div>
+          </thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                ${headers.map((h, colIdx) => `<td>${getCellValue(r, h, colIdx)}</td>`).join('')}
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <div class="footer">Document certified by EventHub Institutional Verification System • Page 1 of 1</div>
+      </div>
     </body>
     </html>
   `;
@@ -140,18 +165,17 @@ export const exportToPDF = (title, headers, rows) => {
     <head>
       <title>${title} — EventHub Official Record</title>
       <style>
-        @page { size: A4 landscape; margin: 15mm; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #0F172A; margin: 0; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #4F46E5; padding-bottom: 15px; margin-bottom: 20px; }
-        .brand-title { font-size: 20px; font-weight: 900; color: #4F46E5; letter-spacing: 0.5px; }
-        .doc-title { font-size: 16px; font-weight: 700; margin-top: 4px; color: #1E293B; }
-        .meta { text-align: right; font-size: 12px; color: #64748B; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-        th { background: #F1F5F9; color: #334155; font-weight: 800; text-align: left; padding: 10px 12px; border-bottom: 2px solid #CBD5E1; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
-        td { padding: 9px 12px; border-bottom: 1px solid #E2E8F0; color: #0F172A; font-size: 12px; }
+        @page { size: A4 landscape; margin: 12mm; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #0F172A; margin: 0; padding: 15px; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #4F46E5; padding-bottom: 12px; margin-bottom: 16px; }
+        .brand-title { font-size: 18px; font-weight: 900; color: #4F46E5; letter-spacing: 0.5px; }
+        .doc-title { font-size: 15px; font-weight: 800; margin-top: 3px; color: #1E293B; }
+        .meta { text-align: right; font-size: 11px; color: #64748B; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+        th { background: #F1F5F9; color: #334155; font-weight: 800; text-align: left; padding: 8px 10px; border-bottom: 2px solid #CBD5E1; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; white-space: nowrap; }
+        td { padding: 8px 10px; border-bottom: 1px solid #E2E8F0; color: #0F172A; font-size: 11px; }
         tr:nth-child(even) { background-color: #F8FAFC; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 700; background: #EEF2FF; color: #4F46E5; }
-        .footer { margin-top: 30px; display: flex; justify-content: space-between; font-size: 11px; color: #94A3B8; border-top: 1px solid #E2E8F0; padding-top: 12px; }
+        .footer { margin-top: 24px; display: flex; justify-content: space-between; font-size: 10px; color: #94A3B8; border-top: 1px solid #E2E8F0; padding-top: 10px; }
         @media print {
           body { padding: 0; }
           .no-print { display: none; }
@@ -159,7 +183,7 @@ export const exportToPDF = (title, headers, rows) => {
       </style>
     </head>
     <body>
-      <div class="no-print" style="background: #EEF2FF; border: 1px solid #C7D2FE; padding: 12px 18px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div class="no-print" style="background: #EEF2FF; border: 1px solid #C7D2FE; padding: 12px 18px; border-radius: 10px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
         <span style="font-weight: 700; color: #4338CA;">PDF Ready: Click Print or Save as PDF in your browser dialog.</span>
         <button onclick="window.print()" style="background: #4F46E5; color: #FFF; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 800; cursor: pointer;">🖨️ Print / Save PDF</button>
       </div>
