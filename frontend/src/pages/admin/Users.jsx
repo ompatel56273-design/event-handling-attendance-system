@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import {
@@ -9,6 +10,7 @@ import {
 import { FaUserGraduate, FaChalkboardTeacher, FaUserCheck, FaUserSlash } from 'react-icons/fa';
 
 const AdminUsers = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('All');
@@ -132,27 +134,6 @@ const AdminUsers = () => {
           </button>
 
           <select
-            value={departmentFilter}
-            onChange={(e) => setDepartmentFilter(e.target.value)}
-            style={{
-              height: 42,
-              padding: '0 16px',
-              borderRadius: 12,
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-primary)',
-              fontSize: '0.86rem',
-              fontWeight: 600,
-              outline: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            <option value="All">All Departments</option>
-            <option value="BCA">BCA</option>
-            <option value="BSc CA & IT">BSc CA & IT</option>
-          </select>
-
-          <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             style={{
@@ -173,7 +154,34 @@ const AdminUsers = () => {
             <option value="Inactive">Inactive</option>
           </select>
 
+          <select
+            value={departmentFilter}
+            onChange={(e) => setDepartmentFilter(e.target.value)}
+            style={{
+              height: 42,
+              padding: '0 16px',
+              borderRadius: 12,
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              color: 'var(--text-primary)',
+              fontSize: '0.86rem',
+              fontWeight: 600,
+              outline: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <option value="All">All Departments</option>
+            <option value="BCA">BCA</option>
+            <option value="BSc CA & IT">BSc CA & IT</option>
+          </select>
+
           <button
+            onClick={() => {
+              setDepartmentFilter('All');
+              setStatusFilter('All');
+              setSearch('');
+            }}
+            title="Reset Filters"
             style={{
               width: 42,
               height: 42,
@@ -341,7 +349,7 @@ const AdminUsers = () => {
                     <td style={{ padding: '14px 18px', textAlign: 'center' }}>
                       <div style={{ display: 'inline-flex', gap: 8 }}>
                         <button
-                          onClick={() => setSelectedUser(u)}
+                          onClick={() => navigate(`/admin/users/${u._id || u.userId}`)}
                           title="View Details"
                           style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
                         >
@@ -375,7 +383,7 @@ const AdminUsers = () => {
             <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <HiChevronLeft />
             </button>
-            <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--primary)', color: '#FFFFFF', border: 'none', fontWeight: 800, cursor: 'pointer' }}>
+            <button className="pagination-active-btn" style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--primary)', color: 'var(--primary-contrast, #090B10)', border: 'none', fontWeight: 900, cursor: 'pointer' }}>
               1
             </button>
             <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', cursor: 'pointer' }}>

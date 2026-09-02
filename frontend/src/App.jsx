@@ -30,6 +30,7 @@ import MemberProfile from './pages/member/Profile';
 // Admin pages
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminUsers from './pages/admin/Users';
+import AdminUserDetails from './pages/admin/UserDetails';
 import AdminEvents from './pages/admin/Events';
 import AdminRegistrations from './pages/admin/Registrations';
 import AdminAttendance from './pages/admin/Attendance';
@@ -85,6 +86,7 @@ function App() {
               {/* SuperAdmin routes */}
               <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminUsers /></ProtectedRoute>} />
+              <Route path="/admin/users/:userId" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminUserDetails /></ProtectedRoute>} />
               <Route path="/admin/events" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminEvents /></ProtectedRoute>} />
               <Route path="/admin/registrations" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminRegistrations /></ProtectedRoute>} />
               <Route path="/admin/attendance" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminAttendance /></ProtectedRoute>} />
