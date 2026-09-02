@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { HiShieldCheck, HiLockClosed, HiMail, HiArrowRight } from 'react-icons/hi';
+import { HiShieldCheck, HiLockClosed, HiMail, HiArrowRight, HiClock } from 'react-icons/hi';
 
 const Login = () => {
-  const { login, getDashboardPath } = useAuth();
+  const { login, getDashboardPath, isAuthenticated, role, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isIdleLogout = searchParams.get('reason') === 'idle_timeout';
@@ -13,6 +13,13 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // If already authenticated and not an idle timeout redirect, automatically forward to user dashboard
+  useEffect(() => {
+    if (!authLoading && isAuthenticated && role && !isIdleLogout) {
+      navigate(getDashboardPath(role), { replace: true });
+    }
+  }, [isAuthenticated, role, authLoading, isIdleLogout, navigate]);
+
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
@@ -20,8 +27,8 @@ const Login = () => {
     setError('');
     setLoading(true);
     try {
-      const role = await login(form.email, form.password);
-      navigate(getDashboardPath(role));
+      const userRole = await login(form.email, form.password);
+      navigate(getDashboardPath(userRole));
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please verify credentials.');
     } finally {
@@ -111,8 +118,27 @@ const Login = () => {
         </div>
 
         {isIdleLogout && (
-          <div className="alert alert-warning" style={{ fontSize: '0.78rem', marginBottom: '18px' }}>
-            🔒 Auto signed out after <strong>5 minutes of inactivity</strong> for security.
+          <div
+            style={{
+              background: 'rgba(245, 158, 11, 0.12)',
+              border: '1.5px solid rgba(245, 158, 11, 0.35)',
+              borderRadius: 14,
+              padding: '12px 16px',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+            }}
+          >
+            <span style={{ fontSize: '1.35rem' }}>⏳</span>
+            <div>
+              <strong style={{ color: '#F59E0B', fontSize: '0.86rem', display: 'block' }}>
+                Session Inactivity Timeout
+              </strong>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', lineHeight: 1.35, display: 'block' }}>
+                You were automatically signed out due to inactivity on the dashboard. Please sign in again.
+              </span>
+            </div>
           </div>
         )}
 

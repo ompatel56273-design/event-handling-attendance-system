@@ -436,7 +436,7 @@ const PublicLanding = () => {
               </a>
 
               <Link
-                to="/login"
+                to={isAuthenticated ? getDashboardPath(role) : "/login"}
                 style={{
                   height: 48,
                   padding: '0 26px',
@@ -453,7 +453,7 @@ const PublicLanding = () => {
                   boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.03)',
                 }}
               >
-                <HiUser style={{ color: textMuted, fontSize: '1.1rem' }} /> Student Sign In
+                <HiUser style={{ color: textMuted, fontSize: '1.1rem' }} /> {isAuthenticated ? 'Go to Dashboard' : 'Student & Admin Sign In'}
               </Link>
             </div>
 

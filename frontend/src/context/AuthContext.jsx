@@ -75,11 +75,11 @@ export const AuthProvider = ({ children }) => {
     setRole(null);
   };
 
-  // 5-minute Inactivity Auto-Logout ONLY for SuperAdmin on dashboard
+  // 15-minute Inactivity Auto-Logout for SuperAdmin on dashboard
   useEffect(() => {
     if (!token || role !== 'SUPER_ADMIN') return;
 
-    const IDLE_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+    const IDLE_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes of inactivity
     let timeoutId;
 
     const handleIdleLogout = () => {
@@ -106,6 +106,31 @@ export const AuthProvider = ({ children }) => {
       activityEvents.forEach(evt => window.removeEventListener(evt, resetTimer));
     };
   }, [token, role]);
+
+  // Cross-Tab Session Synchronization
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'token') {
+        if (!e.newValue) {
+          // Logged out in another tab
+          setToken(null);
+          setUser(null);
+          setRole(null);
+        } else {
+          // Logged in in another tab
+          setToken(e.newValue);
+          const savedUser = localStorage.getItem('user');
+          const savedRole = localStorage.getItem('role');
+          if (savedUser) {
+            try { setUser(JSON.parse(savedUser)); } catch (err) {}
+          }
+          if (savedRole) setRole(savedRole);
+        }
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const updateUser = (updatedData) => {
     const newUser = { ...user, ...updatedData };
