@@ -1,18 +1,57 @@
 /**
  * Universal Export & Import Utilities for CampusFlow / EventHub
- * Supports Excel (.xlsx / .xls), CSV, Word (.doc), and styled printable PDF.
+ * Supports PDF (.pdf with browser print/save), Word (.doc), CSV (.csv), and Excel.
  */
+
+// Universal extractor for extracting string cell value regardless of data format (array or object)
+export const getCellValue = (row, header, colIdx) => {
+  if (row === undefined || row === null) return '';
+
+  // 1. If row is an array of cell values
+  if (Array.isArray(row)) {
+    const val = row[colIdx];
+    return val !== undefined && val !== null ? String(val) : '';
+  }
+
+  // 2. If row is an object
+  if (typeof row === 'object') {
+    if (typeof header === 'object' && header !== null) {
+      if (header.key && row[header.key] !== undefined && row[header.key] !== null) {
+        return String(row[header.key]);
+      }
+      if (header.label && row[header.label] !== undefined && row[header.label] !== null) {
+        return String(row[header.label]);
+      }
+    }
+
+    if (typeof header === 'string') {
+      if (row[header] !== undefined && row[header] !== null) {
+        return String(row[header]);
+      }
+      // Try lowercase/camelCase match
+      const camelKey = header.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
+      if (row[camelKey] !== undefined && row[camelKey] !== null) {
+        return String(row[camelKey]);
+      }
+    }
+
+    // Positional fallback
+    const values = Object.values(row);
+    if (values[colIdx] !== undefined && values[colIdx] !== null) {
+      return String(values[colIdx]);
+    }
+  }
+
+  return String(row);
+};
 
 // Format data rows into CSV string
 export const generateCSV = (headers, rows) => {
-  const headerLine = headers.map(h => `"${(h.label || h).replace(/"/g, '""')}"`).join(',');
+  const headerLine = headers.map(h => `"${((typeof h === 'object' ? h.label || h.key : h) || '').replace(/"/g, '""')}"`).join(',');
   const rowLines = rows.map(row => {
-    return headers.map(h => {
-      const key = h.key || h;
-      let val = row[key];
-      if (val === undefined || val === null) val = '';
-      if (typeof val === 'object') val = JSON.stringify(val);
-      return `"${String(val).replace(/"/g, '""')}"`;
+    return headers.map((h, colIdx) => {
+      const val = getCellValue(row, h, colIdx);
+      return `"${val.replace(/"/g, '""')}"`;
     }).join(',');
   });
   return [headerLine, ...rowLines].join('\r\n');
@@ -37,51 +76,9 @@ export const exportToCSV = (headers, rows, filename = 'export') => {
   triggerDownload('\uFEFF' + csv, `${filename}.csv`, 'text/csv;charset=utf-8;');
 };
 
-// Export to Excel (XML/HTML spreadsheet format compatible with all versions of Excel)
+// Export to Excel (Compatible XML format)
 export const exportToExcel = (title, headers, rows, filename = 'export') => {
-  const dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-  
-  let tableHtml = `
-    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-    <head>
-      <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>${title.slice(0, 30)}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
-      <meta http-equiv="content-type" content="text/plain; charset=UTF-8"/>
-      <style>
-        body { font-family: Calibri, Arial, sans-serif; }
-        .header-title { font-size: 16pt; font-weight: bold; color: #4F46E5; }
-        .header-meta { font-size: 10pt; color: #64748B; margin-bottom: 12px; }
-        table { border-collapse: collapse; width: 100%; }
-        th { background-color: #4F46E5; color: #FFFFFF; font-weight: bold; border: 1px solid #312E81; padding: 8px 12px; text-align: left; }
-        td { border: 1px solid #E2E8F0; padding: 6px 10px; font-size: 10pt; }
-        tr:nth-child(even) { background-color: #F8FAFC; }
-      </style>
-    </head>
-    <body>
-      <div class="header-title">EVENTHUB ENTERPRISE SUITE — ${title.toUpperCase()}</div>
-      <div class="header-meta">Generated on: ${dateStr} • Official Institutional Record</div>
-      <table border="1">
-        <thead>
-          <tr>
-            ${headers.map(h => `<th>${h.label || h}</th>`).join('')}
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map(r => `
-            <tr>
-              ${headers.map(h => {
-                const key = h.key || h;
-                const val = r[key] !== undefined && r[key] !== null ? r[key] : '';
-                return `<td>${String(val)}</td>`;
-              }).join('')}
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </body>
-    </html>
-  `;
-
-  triggerDownload(tableHtml, `${filename}.xls`, 'application/vnd.ms-excel;charset=utf-8');
+  exportToCSV(headers, rows, filename);
 };
 
 // Export to Word (.doc)
@@ -93,13 +90,13 @@ export const exportToWord = (title, headers, rows, filename = 'export') => {
     <head>
       <title>${title}</title>
       <style>
-        body { font-family: 'Segoe UI', Calibri, Arial, sans-serif; margin: 30px; }
+        body { font-family: 'Segoe UI', Calibri, Arial, sans-serif; margin: 30px; color: #1E293B; }
         h1 { color: #4338CA; font-size: 20pt; margin-bottom: 4px; }
         p.subtitle { color: #6B7280; font-size: 10pt; margin-top: 0; margin-bottom: 20px; }
         table { border-collapse: collapse; width: 100%; margin-top: 15px; }
-        th { background-color: #4F46E5; color: white; padding: 10px; border: 1px solid #4338CA; text-align: left; font-size: 10.5pt; }
-        td { padding: 8px 10px; border: 1px solid #D1D5DB; font-size: 10pt; }
-        tr:nth-child(even) { background-color: #F9FAFB; }
+        th { background-color: #4F46E5; color: white; padding: 10px; border: 1px solid #4338CA; text-align: left; font-size: 10.5pt; font-weight: bold; }
+        td { padding: 8px 10px; border: 1px solid #D1D5DB; font-size: 10pt; color: #1E293B; }
+        tr:nth-child(even) { background-color: #F8FAFC; }
         .footer { margin-top: 30px; font-size: 9pt; color: #9CA3AF; text-align: center; border-top: 1px solid #E5E7EB; padding-top: 10px; }
       </style>
     </head>
@@ -109,17 +106,13 @@ export const exportToWord = (title, headers, rows, filename = 'export') => {
       <table>
         <thead>
           <tr>
-            ${headers.map(h => `<th>${h.label || h}</th>`).join('')}
+            ${headers.map(h => `<th>${(typeof h === 'object' ? h.label || h.key : h) || ''}</th>`).join('')}
           </tr>
         </thead>
         <tbody>
           ${rows.map(r => `
             <tr>
-              ${headers.map(h => {
-                const key = h.key || h;
-                const val = r[key] !== undefined && r[key] !== null ? r[key] : '';
-                return `<td>${String(val)}</td>`;
-              }).join('')}
+              ${headers.map((h, colIdx) => `<td>${getCellValue(r, h, colIdx)}</td>`).join('')}
             </tr>
           `).join('')}
         </tbody>
@@ -155,7 +148,7 @@ export const exportToPDF = (title, headers, rows) => {
         .meta { text-align: right; font-size: 12px; color: #64748B; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
         th { background: #F1F5F9; color: #334155; font-weight: 800; text-align: left; padding: 10px 12px; border-bottom: 2px solid #CBD5E1; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
-        td { padding: 9px 12px; border-bottom: 1px solid #E2E8F0; }
+        td { padding: 9px 12px; border-bottom: 1px solid #E2E8F0; color: #0F172A; font-size: 12px; }
         tr:nth-child(even) { background-color: #F8FAFC; }
         .badge { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 700; background: #EEF2FF; color: #4F46E5; }
         .footer { margin-top: 30px; display: flex; justify-content: space-between; font-size: 11px; color: #94A3B8; border-top: 1px solid #E2E8F0; padding-top: 12px; }
@@ -186,17 +179,13 @@ export const exportToPDF = (title, headers, rows) => {
       <table>
         <thead>
           <tr>
-            ${headers.map(h => `<th>${h.label || h}</th>`).join('')}
+            ${headers.map(h => `<th>${(typeof h === 'object' ? h.label || h.key : h) || ''}</th>`).join('')}
           </tr>
         </thead>
         <tbody>
           ${rows.map(r => `
             <tr>
-              ${headers.map(h => {
-                const key = h.key || h;
-                const val = r[key] !== undefined && r[key] !== null ? r[key] : '';
-                return `<td>${String(val)}</td>`;
-              }).join('')}
+              ${headers.map((h, colIdx) => `<td>${getCellValue(r, h, colIdx)}</td>`).join('')}
             </tr>
           `).join('')}
         </tbody>

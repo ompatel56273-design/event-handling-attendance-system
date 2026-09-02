@@ -157,67 +157,7 @@ const ExportDropdown = ({
               Select File Format
             </div>
 
-            {/* Option 1: Excel */}
-            <button
-              onClick={() => handleExport('excel')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                padding: '10px 12px',
-                borderRadius: 10,
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-primary)',
-                fontSize: '0.86rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'background 120ms ease',
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-app)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-            >
-              <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(16, 185, 129, 0.14)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <FaFileExcel />
-              </div>
-              <div>
-                <strong style={{ display: 'block' }}>Excel Spreadsheet</strong>
-                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>.xlsx / .xls format</span>
-              </div>
-            </button>
-
-            {/* Option 2: CSV */}
-            <button
-              onClick={() => handleExport('csv')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                padding: '10px 12px',
-                borderRadius: 10,
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-primary)',
-                fontSize: '0.86rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'background 120ms ease',
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-app)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-            >
-              <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(56, 189, 248, 0.14)', color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <FaFileCsv />
-              </div>
-              <div>
-                <strong style={{ display: 'block' }}>CSV Document</strong>
-                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>.csv delimited file</span>
-              </div>
-            </button>
-
-            {/* Option 3: PDF */}
+            {/* Option 1: PDF */}
             <button
               onClick={() => handleExport('pdf')}
               style={{
@@ -247,7 +187,7 @@ const ExportDropdown = ({
               </div>
             </button>
 
-            {/* Option 4: Word */}
+            {/* Option 2: Word */}
             <button
               onClick={() => handleExport('word')}
               style={{
@@ -273,7 +213,37 @@ const ExportDropdown = ({
               </div>
               <div>
                 <strong style={{ display: 'block' }}>Word Document</strong>
-                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>.doc formatted export</span>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>.doc format</span>
+              </div>
+            </button>
+
+            {/* Option 3: CSV */}
+            <button
+              onClick={() => handleExport('csv')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                padding: '10px 12px',
+                borderRadius: 10,
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-primary)',
+                fontSize: '0.86rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'background 120ms ease',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-app)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            >
+              <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(56, 189, 248, 0.14)', color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <FaFileCsv />
+              </div>
+              <div>
+                <strong style={{ display: 'block' }}>CSV Spreadsheet</strong>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>.csv delimited file</span>
               </div>
             </button>
           </div>
