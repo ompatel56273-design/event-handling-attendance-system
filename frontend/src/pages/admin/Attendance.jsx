@@ -4,12 +4,13 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import QRCode from 'react-qr-code';
 import LiveQRScanner from '../../components/common/LiveQRScanner';
 import FullScreenQRModal from '../../components/common/FullScreenQRModal';
+import ExportDropdown from '../../components/common/ExportDropdown';
 import {
   HiCheckCircle, HiXCircle, HiInformationCircle,
   HiCamera, HiRefresh, HiLocationMarker, HiCalendar,
   HiDownload, HiFilter, HiArrowsExpand, HiX
 } from 'react-icons/hi';
-import { FaFileExcel, FaFileCsv, FaIdBadge } from 'react-icons/fa';
+import { FaIdBadge } from 'react-icons/fa';
 
 const AdminAttendance = () => {
   const [events, setEvents] = useState([]);
@@ -34,8 +35,8 @@ const AdminAttendance = () => {
     try {
       const res = await api.get('/admin/events');
       const evts = Array.isArray(res.data) && res.data.length > 0 ? res.data : [
-        { _id: 'e3', eventId: 'EVT-1003', name: 'Poster Presentation', location: 'Auditorium', date: '2024-06-18' },
-        { _id: 'e4', eventId: 'EVT-1004', name: 'Code Carnival 2.0', location: 'Seminar Hall', date: '2024-05-25' },
+        { _id: 'e3', eventId: 'EVT-1003', name: 'Poster Presentation', location: 'Auditorium', date: '2026-06-18' },
+        { _id: 'e4', eventId: 'EVT-1004', name: 'Code Carnival 2.0', location: 'Seminar Hall', date: '2026-07-25' },
       ];
       setEvents(evts);
       setSelectedEvent(evts[0]._id);
@@ -59,7 +60,7 @@ const AdminAttendance = () => {
             {
               _id: 'reg-charlie',
               student: { firstName: 'Charlie', lastName: 'Brown', userId: 'USR-102941', department: 'BCA', year: 2, className: 'C', rollNumber: '21BCA088' },
-              qrToken: 'ATT-CAMPUS-POSTER-2024-941',
+              qrToken: 'ATT-CAMPUS-POSTER-2026-941',
               status: 'REGISTERED',
             },
           ];
@@ -129,30 +130,55 @@ const AdminAttendance = () => {
   const currentStudent = activeRegistration?.student || activeRegistration?.user || {};
   const studentName = `${currentStudent.firstName || 'Charlie'} ${currentStudent.lastName || 'Brown'}`.trim();
   const studentInitials = (studentName[0] || 'C').toUpperCase();
-  const qrValue = activeRegistration?.qrToken || `ATT-EVENT-${currentEvent.eventId || '2024'}-${currentStudent.userId || '102941'}`;
+  const qrValue = activeRegistration?.qrToken || `ATT-EVENT-${currentEvent.eventId || '2026'}-${currentStudent.userId || '102941'}`;
+
+  // Export Data normalization
+  const exportHeaders = [
+    { key: 'studentName', label: 'Student Name' },
+    { key: 'userId', label: 'User ID' },
+    { key: 'department', label: 'Department' },
+    { key: 'rollNumber', label: 'Roll Number' },
+    { key: 'eventName', label: 'Event Name' },
+    { key: 'status', label: 'Attendance Status' },
+    { key: 'verifiedDate', label: 'Verified Date / Time' },
+  ];
+
+  const exportRows = participants.map((p) => {
+    const s = p.student || p.user || {};
+    return {
+      studentName: `${s.firstName || ''} ${s.lastName || ''}`.trim() || 'Student',
+      userId: s.userId || '—',
+      department: s.department || 'BCA',
+      rollNumber: s.rollNumber || '—',
+      eventName: currentEvent.name || 'Campus Event',
+      status: p.status === 'ATTENDED' ? 'VERIFIED' : 'PENDING',
+      verifiedDate: p.markedAt ? new Date(p.markedAt).toLocaleString('en-GB') : 'Not marked',
+    };
+  });
 
   return (
     <DashboardLayout>
-      {/* =========================================================================
-          PAGE HEADER (Exact Super admin/5.png Layout)
-          ========================================================================= */}
+      {/* Page Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
         <div>
           <h1 style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
             Attendance Management
           </h1>
           <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', margin: 0 }}>
-            Issue event attendance QRs and process real-time attendance
+            Issue event attendance QRs, scan credentials, and export records
           </p>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <button className="btn btn-secondary" style={{ borderRadius: 12, padding: '10px 18px', gap: 8 }}>
-            <FaFileExcel /> Export Excel
-          </button>
-          <button className="btn btn-secondary" style={{ borderRadius: 12, padding: '10px 18px', gap: 8 }}>
-            <FaFileCsv /> Export CSV
-          </button>
+          {/* Multi-Format Export Dropdown */}
+          <ExportDropdown
+            title={`Attendance — ${currentEvent.name || 'Event'}`}
+            headers={exportHeaders}
+            data={exportRows}
+            filename={`Attendance_${(currentEvent.name || 'Event').replace(/\s+/g, '_')}`}
+            showImport={false}
+          />
+
           <button
             className="btn btn-secondary"
             onClick={() => setScanMode(true)}
@@ -160,6 +186,7 @@ const AdminAttendance = () => {
           >
             <HiCamera /> Open Scanner
           </button>
+
           <button
             className="btn btn-primary"
             onClick={handleGenerateQR}
@@ -177,9 +204,7 @@ const AdminAttendance = () => {
         </div>
       )}
 
-      {/* =========================================================================
-          EVENT & USER SELECTOR BAR
-          ========================================================================= */}
+      {/* Event & User Selectors */}
       <div
         style={{
           display: 'grid',
@@ -230,9 +255,7 @@ const AdminAttendance = () => {
         </div>
       </div>
 
-      {/* =========================================================================
-          2 COLUMN SPLIT: ATTENDANCE E-CARD & ATTENDANCE HISTORY
-          ========================================================================= */}
+      {/* 2 Column Split */}
       <div
         style={{
           display: 'grid',
@@ -240,7 +263,7 @@ const AdminAttendance = () => {
           gap: 26,
         }}
       >
-        {/* Left Card: Attendance E-Card */}
+        {/* Left: Attendance E-Card */}
         <div
           style={{
             background: 'var(--bg-card)',
@@ -252,14 +275,13 @@ const AdminAttendance = () => {
             flexDirection: 'column',
           }}
         >
-          {/* Header pill tags */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <span style={{ background: 'rgba(99, 102, 241, 0.12)', color: 'var(--primary)', fontSize: '0.78rem', fontWeight: 800, padding: '4px 14px', borderRadius: 20 }}>
               Attendance E-Card
             </span>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
               <HiCalendar />
-              {currentEvent.date ? new Date(currentEvent.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : '18 June 2024'}
+              {currentEvent.date ? new Date(currentEvent.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : '18 June 2026'}
             </span>
           </div>
 
@@ -271,9 +293,7 @@ const AdminAttendance = () => {
             <HiLocationMarker style={{ color: '#EF4444' }} /> {currentEvent.location || 'Auditorium'}
           </span>
 
-          {/* Student details & QR code block */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-app)', border: '1px solid var(--border-color)', borderRadius: 18, padding: '20px', marginBottom: 20 }}>
-            {/* Student Info */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <div
                 style={{
@@ -308,7 +328,6 @@ const AdminAttendance = () => {
               </div>
             </div>
 
-            {/* QR Code */}
             <div style={{ textAlign: 'center' }}>
               <div
                 onClick={() =>
@@ -351,14 +370,13 @@ const AdminAttendance = () => {
             </div>
           </div>
 
-          {/* Notice bottom box */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', background: 'var(--bg-app)', borderRadius: 14, border: '1px solid var(--border-color)', marginTop: 'auto', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
             <HiInformationCircle style={{ color: 'var(--primary)', fontSize: '1.2rem', flexShrink: 0 }} />
             <span>Only Event Members and Super Admin can scan this QR and mark attendance.</span>
           </div>
         </div>
 
-        {/* Right Card: Attendance History */}
+        {/* Right: Attendance History */}
         <div
           style={{
             background: 'var(--bg-card)',
@@ -378,7 +396,6 @@ const AdminAttendance = () => {
           </div>
 
           {attendanceHistory.length === 0 ? (
-            /* Empty state illustration matching Super admin/5.png */
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', textAlign: 'center' }}>
               <div
                 style={{

@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import ExportDropdown from '../../components/common/ExportDropdown';
 import {
-  HiSearch, HiTrash, HiDownload, HiCalendar,
+  HiSearch, HiTrash, HiCalendar,
   HiTicket, HiCheckCircle, HiXCircle, HiRefresh,
   HiChevronLeft, HiChevronRight, HiFilter
 } from 'react-icons/hi';
-import { FaFileExcel, FaFileCsv } from 'react-icons/fa';
 
 const DEFAULT_MOCK_REGISTRATIONS = [
-  { _id: 'r1', student: { firstName: 'Emma', lastName: 'Wilson', email: 'emma.wilson@email.com', department: 'BSc CA & IT', year: 2, className: 'A', rollNumber: '21BSc021' }, event: { name: 'Debate Competition' }, createdAt: '2024-05-13', status: 'REGISTERED' },
-  { _id: 'r2', student: { firstName: 'John', lastName: 'Doe', email: 'john.doe@email.com', department: 'BCA', year: 2, className: 'A', rollNumber: '21BCA102' }, event: { name: 'UI/UX Design Challenge' }, createdAt: '2024-05-12', status: 'REGISTERED' },
-  { _id: 'r3', student: { firstName: 'Bob', lastName: 'Johnson', email: 'bob.johnson@email.com', department: 'BCA', year: 1, className: 'A', rollNumber: '22BCA042' }, event: { name: 'Code Carnival 2.0' }, createdAt: '2024-05-12', status: 'REGISTERED' },
-  { _id: 'r4', student: { firstName: 'Charlie', lastName: 'Brown', email: 'charlie.brown@email.com', department: 'BCA', year: 2, className: 'C', rollNumber: '21BCA088' }, event: { name: 'Poster Presentation' }, createdAt: '2024-05-12', status: 'REGISTERED' },
-  { _id: 'r5', student: { firstName: 'Alice', lastName: 'Smith', email: 'alice.smith@email.com', department: 'BSc CA & IT', year: 3, className: 'B', rollNumber: '20BSc015' }, event: { name: 'Code Carnival 2.0' }, createdAt: '2024-05-11', status: 'REGISTERED' },
-  { _id: 'r6', student: { firstName: 'Alice', lastName: 'Smith', email: 'alice.smith@email.com', department: 'BSc CA & IT', year: 3, className: 'B', rollNumber: '20BSc015' }, event: { name: 'UI/UX Design Challenge' }, createdAt: '2024-05-11', status: 'ATTENDED' },
-  { _id: 'r7', student: { firstName: 'John', lastName: 'Doe', email: 'john.doe@email.com', department: 'BCA', year: 2, className: 'A', rollNumber: '21BCA102' }, event: { name: 'Code Carnival 2.0' }, createdAt: '2024-05-10', status: 'ATTENDED' },
+  { _id: 'r1', student: { firstName: 'Emma', lastName: 'Wilson', email: 'emma.wilson@email.com', department: 'BSc CA & IT', year: 2, className: 'A', rollNumber: '21BSc021' }, event: { name: 'Debate Competition' }, createdAt: '2026-05-13', status: 'REGISTERED' },
+  { _id: 'r2', student: { firstName: 'John', lastName: 'Doe', email: 'john.doe@email.com', department: 'BCA', year: 2, className: 'A', rollNumber: '21BCA102' }, event: { name: 'UI/UX Design Challenge' }, createdAt: '2026-05-12', status: 'REGISTERED' },
+  { _id: 'r3', student: { firstName: 'Bob', lastName: 'Johnson', email: 'bob.johnson@email.com', department: 'BCA', year: 1, className: 'A', rollNumber: '22BCA042' }, event: { name: 'Code Carnival 2.0' }, createdAt: '2026-05-12', status: 'REGISTERED' },
+  { _id: 'r4', student: { firstName: 'Charlie', lastName: 'Brown', email: 'charlie.brown@email.com', department: 'BCA', year: 2, className: 'C', rollNumber: '21BCA088' }, event: { name: 'Poster Presentation' }, createdAt: '2026-05-12', status: 'REGISTERED' },
+  { _id: 'r5', student: { firstName: 'Alice', lastName: 'Smith', email: 'alice.smith@email.com', department: 'BSc CA & IT', year: 3, className: 'B', rollNumber: '20BSc015' }, event: { name: 'Code Carnival 2.0' }, createdAt: '2026-05-11', status: 'REGISTERED' },
+  { _id: 'r6', student: { firstName: 'Alice', lastName: 'Smith', email: 'alice.smith@email.com', department: 'BSc CA & IT', year: 3, className: 'B', rollNumber: '20BSc015' }, event: { name: 'UI/UX Design Challenge' }, createdAt: '2026-05-11', status: 'ATTENDED' },
+  { _id: 'r7', student: { firstName: 'John', lastName: 'Doe', email: 'john.doe@email.com', department: 'BCA', year: 2, className: 'A', rollNumber: '21BCA102' }, event: { name: 'Code Carnival 2.0' }, createdAt: '2026-05-10', status: 'ATTENDED' },
 ];
 
 const AdminRegistrations = () => {
@@ -67,28 +67,32 @@ const AdminRegistrations = () => {
     }
   };
 
-  const handleExport = async (format = 'xlsx') => {
-    try {
-      const res = await api.get(`/admin/registrations/export?eventId=${selectedEvent === 'All' ? '' : selectedEvent}&format=${format}`, {
-        responseType: 'blob',
-      });
-      const blob = new Blob([res.data], {
-        type: format === 'csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      });
-      const link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      link.download = `Registrations_${selectedEvent !== 'All' ? 'Event' : 'All'}_${new Date().toISOString().split('T')[0]}.${format}`;
-      link.click();
-    } catch (err) {
-      console.error('Export failed:', err);
-    }
-  };
-
   const handleReset = () => {
     setSelectedEvent('All');
     setSelectedDept('All');
     setSelectedStatus('All');
     setSearch('');
+  };
+
+  const handleImportRegistrations = (importedRows) => {
+    const newRegs = importedRows.map((row, idx) => ({
+      _id: `reg-imported-${Date.now()}-${idx}`,
+      student: {
+        firstName: row.firstName || row.studentName?.split(' ')[0] || 'Student',
+        lastName: row.lastName || row.studentName?.split(' ').slice(1).join(' ') || '',
+        email: row.email || 'student@email.com',
+        department: row.department || 'BCA',
+        year: row.year || 2,
+        className: row.className || 'A',
+        rollNumber: row.rollNumber || row.roll || '21BCA100',
+      },
+      event: { name: row.eventName || row.event || 'Campus Event' },
+      createdAt: new Date().toISOString(),
+      status: row.status || 'REGISTERED',
+    }));
+
+    setRegistrations(prev => [...newRegs, ...prev]);
+    setMsg({ type: 'success', text: `Imported ${importedRows.length} registration records!` });
   };
 
   // Metrics
@@ -113,57 +117,54 @@ const AdminRegistrations = () => {
     return matchesSearch && matchesEvent && matchesDept && matchesStatus;
   });
 
+  // Export Data normalization
+  const exportHeaders = [
+    { key: 'studentName', label: 'Student Name' },
+    { key: 'email', label: 'Email' },
+    { key: 'department', label: 'Department' },
+    { key: 'yearClass', label: 'Year / Class' },
+    { key: 'rollNumber', label: 'Roll Number' },
+    { key: 'eventName', label: 'Event Name' },
+    { key: 'joinedDate', label: 'Joined Date' },
+    { key: 'status', label: 'Status' },
+  ];
+
+  const exportRows = filteredRegs.map(r => {
+    const s = r.student || r.user || {};
+    return {
+      studentName: `${s.firstName || ''} ${s.lastName || ''}`.trim() || s.name || 'Student',
+      email: s.email || '—',
+      department: s.department || 'BCA',
+      yearClass: `${s.year || 2} / ${s.className || 'A'}`,
+      rollNumber: s.rollNumber || '—',
+      eventName: r.event?.name || 'Campus Event',
+      joinedDate: new Date(r.createdAt || Date.now()).toLocaleDateString('en-GB'),
+      status: r.status || 'REGISTERED',
+    };
+  });
+
   return (
     <DashboardLayout>
-      {/* =========================================================================
-          PAGE HEADER (Exact Super admin/4.png Layout)
-          ========================================================================= */}
+      {/* Page Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
         <div>
           <h1 style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
             Registration Management
           </h1>
           <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', margin: 0 }}>
-            View, filter, and manage all student event registrations
+            View, filter, export in all formats, and import student event registrations
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <button
-            className="btn btn-primary"
-            onClick={() => handleExport('xlsx')}
-            style={{ borderRadius: 12, fontWeight: 700, padding: '10px 20px', gap: 8 }}
-          >
-            <FaFileExcel /> Export Excel
-          </button>
-
-          <button
-            className="btn btn-secondary"
-            onClick={() => handleExport('csv')}
-            style={{ borderRadius: 12, fontWeight: 700, padding: '10px 20px', gap: 8 }}
-          >
-            <FaFileCsv /> Export CSV
-          </button>
-
-          <button
-            style={{
-              height: 42,
-              padding: '0 16px',
-              borderRadius: 12,
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-primary)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              fontWeight: 700,
-              fontSize: '0.86rem',
-              cursor: 'pointer',
-            }}
-          >
-            <HiFilter /> Filters
-          </button>
-        </div>
+        {/* Multi-Format Export Dropdown & Import Button */}
+        <ExportDropdown
+          title="Student Event Registrations"
+          headers={exportHeaders}
+          data={exportRows}
+          filename="Registrations_Report"
+          onImport={handleImportRegistrations}
+          showImport={true}
+        />
       </div>
 
       {msg.text && (
@@ -172,9 +173,7 @@ const AdminRegistrations = () => {
         </div>
       )}
 
-      {/* =========================================================================
-          4 METRIC CARDS ROW
-          ========================================================================= */}
+      {/* 4 Metric Cards Row */}
       <div
         style={{
           display: 'grid',
@@ -220,9 +219,7 @@ const AdminRegistrations = () => {
         </div>
       </div>
 
-      {/* =========================================================================
-          FILTER BAR
-          ========================================================================= */}
+      {/* Filter Bar */}
       <div
         style={{
           display: 'grid',
@@ -304,9 +301,7 @@ const AdminRegistrations = () => {
         </button>
       </div>
 
-      {/* =========================================================================
-          DATA TABLE
-          ========================================================================= */}
+      {/* Data Table */}
       <div
         style={{
           background: 'var(--bg-card)',
@@ -365,7 +360,7 @@ const AdminRegistrations = () => {
                     <td style={{ padding: '14px 18px', color: 'var(--text-muted)' }}>
                       <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <HiCalendar />
-                        {new Date(r.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        {new Date(r.createdAt || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </span>
                     </td>
 

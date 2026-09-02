@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Auth pages
 import Login from './pages/auth/Login';
@@ -38,63 +39,73 @@ import AdminEventMembers from './pages/admin/EventMembers';
 import AdminECards from './pages/admin/ECards';
 import AdminSettings from './pages/admin/Settings';
 
+// Public & Error pages
 import VerifyCertificate from './pages/public/VerifyCertificate';
 import PublicLanding from './pages/public/PublicLanding';
+import NotFound from './pages/public/NotFound';
+import ServerError from './pages/public/ServerError';
 
 function App() {
   return (
-    <BrowserRouter>
-      <ThemeProvider>
-        <AuthProvider>
-          <Routes>
-            {/* Public Landing & Events Showcase Portal */}
-            <Route path="/" element={<PublicLanding />} />
+    <ErrorBoundary>
+      <BrowserRouter>
+        <ThemeProvider>
+          <AuthProvider>
+            <Routes>
+              {/* Public Landing & Events Showcase Portal */}
+              <Route path="/" element={<PublicLanding />} />
 
-            {/* Public certificate verification */}
-            <Route path="/verify-certificate/:certificateId" element={<VerifyCertificate />} />
-            <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
+              {/* Public certificate verification */}
+              <Route path="/verify-certificate/:certificateId" element={<VerifyCertificate />} />
+              <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
 
-            {/* Auth routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+              {/* Auth routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
 
-            {/* User routes */}
-            <Route path="/user/dashboard" element={<ProtectedRoute allowedRoles={['USER']}><UserDashboard /></ProtectedRoute>} />
-            <Route path="/user/profile" element={<ProtectedRoute allowedRoles={['USER']}><UserProfile /></ProtectedRoute>} />
-            <Route path="/user/upcoming-events" element={<ProtectedRoute allowedRoles={['USER']}><UpcomingEvents /></ProtectedRoute>} />
-            <Route path="/user/events" element={<ProtectedRoute allowedRoles={['USER']}><Events /></ProtectedRoute>} />
-            <Route path="/user/my-events" element={<ProtectedRoute allowedRoles={['USER']}><MyEvents /></ProtectedRoute>} />
-            <Route path="/user/winners" element={<ProtectedRoute allowedRoles={['USER']}><Winners /></ProtectedRoute>} />
-            <Route path="/user/settings" element={<ProtectedRoute allowedRoles={['USER']}><UserSettings /></ProtectedRoute>} />
+              {/* User routes */}
+              <Route path="/user/dashboard" element={<ProtectedRoute allowedRoles={['USER']}><UserDashboard /></ProtectedRoute>} />
+              <Route path="/user/profile" element={<ProtectedRoute allowedRoles={['USER']}><UserProfile /></ProtectedRoute>} />
+              <Route path="/user/upcoming-events" element={<ProtectedRoute allowedRoles={['USER']}><UpcomingEvents /></ProtectedRoute>} />
+              <Route path="/user/events" element={<ProtectedRoute allowedRoles={['USER']}><Events /></ProtectedRoute>} />
+              <Route path="/user/my-events" element={<ProtectedRoute allowedRoles={['USER']}><MyEvents /></ProtectedRoute>} />
+              <Route path="/user/winners" element={<ProtectedRoute allowedRoles={['USER']}><Winners /></ProtectedRoute>} />
+              <Route path="/user/settings" element={<ProtectedRoute allowedRoles={['USER']}><UserSettings /></ProtectedRoute>} />
 
-            {/* Event Member routes */}
-            <Route path="/member/dashboard" element={<ProtectedRoute allowedRoles={['EVENT_MEMBER']}><MemberDashboard /></ProtectedRoute>} />
-            <Route path="/member/scanner" element={<ProtectedRoute allowedRoles={['EVENT_MEMBER']}><Scanner /></ProtectedRoute>} />
-            <Route path="/member/events" element={<ProtectedRoute allowedRoles={['EVENT_MEMBER']}><MemberEvents /></ProtectedRoute>} />
-            <Route path="/member/marks" element={<ProtectedRoute allowedRoles={['EVENT_MEMBER']}><MemberMarks /></ProtectedRoute>} />
-            <Route path="/member/profile" element={<ProtectedRoute allowedRoles={['EVENT_MEMBER']}><MemberProfile /></ProtectedRoute>} />
+              {/* Event Member routes */}
+              <Route path="/member/dashboard" element={<ProtectedRoute allowedRoles={['EVENT_MEMBER']}><MemberDashboard /></ProtectedRoute>} />
+              <Route path="/member/scanner" element={<ProtectedRoute allowedRoles={['EVENT_MEMBER']}><Scanner /></ProtectedRoute>} />
+              <Route path="/member/events" element={<ProtectedRoute allowedRoles={['EVENT_MEMBER']}><MemberEvents /></ProtectedRoute>} />
+              <Route path="/member/marks" element={<ProtectedRoute allowedRoles={['EVENT_MEMBER']}><MemberMarks /></ProtectedRoute>} />
+              <Route path="/member/profile" element={<ProtectedRoute allowedRoles={['EVENT_MEMBER']}><MemberProfile /></ProtectedRoute>} />
 
-            {/* SuperAdmin routes */}
-            <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminDashboard /></ProtectedRoute>} />
-            <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminUsers /></ProtectedRoute>} />
-            <Route path="/admin/events" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminEvents /></ProtectedRoute>} />
-            <Route path="/admin/registrations" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminRegistrations /></ProtectedRoute>} />
-            <Route path="/admin/attendance" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminAttendance /></ProtectedRoute>} />
-            <Route path="/admin/marks" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminMarks /></ProtectedRoute>} />
-            <Route path="/admin/winners" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminWinners /></ProtectedRoute>} />
-            <Route path="/admin/event-members" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminEventMembers /></ProtectedRoute>} />
-            <Route path="/admin/e-cards" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminECards /></ProtectedRoute>} />
-            <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminSettings /></ProtectedRoute>} />
+              {/* SuperAdmin routes */}
+              <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminUsers /></ProtectedRoute>} />
+              <Route path="/admin/events" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminEvents /></ProtectedRoute>} />
+              <Route path="/admin/registrations" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminRegistrations /></ProtectedRoute>} />
+              <Route path="/admin/attendance" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminAttendance /></ProtectedRoute>} />
+              <Route path="/admin/marks" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminMarks /></ProtectedRoute>} />
+              <Route path="/admin/winners" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminWinners /></ProtectedRoute>} />
+              <Route path="/admin/event-members" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminEventMembers /></ProtectedRoute>} />
+              <Route path="/admin/e-cards" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminECards /></ProtectedRoute>} />
+              <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']}><AdminSettings /></ProtectedRoute>} />
 
-            {/* Catch all */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </AuthProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+              {/* Explicit error routes */}
+              <Route path="/500" element={<ServerError />} />
+              <Route path="/error" element={<ServerError />} />
+              <Route path="/404" element={<NotFound />} />
+
+              {/* 404 Catch-All */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 
