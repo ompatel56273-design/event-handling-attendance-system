@@ -16,12 +16,10 @@ const Login = () => {
 
   // If already authenticated and not an idle timeout / session superseded redirect, forward to dashboard
   useEffect(() => {
-    const savedToken = token || localStorage.getItem('token');
-    const savedRole = role || localStorage.getItem('role');
-    if (savedToken && savedRole && !isIdleLogout && !isSessionSuperseded) {
-      navigate(getDashboardPath(savedRole), { replace: true });
+    if (!authLoading && isAuthenticated && role && !isIdleLogout && !isSessionSuperseded) {
+      navigate(getDashboardPath(role), { replace: true });
     }
-  }, [isAuthenticated, role, token, isIdleLogout, isSessionSuperseded, navigate]);
+  }, [isAuthenticated, role, authLoading, isIdleLogout, isSessionSuperseded, navigate]);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 

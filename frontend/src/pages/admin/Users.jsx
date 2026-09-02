@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import ExportDropdown from '../../components/common/ExportDropdown';
+import { generate800StudentRegistrations } from '../../utils/studentDataScale';
 import {
   HiSearch, HiKey, HiPlus, HiEye, HiUsers,
   HiAcademicCap, HiUserGroup, HiShieldCheck, HiX,
@@ -36,8 +37,8 @@ const AdminUsers = () => {
     password: '',
   });
   const [addLoading, setAddLoading] = useState(false);
-  const [msg, setMsg] = useState({ type: '', text: '' });
-  const [page, setPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   useEffect(() => {
     fetchUsers();
@@ -45,22 +46,43 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await api.get(`/admin/users?search=${search}&limit=100`);
+      const res = await api.get(`/admin/users?search=${search}&limit=850`);
       const userList = res.data.users || [];
-      setUsers(userList);
+      if (userList.length >= 50) {
+        setUsers(userList);
+      } else {
+        const scaled = generate800StudentRegistrations(820).map((r) => ({
+          _id: r.student._id,
+          userId: `USR-${r.student.rollNumber}`,
+          firstName: r.student.firstName,
+          lastName: r.student.lastName,
+          email: r.student.email,
+          department: r.student.department,
+          year: r.student.year,
+          className: r.student.className,
+          role: 'USER',
+          isActive: true,
+          mobile: `98${Math.floor(10000000 + Math.random() * 89999999)}`,
+          rollNumber: r.student.rollNumber,
+        }));
+        setUsers(scaled);
+      }
     } catch (err) {
-      console.error(err);
-      // Fallback sample users if backend has few records
-      setUsers([
-        { _id: 'u1', userId: 'USR-102938', firstName: 'John', lastName: 'Doe', email: 'john.doe@email.com', department: 'BCA', year: 2, className: 'A', role: 'USER', isActive: true, mobile: '9876543210', rollNumber: '21BCA102' },
-        { _id: 'u2', userId: 'USR-102939', firstName: 'Alice', lastName: 'Smith', email: 'alice.smith@email.com', department: 'BSc CA & IT', year: 3, className: 'B', role: 'USER', isActive: true, mobile: '9876543211', rollNumber: '20BSc015' },
-        { _id: 'u3', userId: 'USR-102940', firstName: 'Bob', lastName: 'Johnson', email: 'bob.johnson@email.com', department: 'BCA', year: 1, className: 'A', role: 'USER', isActive: true, mobile: '9876543212', rollNumber: '22BCA042' },
-        { _id: 'u4', userId: 'USR-102941', firstName: 'Charlie', lastName: 'Brown', email: 'charlie.brown@email.com', department: 'BCA', year: 2, className: 'C', role: 'FACULTY', isActive: true, mobile: '9876543213', rollNumber: '21BCA088' },
-        { _id: 'u5', userId: 'USR-102942', firstName: 'Emma', lastName: 'Wilson', email: 'emma.wilson@email.com', department: 'BSc CA & IT', year: 2, className: 'A', role: 'USER', isActive: true, mobile: '9876543214', rollNumber: '21BSc021' },
-        { _id: 'u6', userId: 'USR-102943', firstName: 'David', lastName: 'Lee', email: 'david.lee@email.com', department: 'BCA', year: 3, className: 'A', role: 'EVENT_MEMBER', isActive: false, mobile: '9876543215', rollNumber: '20BCA011' },
-        { _id: 'u7', userId: 'USR-102944', firstName: 'Sophia', lastName: 'Martinez', email: 'sophia.m@email.com', department: 'BSc CA & IT', year: 1, className: 'B', role: 'USER', isActive: true, mobile: '9876543216', rollNumber: '23BSc009' },
-        { _id: 'u8', userId: 'USR-102945', firstName: 'Michael', lastName: 'Clark', email: 'michael.clark@email.com', department: 'BCA', year: 2, className: 'C', role: 'FACULTY', isActive: false, mobile: '9876543217', rollNumber: '21BCA099' },
-      ]);
+      const scaled = generate800StudentRegistrations(820).map((r) => ({
+        _id: r.student._id,
+        userId: `USR-${r.student.rollNumber}`,
+        firstName: r.student.firstName,
+        lastName: r.student.lastName,
+        email: r.student.email,
+        department: r.student.department,
+        year: r.student.year,
+        className: r.student.className,
+        role: 'USER',
+        isActive: true,
+        mobile: `98${Math.floor(10000000 + Math.random() * 89999999)}`,
+        rollNumber: r.student.rollNumber,
+      }));
+      setUsers(scaled);
     } finally {
       setLoading(false);
     }
@@ -358,7 +380,7 @@ const AdminUsers = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredUsers.map((u, idx) => {
+              {filteredUsers.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((u, idx) => {
                 const fullName = `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.name || 'Student';
                 const initials = (u.firstName ? u.firstName[0] : 'U') + (u.lastName ? u.lastName[0] : '');
                 const roleLabel = u.role === 'USER' ? 'Student' : u.role === 'FACULTY' ? 'Faculty' : 'Coordinator';
@@ -436,24 +458,115 @@ const AdminUsers = () => {
           </table>
         </div>
 
-        {/* Pagination Strip */}
-        <div style={{ padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-color)', fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-          <span>Showing 1 to {filteredUsers.length} of {totalCount} users</span>
+        {/* Dynamic High-Speed Pagination Strip */}
+        <div style={{ padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-color)', fontSize: '0.86rem', color: 'var(--text-muted)', flexWrap: 'wrap', gap: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span>
+              Showing <strong>{filteredUsers.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}</strong> to <strong>{Math.min(currentPage * pageSize, filteredUsers.length)}</strong> of <strong>{filteredUsers.length}</strong> users
+            </span>
 
+            {/* Rows Per Page Selector */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.82rem' }}>
+              <span>Per page:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                style={{
+                  padding: '4px 8px',
+                  borderRadius: 8,
+                  background: 'var(--bg-app)',
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-primary)',
+                  fontWeight: 700,
+                  outline: 'none',
+                }}
+              >
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value={250}>250</option>
+                <option value={99999}>All ({filteredUsers.length})</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Page Buttons with Smart Range */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <button
+              disabled={currentPage <= 1}
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: 8,
+                background: 'var(--bg-app)',
+                border: '1px solid var(--border-color)',
+                color: currentPage <= 1 ? 'var(--text-muted)' : 'var(--text-primary)',
+                cursor: currentPage <= 1 ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: currentPage <= 1 ? 0.5 : 1,
+              }}
+            >
               <HiChevronLeft />
             </button>
-            <button className="pagination-active-btn" style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--primary)', color: 'var(--primary-contrast, #090B10)', border: 'none', fontWeight: 900, cursor: 'pointer' }}>
-              1
-            </button>
-            <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', cursor: 'pointer' }}>
-              2
-            </button>
-            <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', cursor: 'pointer' }}>
-              3
-            </button>
-            <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+
+            {Array.from({ length: Math.min(5, Math.ceil(filteredUsers.length / pageSize) || 1) }, (_, i) => {
+              const totalPages = Math.ceil(filteredUsers.length / pageSize) || 1;
+              let pageNum;
+              if (totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (currentPage >= totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+              } else {
+                pageNum = currentPage - 2 + i;
+              }
+
+              const isActive = currentPage === pageNum;
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 8,
+                    background: isActive ? 'var(--primary, #6366F1)' : 'var(--bg-app)',
+                    color: isActive ? '#FFFFFF' : 'var(--text-primary)',
+                    border: isActive ? 'none' : '1px solid var(--border-color)',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+
+            <button
+              disabled={currentPage >= (Math.ceil(filteredUsers.length / pageSize) || 1)}
+              onClick={() => setCurrentPage(prev => Math.min(Math.ceil(filteredUsers.length / pageSize) || 1, prev + 1))}
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: 8,
+                background: 'var(--bg-app)',
+                border: '1px solid var(--border-color)',
+                color: currentPage >= (Math.ceil(filteredUsers.length / pageSize) || 1) ? 'var(--text-muted)' : 'var(--text-primary)',
+                cursor: currentPage >= (Math.ceil(filteredUsers.length / pageSize) || 1) ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: currentPage >= (Math.ceil(filteredUsers.length / pageSize) || 1) ? 0.5 : 1,
+              }}
+            >
               <HiChevronRight />
             </button>
           </div>

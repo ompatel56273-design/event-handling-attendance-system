@@ -260,7 +260,8 @@ exports.getEventParticipants = async (req, res, next) => {
   try {
     const registrations = await EventRegistration.find({ eventId: req.params.id })
       .populate('userId', 'userId firstName lastName department year className rollNumber mobile email profileImage')
-      .sort({ joinedAt: -1 });
+      .sort({ joinedAt: -1 })
+      .lean();
     res.json(registrations);
   } catch (error) {
     next(error);
@@ -275,14 +276,14 @@ exports.getAllEvents = async (req, res, next) => {
     if (search) filter.name = { $regex: search, $options: 'i' };
     if (status) filter.status = status;
 
-    const events = await Event.find(filter).sort({ createdAt: -1 });
+    const events = await Event.find(filter).sort({ createdAt: -1 }).lean();
     const eventsWithCounts = await Promise.all(
       events.map(async (event) => {
         const participantCount = await EventRegistration.countDocuments({
           eventId: event._id,
           status: { $ne: 'REMOVED_BY_ADMIN' },
         });
-        return { ...event.toObject(), participantCount };
+        return { ...event, participantCount };
       })
     );
     res.json(eventsWithCounts);
@@ -303,7 +304,8 @@ exports.getAllRegistrations = async (req, res, next) => {
     let registrations = await EventRegistration.find(filter)
       .populate('userId', 'userId firstName lastName department year className rollNumber mobile email')
       .populate('eventId', 'eventId name date')
-      .sort({ joinedAt: -1 });
+      .sort({ joinedAt: -1 })
+      .lean();
 
     if (search) {
       registrations = registrations.filter(r =>

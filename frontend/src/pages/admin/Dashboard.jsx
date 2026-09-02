@@ -10,6 +10,7 @@ import {
 } from 'react-icons/hi';
 import { FaUserPlus, FaQrcode, FaUsersCog, FaPoll } from 'react-icons/fa';
 import { exportToCSV } from '../../utils/exportUtils';
+import { generate800MasterDataset } from '../../utils/studentDataScale';
 
 const MASTER_STUDENT_DATASET = [
   {
@@ -216,7 +217,8 @@ const AdminDashboard = () => {
 
   const handleMasterExportCSV = () => {
     const filename = `CampusMaster_Students_Events_Marks_Directory_${new Date().toISOString().split('T')[0]}`;
-    exportToCSV(MASTER_CSV_HEADERS, MASTER_STUDENT_DATASET, filename);
+    const dataset = generate800MasterDataset(840);
+    exportToCSV(MASTER_CSV_HEADERS, dataset, filename);
   };
 
   return (

@@ -11,25 +11,20 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(() => localStorage.getItem('token') || null);
-  const [role, setRole] = useState(() => localStorage.getItem('role') || null);
-  const [user, setUser] = useState(() => {
-    try {
-      const saved = localStorage.getItem('user');
-      return saved ? JSON.parse(saved) : null;
-    } catch (e) {
-      return null;
-    }
-  });
-  const [sessionId, setSessionId] = useState(() => localStorage.getItem('sessionId') || null);
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const [sessionId, setSessionId] = useState(null);
 
   useEffect(() => {
     const initAuth = async () => {
-      const savedToken = localStorage.getItem('token');
-      const savedUser = localStorage.getItem('user');
-      const savedRole = localStorage.getItem('role');
-      const savedSessionId = localStorage.getItem('sessionId');
+      // Check sessionStorage (single tab) first, then fallback to localStorage
+      const savedToken = sessionStorage.getItem('token') || localStorage.getItem('token');
+      const savedUser = sessionStorage.getItem('user') || localStorage.getItem('user');
+      const savedRole = sessionStorage.getItem('role') || localStorage.getItem('role');
+      const savedSessionId = sessionStorage.getItem('sessionId') || localStorage.getItem('sessionId');
 
       if (savedToken) {
         try {
@@ -37,15 +32,32 @@ export const AuthProvider = ({ children }) => {
           setToken(savedToken);
           setUser(res.data.user);
           setRole(res.data.role);
-          if (res.data.sessionId) {
-            setSessionId(res.data.sessionId);
-            localStorage.setItem('sessionId', res.data.sessionId);
+
+          if (res.data.role === 'SUPER_ADMIN') {
+            // Super Admin session belongs strictly to sessionStorage
+            sessionStorage.setItem('token', savedToken);
+            sessionStorage.setItem('user', JSON.stringify(res.data.user));
+            sessionStorage.setItem('role', res.data.role);
+            if (res.data.sessionId) {
+              setSessionId(res.data.sessionId);
+              sessionStorage.setItem('sessionId', res.data.sessionId);
+            }
+            // Ensure localStorage is cleared so new tabs do not auto-login
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('role');
+            localStorage.removeItem('sessionId');
+          } else {
+            localStorage.setItem('user', JSON.stringify(res.data.user));
+            localStorage.setItem('role', res.data.role);
           }
-          localStorage.setItem('user', JSON.stringify(res.data.user));
-          localStorage.setItem('role', res.data.role);
         } catch (err) {
           // Token invalid or session superseded
           const isSuperseded = err.response?.data?.code === 'SESSION_SUPERSEDED';
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
+          sessionStorage.removeItem('role');
+          sessionStorage.removeItem('sessionId');
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           localStorage.removeItem('role');
@@ -72,19 +84,38 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email, password });
     const { token: newToken, role: newRole, user: userData, sessionId: newSessionId } = res.data;
-    localStorage.setItem('token', newToken);
-    localStorage.setItem('user', JSON.stringify(userData));
-    localStorage.setItem('role', newRole);
-    if (newSessionId) {
-      localStorage.setItem('sessionId', newSessionId);
-      setSessionId(newSessionId);
-      // Broadcast to all other tabs to terminate old admin sessions
+
+    if (newRole === 'SUPER_ADMIN') {
+      // Super Admin: store ONLY in sessionStorage for 1 single tab isolation
+      sessionStorage.setItem('token', newToken);
+      sessionStorage.setItem('user', JSON.stringify(userData));
+      sessionStorage.setItem('role', newRole);
+      if (newSessionId) {
+        sessionStorage.setItem('sessionId', newSessionId);
+        setSessionId(newSessionId);
+      }
+      // Purge any lingering admin token from localStorage so other tabs NEVER auto-login
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('role');
+      localStorage.removeItem('sessionId');
+
+      // Notify other tabs to close any previous admin session
       try {
         const channel = new BroadcastChannel('admin_single_session_channel');
         channel.postMessage({ type: 'ADMIN_SESSION_STARTED', sessionId: newSessionId });
         channel.close();
       } catch (e) {}
+    } else {
+      localStorage.setItem('token', newToken);
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('role', newRole);
+      if (newSessionId) {
+        localStorage.setItem('sessionId', newSessionId);
+        setSessionId(newSessionId);
+      }
     }
+
     setToken(newToken);
     setUser(userData);
     setRole(newRole);
@@ -97,6 +128,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('sessionId');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('role');

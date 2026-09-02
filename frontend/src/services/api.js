@@ -7,10 +7,10 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Request interceptor — attach JWT token
+// Request interceptor — attach JWT token (sessionStorage for single-tab admin, localStorage for persistent student)
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,6 +25,10 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       const isSuperseded = error.response?.data?.code === 'SESSION_SUPERSEDED';
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('role');
+      sessionStorage.removeItem('sessionId');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('role');
