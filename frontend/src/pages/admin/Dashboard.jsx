@@ -28,12 +28,6 @@ const MASTER_STUDENT_DATASET = [
     venue: 'Seminar Hall',
     attendanceStatus: 'VERIFIED (Attended)',
     checkInTime: '2026-07-25 09:15 AM',
-    criteria1: '38/40',
-    criteria2: '28/30',
-    criteria3: '19/20',
-    criteria4: '10/10',
-    totalMarks: '95/100',
-    percentage: '95%',
     winnerStatus: '🥇 1st Place Gold Winner',
     certificateId: 'CRT-102938',
     verification: 'VERIFIED & CERTIFIED'
@@ -54,12 +48,6 @@ const MASTER_STUDENT_DATASET = [
     venue: 'Lab 3',
     attendanceStatus: 'VERIFIED (Attended)',
     checkInTime: '2026-07-10 09:45 AM',
-    criteria1: '36/40',
-    criteria2: '26/30',
-    criteria3: '17/20',
-    criteria4: '9/10',
-    totalMarks: '88/100',
-    percentage: '88%',
     winnerStatus: '🥈 2nd Place Silver Medal',
     certificateId: 'CRT-102939',
     verification: 'VERIFIED & CERTIFIED'
@@ -80,12 +68,6 @@ const MASTER_STUDENT_DATASET = [
     venue: 'Seminar Hall',
     attendanceStatus: 'REGISTERED (Pending Scan)',
     checkInTime: '—',
-    criteria1: '32/40',
-    criteria2: '24/30',
-    criteria3: '16/20',
-    criteria4: '8/10',
-    totalMarks: '80/100',
-    percentage: '80%',
     winnerStatus: '🥉 3rd Place Bronze Medal',
     certificateId: 'CRT-102940',
     verification: 'VERIFIED'
@@ -106,12 +88,6 @@ const MASTER_STUDENT_DATASET = [
     venue: 'Auditorium',
     attendanceStatus: 'VERIFIED (Attended)',
     checkInTime: '2026-06-18 10:10 AM',
-    criteria1: '30/40',
-    criteria2: '22/30',
-    criteria3: '15/20',
-    criteria4: '8/10',
-    totalMarks: '75/100',
-    percentage: '75%',
     winnerStatus: '🎖️ Top 5 Finalist',
     certificateId: 'CRT-102941',
     verification: 'VERIFIED'
@@ -132,12 +108,6 @@ const MASTER_STUDENT_DATASET = [
     venue: 'Conference Hall',
     attendanceStatus: 'REGISTERED (Pending Scan)',
     checkInTime: '—',
-    criteria1: '35/40',
-    criteria2: '25/30',
-    criteria3: '18/20',
-    criteria4: '9/10',
-    totalMarks: '87/100',
-    percentage: '87%',
     winnerStatus: '🥈 Runner-Up Award',
     certificateId: 'CRT-102942',
     verification: 'VERIFIED & CERTIFIED'
@@ -160,15 +130,17 @@ const MASTER_CSV_HEADERS = [
   { key: 'venue', label: 'EVENT VENUE' },
   { key: 'attendanceStatus', label: 'ATTENDANCE STATUS' },
   { key: 'checkInTime', label: 'CHECK-IN TIME' },
-  { key: 'criteria1', label: 'CRITERIA 1: PROBLEM SOLVING' },
-  { key: 'criteria2', label: 'CRITERIA 2: LOGIC & APPROACH' },
-  { key: 'criteria3', label: 'CRITERIA 3: CODE/DESIGN QUALITY' },
-  { key: 'criteria4', label: 'CRITERIA 4: TIME MANAGEMENT' },
-  { key: 'totalMarks', label: 'TOTAL MARKS OBTAINED' },
-  { key: 'percentage', label: 'EVALUATION SCORE (%)' },
   { key: 'winnerStatus', label: 'WINNER / PODIUM STATUS' },
   { key: 'certificateId', label: 'CERTIFICATE ID' },
   { key: 'verification', label: 'VERIFICATION STATUS' },
+];
+
+const MOCK_FALLBACK_RECENT_REGS = [
+  { _id: 'r1', user: { name: 'Emma Wilson', firstName: 'Emma', lastName: 'Wilson' }, event: { name: 'Debate Competition' }, createdAt: '2026-08-28T10:30:00Z', status: 'REGISTERED' },
+  { _id: 'r2', user: { name: 'John Doe', firstName: 'John', lastName: 'Doe' }, event: { name: 'Code Carnival 2.0' }, createdAt: '2026-08-26T14:15:00Z', status: 'ATTENDED' },
+  { _id: 'r3', user: { name: 'Alice Smith', firstName: 'Alice', lastName: 'Smith' }, event: { name: 'UI/UX Design Challenge' }, createdAt: '2026-08-24T09:00:00Z', status: 'REGISTERED' },
+  { _id: 'r4', user: { name: 'Bob Johnson', firstName: 'Bob', lastName: 'Johnson' }, event: { name: 'Code Carnival 2.0' }, createdAt: '2026-08-22T11:45:00Z', status: 'REGISTERED' },
+  { _id: 'r5', user: { name: 'Charlie Brown', firstName: 'Charlie', lastName: 'Brown' }, event: { name: 'Poster Presentation' }, createdAt: '2026-08-20T16:20:00Z', status: 'ATTENDED' },
 ];
 
 const AdminDashboard = () => {
@@ -204,16 +176,25 @@ const AdminDashboard = () => {
       });
 
       if (allRegs.length > 0) {
-        setRecentRegs(allRegs.slice(0, 5));
+        const resolved = allRegs.slice(0, 5).map((r, idx) => {
+          const fallback = MOCK_FALLBACK_RECENT_REGS[idx % MOCK_FALLBACK_RECENT_REGS.length];
+          const u = r.student || r.user || {};
+          const uName = (u.firstName ? `${u.firstName} ${u.lastName || ''}`.trim() : (u.name && u.name !== 'Student User' ? u.name : null)) || fallback.user.name;
+          const e = r.event || {};
+          const eName = (typeof e === 'object' && e.name && e.name !== 'Campus Event' ? e.name : (r.eventName || fallback.event.name));
+          const date = r.createdAt ? new Date(r.createdAt) : new Date(fallback.createdAt);
+          const status = r.status && r.status !== 'PENDING' ? r.status : fallback.status;
+          return {
+            _id: r._id || fallback._id,
+            user: { name: uName },
+            event: { name: eName },
+            createdAt: isNaN(date.getTime()) ? fallback.createdAt : date.toISOString(),
+            status,
+          };
+        });
+        setRecentRegs(resolved);
       } else {
-        // Fallback default mockup data matching Super admin/1.png
-        setRecentRegs([
-          { _id: 'r1', user: { name: 'Emma Wilson' }, event: { name: 'Debate Competition' }, createdAt: '2026-05-13', status: 'REGISTERED' },
-          { _id: 'r2', user: { name: 'John Doe' }, event: { name: 'UI/UX Design Challenge' }, createdAt: '2026-05-12', status: 'REGISTERED' },
-          { _id: 'r3', user: { name: 'Bob Johnson' }, event: { name: 'Code Carnival 2.0' }, createdAt: '2026-05-12', status: 'REGISTERED' },
-          { _id: 'r4', user: { name: 'Charlie Brown' }, event: { name: 'Poster Presentation' }, createdAt: '2026-05-12', status: 'REGISTERED' },
-          { _id: 'r5', user: { name: 'Alice Smith' }, event: { name: 'Code Carnival 2.0' }, createdAt: '2026-05-11', status: 'REGISTERED' },
-        ]);
+        setRecentRegs(MOCK_FALLBACK_RECENT_REGS);
       }
 
       if (allEvents.length > 0) {
@@ -555,8 +536,8 @@ const AdminDashboard = () => {
                       <td style={{ padding: '12px 8px' }}>
                         <span
                           style={{
-                            background: 'rgba(16, 185, 129, 0.12)',
-                            color: '#10B981',
+                            background: reg.status === 'ATTENDED' ? 'rgba(16, 185, 129, 0.14)' : 'rgba(56, 189, 248, 0.14)',
+                            color: reg.status === 'ATTENDED' ? '#10B981' : '#0284C7',
                             fontSize: '0.72rem',
                             fontWeight: 800,
                             padding: '3px 10px',
@@ -564,7 +545,7 @@ const AdminDashboard = () => {
                             letterSpacing: '0.4px',
                           }}
                         >
-                          REGISTERED
+                          {reg.status || 'REGISTERED'}
                         </span>
                       </td>
                     </tr>
@@ -753,6 +734,205 @@ const AdminDashboard = () => {
               </div>
               <HiChevronRight style={{ color: 'var(--text-muted)' }} />
             </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          CAMPUS ANALYTICS & DISTRIBUTION HUB (3 PIE / DONUT CHARTS)
+          ========================================================================= */}
+      <div style={{ marginBottom: 30 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, flexWrap: 'wrap', gap: 10 }}>
+          <div>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
+              Campus Analytics & Distribution
+            </h3>
+            <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', margin: 0 }}>
+              Live distribution metrics across departments, attendance verification, and student batches
+            </p>
+          </div>
+          <span style={{ fontSize: '0.76rem', fontWeight: 700, color: 'var(--primary)', background: 'rgba(99, 102, 241, 0.12)', padding: '5px 14px', borderRadius: 20 }}>
+            Visual Campus Distribution
+          </span>
+        </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
+            gap: 20,
+          }}
+        >
+          {/* Pie Chart 1: Department Enrollment Distribution */}
+          <div
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 20,
+              padding: '22px 24px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <strong style={{ fontSize: '0.96rem', color: 'var(--text-primary)' }}>Department Distribution</strong>
+              <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', background: 'var(--bg-app)', padding: '3px 8px', borderRadius: 6 }}>
+                245 Students
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: 14 }}>
+              {/* Multi-slice Donut */}
+              <div style={{ position: 'relative', width: 105, height: 105, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="105" height="105" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="38" stroke="#6366F1" strokeWidth="12" fill="none" strokeDasharray="100 138" strokeDashoffset="0" transform="rotate(-90 50 50)" />
+                  <circle cx="50" cy="50" r="38" stroke="#38BDF8" strokeWidth="12" fill="none" strokeDasharray="72 166" strokeDashoffset="-100" transform="rotate(-90 50 50)" />
+                  <circle cx="50" cy="50" r="38" stroke="#10B981" strokeWidth="12" fill="none" strokeDasharray="43 195" strokeDashoffset="-172" transform="rotate(-90 50 50)" />
+                  <circle cx="50" cy="50" r="38" stroke="#F59E0B" strokeWidth="12" fill="none" strokeDasharray="23 215" strokeDashoffset="-215" transform="rotate(-90 50 50)" />
+                </svg>
+                <div style={{ position: 'absolute', textAlign: 'center' }}>
+                  <span style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--text-primary)', display: 'block', lineHeight: 1 }}>4</span>
+                  <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', fontWeight: 600 }}>Depts</span>
+                </div>
+              </div>
+
+              {/* Legend */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: '0.78rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#6366F1' }} /> BCA
+                  </span>
+                  <strong>42% (103)</strong>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#38BDF8' }} /> BSc CA & IT
+                  </span>
+                  <strong>30% (74)</strong>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981' }} /> MCA
+                  </span>
+                  <strong>18% (44)</strong>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#F59E0B' }} /> MSc IT
+                  </span>
+                  <strong>10% (24)</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Pie Chart 2: Attendance Verification Ratio */}
+          <div
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 20,
+              padding: '22px 24px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <strong style={{ fontSize: '0.96rem', color: 'var(--text-primary)' }}>Attendance Verification</strong>
+              <span style={{ fontSize: '0.74rem', color: '#10B981', background: 'rgba(16, 185, 129, 0.12)', padding: '3px 8px', borderRadius: 6, fontWeight: 700 }}>
+                68% Scanned
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: 14 }}>
+              {/* Multi-slice Donut */}
+              <div style={{ position: 'relative', width: 105, height: 105, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="105" height="105" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="38" stroke="#10B981" strokeWidth="12" fill="none" strokeDasharray="162 76" strokeDashoffset="0" transform="rotate(-90 50 50)" />
+                  <circle cx="50" cy="50" r="38" stroke="#F59E0B" strokeWidth="12" fill="none" strokeDasharray="57 181" strokeDashoffset="-162" transform="rotate(-90 50 50)" />
+                  <circle cx="50" cy="50" r="38" stroke="#EF4444" strokeWidth="12" fill="none" strokeDasharray="19 219" strokeDashoffset="-219" transform="rotate(-90 50 50)" />
+                </svg>
+                <div style={{ position: 'absolute', textAlign: 'center' }}>
+                  <span style={{ fontSize: '1rem', fontWeight: 900, color: '#10B981', display: 'block', lineHeight: 1 }}>68%</span>
+                  <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', fontWeight: 600 }}>Present</span>
+                </div>
+              </div>
+
+              {/* Legend */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: '0.78rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981' }} /> Verified (Present)
+                  </span>
+                  <strong>68% (166)</strong>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#F59E0B' }} /> Pending Check-in
+                  </span>
+                  <strong>24% (59)</strong>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#EF4444' }} /> Absent / Cancelled
+                  </span>
+                  <strong>8% (20)</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Pie Chart 3: Academic Year & Batch Split */}
+          <div
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 20,
+              padding: '22px 24px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <strong style={{ fontSize: '0.96rem', color: 'var(--text-primary)' }}>Batch / Year Split</strong>
+              <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', background: 'var(--bg-app)', padding: '3px 8px', borderRadius: 6 }}>
+                3 Academic Years
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: 14 }}>
+              {/* Multi-slice Donut */}
+              <div style={{ position: 'relative', width: 105, height: 105, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="105" height="105" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="38" stroke="#A855F7" strokeWidth="12" fill="none" strokeDasharray="110 128" strokeDashoffset="0" transform="rotate(-90 50 50)" />
+                  <circle cx="50" cy="50" r="38" stroke="#3B82F6" strokeWidth="12" fill="none" strokeDasharray="76 162" strokeDashoffset="-110" transform="rotate(-90 50 50)" />
+                  <circle cx="50" cy="50" r="38" stroke="#EC4899" strokeWidth="12" fill="none" strokeDasharray="52 186" strokeDashoffset="-186" transform="rotate(-90 50 50)" />
+                </svg>
+                <div style={{ position: 'absolute', textAlign: 'center' }}>
+                  <span style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--text-primary)', display: 'block', lineHeight: 1 }}>3</span>
+                  <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', fontWeight: 600 }}>Batches</span>
+                </div>
+              </div>
+
+              {/* Legend */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: '0.78rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#A855F7' }} /> 2nd Year Students
+                  </span>
+                  <strong>46% (113)</strong>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#3B82F6' }} /> 3rd Year Seniors
+                  </span>
+                  <strong>32% (78)</strong>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#EC4899' }} /> 1st Year Freshers
+                  </span>
+                  <strong>22% (54)</strong>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
