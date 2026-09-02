@@ -1,47 +1,74 @@
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { HiCheck } from 'react-icons/hi';
+import { HiCheck, HiLogout, HiShieldCheck } from 'react-icons/hi';
+import { FaMoon, FaSun, FaUserShield, FaClock } from 'react-icons/fa';
 
 const AdminSettings = () => {
   const { user, logout } = useAuth();
   const { theme, setTheme, mode, setMode, themes } = useTheme();
 
   return (
-    <DashboardLayout title="Settings" subtitle="SuperAdmin account & global dashboard theme control">
-      {/* Global Display Mode (Dark vs Light) */}
-      <div className="card" style={{ marginBottom: 24 }}>
-        <h3 style={{ marginBottom: 6 }}>🌓 Global Display Mode (Light / Dark)</h3>
-        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 18 }}>
+    <DashboardLayout>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
+          Settings
+        </h1>
+        <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', margin: 0 }}>
+          SuperAdmin account & global dashboard theme control
+        </p>
+      </div>
+
+      {/* =========================================================================
+          SECTION 1: GLOBAL DISPLAY MODE (LIGHT / DARK)
+          ========================================================================= */}
+      <div
+        style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 20,
+          padding: '24px',
+          marginBottom: 24,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+          <span style={{ fontSize: '1.2rem' }}>🌓</span>
+          <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+            Global Display Mode (Light / Dark)
+          </h3>
+        </div>
+        <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', margin: '0 0 18px 0' }}>
           Choose between immersive Dark Mode or clean high-contrast Light Mode.
         </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
           {/* Dark Mode Card */}
           <div
             onClick={() => setMode('dark')}
             style={{
-              padding: '18px 20px',
-              borderRadius: '16px',
-              background: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.02)',
+              padding: '20px 24px',
+              borderRadius: 16,
+              background: mode === 'dark' ? 'rgba(99, 102, 241, 0.08)' : 'var(--bg-app)',
               border: mode === 'dark' ? '2px solid var(--primary)' : '1px solid var(--border-color)',
-              boxShadow: mode === 'dark' ? '0 0 20px var(--primary-glow)' : 'none',
               cursor: 'pointer',
-              transition: 'all 200ms ease',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              transition: 'all 160ms ease',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <span style={{ fontSize: '2rem' }}>🌙</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#1E1B4B', color: '#818CF8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem' }}>
+                <FaMoon />
+              </div>
               <div>
-                <strong style={{ fontSize: '0.96rem', color: 'var(--text-main)', display: 'block' }}>Dark Mode (Default)</strong>
-                <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: 2 }}>Deep obsidian void with frosted glass</p>
+                <strong style={{ fontSize: '1rem', color: 'var(--text-primary)', display: 'block' }}>Dark Mode (Default)</strong>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Deep obsidian void with frosted glass</span>
               </div>
             </div>
             {mode === 'dark' && (
-              <span style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '0.84rem', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '0.86rem', display: 'flex', alignItems: 'center', gap: 4 }}>
                 <HiCheck /> Active
               </span>
             )}
@@ -51,27 +78,28 @@ const AdminSettings = () => {
           <div
             onClick={() => setMode('light')}
             style={{
-              padding: '18px 20px',
-              borderRadius: '16px',
-              background: mode === 'light' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.02)',
+              padding: '20px 24px',
+              borderRadius: 16,
+              background: mode === 'light' ? 'rgba(99, 102, 241, 0.08)' : 'var(--bg-app)',
               border: mode === 'light' ? '2px solid var(--primary)' : '1px solid var(--border-color)',
-              boxShadow: mode === 'light' ? '0 0 20px var(--primary-glow)' : 'none',
               cursor: 'pointer',
-              transition: 'all 200ms ease',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              transition: 'all 160ms ease',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <span style={{ fontSize: '2rem' }}>☀️</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem' }}>
+                <FaSun />
+              </div>
               <div>
-                <strong style={{ fontSize: '0.96rem', color: 'var(--text-main)', display: 'block' }}>Light Mode</strong>
-                <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: 2 }}>Pristine high-contrast clean daylight</p>
+                <strong style={{ fontSize: '1rem', color: 'var(--text-primary)', display: 'block' }}>Light Mode</strong>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Pristine high-contrast clean daylight</span>
               </div>
             </div>
             {mode === 'light' && (
-              <span style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '0.84rem', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '0.86rem', display: 'flex', alignItems: 'center', gap: 4 }}>
                 <HiCheck /> Active
               </span>
             )}
@@ -79,14 +107,30 @@ const AdminSettings = () => {
         </div>
       </div>
 
-      {/* Global Dashboard Theme Combos */}
-      <div className="card" style={{ marginBottom: 24 }}>
-        <h3 style={{ marginBottom: 6 }}>🎨 Global Dashboard Theme Combos</h3>
-        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 18 }}>
+      {/* =========================================================================
+          SECTION 2: GLOBAL DASHBOARD THEME COMBOS (6 Cards)
+          ========================================================================= */}
+      <div
+        style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 20,
+          padding: '24px',
+          marginBottom: 24,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+          <span style={{ fontSize: '1.2rem' }}>🎨</span>
+          <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+            Global Dashboard Theme Combos
+          </h3>
+        </div>
+        <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', margin: '0 0 20px 0' }}>
           Select a system-wide theme palette. The Executive Black & White theme is active by default.
         </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 16 }}>
           {themes.map((t) => {
             const isSelected = theme === t.id;
             return (
@@ -94,70 +138,123 @@ const AdminSettings = () => {
                 key={t.id}
                 onClick={() => setTheme(t.id)}
                 style={{
-                  padding: '16px',
-                  borderRadius: '14px',
-                  background: isSelected ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.02)',
-                  border: isSelected ? `2px solid ${t.primary}` : '1px solid var(--border-color)',
-                  boxShadow: isSelected ? `0 0 20px ${t.primary}40` : 'none',
+                  padding: '18px 16px',
+                  borderRadius: 16,
+                  background: isSelected ? 'rgba(99, 102, 241, 0.08)' : 'var(--bg-app)',
+                  border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border-color)',
                   cursor: 'pointer',
-                  transition: 'all 200ms ease',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 10,
+                  justifyContent: 'space-between',
+                  minHeight: '170px',
+                  transition: 'all 160ms ease',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '1.8rem' }}>{t.icon}</span>
-                  <div style={{ display: 'flex', gap: 4 }}>
-                    <span style={{ width: 14, height: 14, borderRadius: '50%', background: t.primary, boxShadow: `0 0 6px ${t.primary}` }} />
-                    <span style={{ width: 14, height: 14, borderRadius: '50%', background: t.secondary }} />
-                    <span style={{ width: 14, height: 14, borderRadius: '50%', background: t.accent }} />
-                  </div>
-                </div>
-
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <strong style={{ fontSize: '0.92rem', color: 'var(--text-main)', display: 'block' }}>{t.name}</strong>
-                    {t.id === 'monochrome' && (
-                      <span className="badge badge-primary" style={{ fontSize: '0.58rem', padding: '1px 5px' }}>
-                        DEFAULT
-                      </span>
-                    )}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <span style={{ fontSize: '1.4rem' }}>{t.icon}</span>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.primary }} />
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.secondary }} />
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.accent }} />
+                    </div>
                   </div>
-                  <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: 4 }}>{t.description}</p>
+
+                  <strong style={{ fontSize: '0.94rem', color: 'var(--text-primary)', display: 'block', marginBottom: 4 }}>
+                    {t.name}
+                  </strong>
+                  <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                    {t.description}
+                  </p>
                 </div>
 
-                <div style={{ marginTop: 'auto', paddingTop: 6 }}>
-                  {isSelected ? (
-                    <span style={{ color: t.primary, fontWeight: 700, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <HiCheck /> Active Theme
-                    </span>
-                  ) : (
-                    <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Click to apply</span>
-                  )}
-                </div>
+                <span style={{ fontSize: '0.76rem', fontWeight: 800, color: isSelected ? 'var(--primary)' : 'var(--text-muted)', marginTop: 14 }}>
+                  {isSelected ? '✓ Active Theme' : 'Click to apply'}
+                </span>
               </div>
             );
           })}
         </div>
       </div>
 
-      <div className="dashboard-split-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
-        <div className="card">
-          <h3 style={{ marginBottom: 16 }}>SuperAdmin Account</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
-            <div><span style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>Full Name</span><p style={{ fontWeight: 600 }}>{user?.firstName} {user?.lastName || 'Admin'}</p></div>
-            <div><span style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>Email Address</span><p style={{ fontWeight: 600 }}>{user?.email}</p></div>
-            <div><span style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>Security Level</span><p style={{ fontWeight: 700, color: 'var(--primary)' }}>SUPER_ADMIN (Full Access)</p></div>
+      {/* =========================================================================
+          SECTION 3: SUPERADMIN ACCOUNT & SESSION ACTIONS (2 Columns)
+          ========================================================================= */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 24 }}>
+        {/* Left: Account Info */}
+        <div
+          style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 20,
+            padding: '24px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
+            <span style={{ fontSize: '1.2rem', color: 'var(--primary)' }}>👤</span>
+            <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+              SuperAdmin Account
+            </h3>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontSize: '0.88rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 10, borderBottom: '1px solid var(--border-color)' }}>
+              <span style={{ color: 'var(--text-muted)' }}>Full Name</span>
+              <strong style={{ color: 'var(--text-primary)' }}>Super Admin</strong>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 10, borderBottom: '1px solid var(--border-color)' }}>
+              <span style={{ color: 'var(--text-muted)' }}>Email Address</span>
+              <strong style={{ color: 'var(--text-primary)' }}>admin@eventhandling.com</strong>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: 'var(--text-muted)' }}>Security Level</span>
+              <span style={{ color: 'var(--primary)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <FaUserShield /> SUPER_ADMIN (Full Access)
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="card">
-          <h3 style={{ marginBottom: 16 }}>Session Actions</h3>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: 20, fontSize: '0.86rem' }}>
-            Logout of your active SuperAdmin session. (Inactivity security timer is set to 5 minutes).
+        {/* Right: Session Actions */}
+        <div
+          style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 20,
+            padding: '24px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+            <span style={{ fontSize: '1.2rem', color: '#EF4444' }}>🕒</span>
+            <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+              Session Actions
+            </h3>
+          </div>
+
+          <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', lineHeight: 1.6, margin: '0 0 20px 0' }}>
+            Logout of your active SuperAdmin session.<br />
+            (Inactivity security timer is set to 5 minutes).
           </p>
-          <button className="btn btn-danger" onClick={logout}>Logout SuperAdmin</button>
+
+          <button
+            onClick={logout}
+            className="btn btn-danger"
+            style={{
+              padding: '12px 24px',
+              borderRadius: 12,
+              fontWeight: 800,
+              fontSize: '0.92rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <HiLogout /> Logout SuperAdmin
+          </button>
         </div>
       </div>
     </DashboardLayout>

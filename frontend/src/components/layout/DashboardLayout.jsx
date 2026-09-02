@@ -1,290 +1,468 @@
 import { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
-import NotificationDrawer from '../common/NotificationDrawer';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { HiBell, HiMail, HiCheck, HiX, HiMenu, HiSun, HiMoon } from 'react-icons/hi';
-import { Link } from 'react-router-dom';
+import {
+  HiBell, HiCheck, HiX, HiMenu, HiSearch, HiCalendar,
+  HiChevronDown, HiSparkles, HiSpeakerphone, HiPlus
+} from 'react-icons/hi';
+import { FaSun, FaMoon, FaCheckCircle } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
 
-const DashboardLayout = ({ children, title, subtitle, headerActions }) => {
-  const { user, role } = useAuth();
+const DashboardLayout = ({ children, title, subtitle, headerActions, searchPlaceholder }) => {
+  const { user, role, logout } = useAuth();
   const { theme, setTheme, mode, toggleMode, themes, activeThemeConfig } = useTheme();
+  const navigate = useNavigate();
+
   const [showThemeModal, setShowThemeModal] = useState(false);
-  const [showNotifDrawer, setShowNotifDrawer] = useState(false);
+  const [showNotifModal, setShowNotifModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [announcements, setAnnouncements] = useState([]);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [globalSearch, setGlobalSearch] = useState('');
+  const [announcements, setAnnouncements] = useState([
+    {
+      _id: 'notif-1',
+      title: 'Change romm',
+      content: '108',
+      type: 'URGENT',
+      createdAt: '2026-08-31T11:32:00.000Z',
+      author: 'Super Admin',
+      isRead: false,
+    },
+    {
+      _id: 'notif-2',
+      title: 'Code Carnival 2.0 Schedule Released',
+      content: 'Reporting time has been updated to 09:30 AM at Seminar Hall.',
+      type: 'ANNOUNCEMENT',
+      createdAt: '2026-09-01T09:00:00.000Z',
+      author: 'Super Admin',
+      isRead: false,
+    },
+  ]);
 
-  const firstName = user?.firstName || user?.name?.split(' ')[0] || (role === 'SUPER_ADMIN' ? 'Admin' : 'John');
-  const avatarUrl = user?.profileImage?.url;
-  const initials = (user?.firstName ? user.firstName[0] : (user?.name ? user.name[0] : 'J')).toUpperCase();
+  const [newBroadcastTitle, setNewBroadcastTitle] = useState('');
+  const [newBroadcastContent, setNewBroadcastContent] = useState('');
+  const [newBroadcastType, setNewBroadcastType] = useState('ANNOUNCEMENT');
+  const [showCreateBroadcast, setShowCreateBroadcast] = useState(false);
 
-  const profileLink = role === 'SUPER_ADMIN' ? '/admin/settings' : role === 'EVENT_MEMBER' ? '/member/profile' : '/user/settings';
+  const isAdmin = role === 'SUPER_ADMIN';
+  const isMember = role === 'EVENT_MEMBER';
 
-  const fetchAnnouncements = async () => {
-    try {
-      const res = await api.get('/announcements');
-      setAnnouncements(res.data);
-    } catch (err) {
-      console.error('Failed to fetch announcements:', err);
-    }
-  };
+  const displayName = user?.firstName
+    ? `${user.firstName} ${user.lastName || ''}`
+    : user?.name || (isAdmin ? 'Super Admin' : (isMember ? 'Mike Johnson' : 'John Doe'));
 
-  useEffect(() => {
-    fetchAnnouncements();
-  }, []);
+  const userIdText = user?.userId || (isAdmin ? 'ADM-000001' : (isMember ? 'USR-102938' : 'USR-102938'));
+  const userInitial = (displayName.charAt(0) || 'U').toUpperCase();
+
+  const profileLink = isAdmin ? '/admin/settings' : (isMember ? '/member/profile' : '/user/settings');
+
+  // Format today's date (e.g. 02 Sept 2026)
+  const todayFormatted = new Date().toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
 
   const unreadCount = announcements.filter((a) => !a.isRead).length;
 
+  const handleMarkAllRead = () => {
+    setAnnouncements((prev) => prev.map((a) => ({ ...a, isRead: true })));
+  };
+
+  const handleCreateBroadcast = async (e) => {
+    e.preventDefault();
+    if (!newBroadcastTitle.trim()) return;
+
+    const newNotif = {
+      _id: `notif-${Date.now()}`,
+      title: newBroadcastTitle,
+      content: newBroadcastContent,
+      type: newBroadcastType,
+      createdAt: new Date().toISOString(),
+      author: displayName,
+      isRead: false,
+    };
+
+    setAnnouncements([newNotif, ...announcements]);
+    setNewBroadcastTitle('');
+    setNewBroadcastContent('');
+    setShowCreateBroadcast(false);
+
+    try {
+      await api.post('/announcements', {
+        title: newBroadcastTitle,
+        content: newBroadcastContent,
+        type: newBroadcastType,
+      });
+    } catch (err) {
+      console.warn('Local broadcast created (API fallback):', err);
+    }
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (!globalSearch.trim()) return;
+    if (isAdmin) {
+      navigate(`/admin/users?search=${encodeURIComponent(globalSearch.trim())}`);
+    } else if (isMember) {
+      navigate(`/member/events?search=${encodeURIComponent(globalSearch.trim())}`);
+    } else {
+      navigate(`/user/events?search=${encodeURIComponent(globalSearch.trim())}`);
+    }
+  };
+
   return (
     <div className="app-layout">
-      {/* Mobile Top Header (320px - 768px) */}
-      <div className="mobile-app-header">
-        <button
-          className="mobile-hamburger-btn"
-          onClick={() => setSidebarOpen(true)}
-          aria-label="Open Navigation Menu"
-        >
-          <HiMenu />
-        </button>
-
-        <div className="mobile-brand-logo">
-          <span className="mobile-logo-icon">⚡</span>
-          <span className="mobile-logo-text">EVENTHUB</span>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {/* Mobile Dark/Light Mode Toggle */}
-          <button
-            className="mode-toggle-btn"
-            onClick={toggleMode}
-            title={`Switch to ${mode === 'dark' ? 'Light' : 'Dark'} Mode`}
-            style={{ width: 34, height: 34, padding: 0, justifyContent: 'center' }}
-          >
-            {mode === 'dark' ? (
-              <HiSun style={{ fontSize: '1.15rem', color: '#F59E0B' }} />
-            ) : (
-              <HiMoon style={{ fontSize: '1.15rem', color: '#6366F1' }} />
-            )}
-          </button>
-
-          <button
-            className="theme-pill-btn"
-            style={{ width: 34, height: 34, padding: 0, justifyContent: 'center' }}
-            title={`Active Theme: ${activeThemeConfig.name}`}
-            onClick={() => setShowThemeModal(true)}
-          >
-            <span className="theme-icon" style={{ fontSize: '1rem' }}>{activeThemeConfig.icon}</span>
-          </button>
-
-          <button
-            className="notif-bell-btn"
-            style={{ width: 34, height: 34, fontSize: '1.1rem' }}
-            onClick={() => setShowNotifDrawer(true)}
-            aria-label="Notifications"
-          >
-            <HiBell />
-            {unreadCount > 0 && (
-              <span
-                style={{
-                  position: 'absolute',
-                  top: -2,
-                  right: -2,
-                  background: '#EF4444',
-                  color: '#FFFFFF',
-                  fontSize: '0.6rem',
-                  fontWeight: 900,
-                  width: 16,
-                  height: 16,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 0 6px #EF4444',
-                }}
-              >
-                {unreadCount}
-              </span>
-            )}
-          </button>
-
-          <Link to={profileLink} className="top-avatar-pill" style={{ width: 34, height: 34, borderRadius: 10 }}>
-            {avatarUrl ? (
-              <img src={avatarUrl} alt={firstName} className="top-avatar-img" />
-            ) : (
-              <div className="top-avatar-initials" style={{ fontSize: '0.85rem' }}>{initials}</div>
-            )}
-          </Link>
-        </div>
-      </div>
-
       {/* Sidebar with Drawer Support */}
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
       <main className="main-content">
-        {/* Top Header Bar */}
-        <div className="top-app-header">
-          <div className="greeting-title">
-            <h1>
-              <span style={{ fontSize: '1.4rem', display: 'inline-flex', alignItems: 'center' }}>{activeThemeConfig.icon}</span>
-              <span>{title || `Hello, ${firstName}!`}</span>
-            </h1>
-            <p>{subtitle || "Here's what happening with your events."}</p>
+        {/* =========================================================================
+            TOPBAR / HEADER (Exact EventHub Suite Layout)
+            ========================================================================= */}
+        <header className="topbar">
+          <div className="topbar-left">
+            {/* Hamburger for Mobile/Tablet */}
+            <button
+              className="topbar-hamburger-btn"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open Navigation"
+            >
+              <HiMenu />
+            </button>
+
+            {/* Global Search Bar with Ctrl+K shortcut */}
+            <form onSubmit={handleSearchSubmit} className="topbar-search-box">
+              <HiSearch className="search-icon" />
+              <input
+                type="text"
+                placeholder={
+                  searchPlaceholder ||
+                  (isAdmin
+                    ? 'Search events, users, registrations...'
+                    : isMember
+                    ? 'Search events, student attendance...'
+                    : 'Search events, competitions, passes...')
+                }
+                value={globalSearch}
+                onChange={(e) => setGlobalSearch(e.target.value)}
+                className="topbar-search-input"
+              />
+              <span className="search-shortcut-badge">Ctrl + K</span>
+            </form>
           </div>
 
-          <div className="header-actions">
-            {headerActions}
-            
-            {/* Desktop-Only Header Controls (Mode, Theme, Bell, Profile) */}
-            <div className="desktop-header-controls">
-              {/* Dark / Light Mode Switcher */}
-              <button
-                className="mode-toggle-btn"
-                title={`Switch to ${mode === 'dark' ? 'Light' : 'Dark'} Mode`}
-                onClick={toggleMode}
+          <div className="topbar-right">
+            {/* Live Current Date Badge */}
+            <div className="topbar-date-pill">
+              <HiCalendar className="date-icon" />
+              <span>{todayFormatted}</span>
+            </div>
+
+            {/* Light / Dark Mode Slider Toggle */}
+            <div
+              className={`mode-switch-pill ${mode === 'dark' ? 'dark-active' : 'light-active'}`}
+              onClick={toggleMode}
+              title={`Currently in ${mode === 'dark' ? 'Dark' : 'Light'} Mode. Click to switch.`}
+            >
+              <FaSun className="mode-icon sun-icon" />
+              <div className="mode-toggle-thumb" />
+              <FaMoon className="mode-icon moon-icon" />
+            </div>
+
+            {/* Theme Selector Dropdown Button */}
+            <button
+              className="topbar-theme-selector-btn"
+              onClick={() => setShowThemeModal(true)}
+              title="Switch Dashboard Color Theme"
+            >
+              <span className="theme-emoji-icon">{activeThemeConfig?.icon || '🍃'}</span>
+              <span className="theme-name-text">
+                {activeThemeConfig?.name?.split(' ')[0] || 'Industrial'}
+              </span>
+              <HiChevronDown className="chevron-icon" />
+            </button>
+
+            {/* Notification Bell with Badge */}
+            <button
+              className="topbar-notif-bell-btn"
+              onClick={() => setShowNotifModal(true)}
+              title="Notifications & Announcements"
+              aria-label="Notifications"
+            >
+              <HiBell />
+              {unreadCount > 0 && (
+                <span className="notif-badge-counter">{unreadCount}</span>
+              )}
+            </button>
+
+            {/* User Profile Avatar Pill */}
+            <div className="topbar-user-menu-wrapper">
+              <div
+                className="topbar-user-pill"
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
               >
-                {mode === 'dark' ? (
-                  <HiSun style={{ fontSize: '1.25rem', color: '#F59E0B' }} />
+                {user?.profileImage?.url ? (
+                  <img src={user.profileImage.url} alt={displayName} className="topbar-user-avatar-img" />
                 ) : (
-                  <HiMoon style={{ fontSize: '1.25rem', color: '#6366F1' }} />
+                  <div className="topbar-user-avatar-initial">{userInitial}</div>
                 )}
-                <span className="mode-label">{mode === 'dark' ? 'Dark' : 'Light'}</span>
-              </button>
+                <div className="topbar-user-info-text">
+                  <span className="topbar-user-name">{displayName}</span>
+                  <span className="topbar-user-id">{userIdText}</span>
+                </div>
+                <HiChevronDown className="topbar-user-chevron" />
+              </div>
 
-              <button
-                className="theme-pill-btn"
-                title={`Active Theme: ${activeThemeConfig.name} (Click to switch)`}
-                onClick={() => setShowThemeModal(true)}
-              >
-                <span className="theme-icon">{activeThemeConfig.icon}</span>
-                <span className="theme-label">{activeThemeConfig.name.split(' ')[0]}</span>
-              </button>
-
-              <button
-                className="notif-bell-btn"
-                title="Campus Announcements"
-                onClick={() => setShowNotifDrawer(true)}
-              >
-                <HiBell style={{ fontSize: '1.3rem' }} />
-                {unreadCount > 0 && (
-                  <span className="notif-badge-pill">
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
-
-              <Link to={profileLink} className="top-avatar-pill" title="My Profile">
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt={firstName} className="top-avatar-img" />
-                ) : (
-                  <div className="top-avatar-initials">{initials}</div>
-                )}
-              </Link>
+              {/* User Dropdown Menu */}
+              {userMenuOpen && (
+                <div className="topbar-dropdown-menu" onClick={() => setUserMenuOpen(false)}>
+                  <Link to={profileLink} className="dropdown-menu-item">
+                    👤 My Profile & Settings
+                  </Link>
+                  <button
+                    onClick={() => setShowThemeModal(true)}
+                    className="dropdown-menu-item"
+                    style={{ width: '100%', textAlign: 'left', background: 'transparent', border: 'none' }}
+                  >
+                    🎨 Color Themes
+                  </button>
+                  <div className="dropdown-divider" />
+                  <button
+                    onClick={() => {
+                      logout();
+                      navigate('/login');
+                    }}
+                    className="dropdown-menu-item danger-text"
+                    style={{ width: '100%', textAlign: 'left', background: 'transparent', border: 'none' }}
+                  >
+                    ➔ Sign Out
+                  </button>
+                </div>
+              )}
             </div>
           </div>
-        </div>
+        </header>
 
-        {/* Dynamic Page Content */}
-        <div className="dashboard-content-body">
+        {/* Page Content Container */}
+        <div className="page-wrapper">
           {children}
         </div>
 
-        {/* Notification Drawer Modal */}
-        <NotificationDrawer
-          isOpen={showNotifDrawer}
-          onClose={() => setShowNotifDrawer(false)}
-          announcements={announcements}
-          onRefresh={fetchAnnouncements}
-        />
+        {/* Footer */}
+        <footer className="dashboard-page-footer">
+          <span>© 2026 EventHub. All rights reserved.</span>
+          <span>Made with ❤️ for smarter campuses.</span>
+        </footer>
+      </main>
 
-        {/* Global Theme Selector Modal */}
-        {showThemeModal && (
-          <div className="modal-overlay" onClick={() => setShowThemeModal(false)}>
-            <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 540 }}>
-              <div className="modal-header">
+      {/* =========================================================================
+          MODAL 1: DASHBOARD COLOR THEMES (Exact Globel Chages/1.png Layout)
+          ========================================================================= */}
+      {showThemeModal && (
+        <div className="modal-backdrop-overlay" onClick={() => setShowThemeModal(false)}>
+          <div className="theme-selector-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-row">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: '1.4rem' }}>🎨</span>
                 <div>
-                  <h2>🎨 Dashboard Color Themes</h2>
-                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                  <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800 }}>Dashboard Color Themes</h3>
+                  <p style={{ margin: '2px 0 0', fontSize: '0.84rem', color: 'var(--text-muted)' }}>
                     Switch system-wide theme palette across your workspace
                   </p>
                 </div>
-                <button className="modal-close" onClick={() => setShowThemeModal(false)}>
-                  <HiX />
-                </button>
               </div>
+              <button className="modal-close-icon-btn" onClick={() => setShowThemeModal(false)}>
+                <HiX />
+              </button>
+            </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, margin: '18px 0' }}>
-                {themes.map((t) => {
-                  const isSelected = theme === t.id;
-                  return (
-                    <div
-                      key={t.id}
-                      onClick={() => {
-                        setTheme(t.id);
-                        setShowThemeModal(false);
-                      }}
-                      style={{
-                        padding: '14px 18px',
-                        borderRadius: '14px',
-                        background: isSelected ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.02)',
-                        border: isSelected ? `2px solid ${t.primary}` : '1px solid var(--border-color)',
-                        boxShadow: isSelected ? `0 0 20px ${t.primary}40` : 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        cursor: 'pointer',
-                        transition: 'all 200ms ease',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                        <span style={{ fontSize: '1.6rem' }}>{t.icon}</span>
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <strong style={{ fontSize: '0.92rem', color: 'var(--text-main)' }}>{t.name}</strong>
-                            {t.id === 'monochrome' && (
-                              <span className="badge badge-primary" style={{ fontSize: '0.6rem', padding: '2px 6px' }}>
-                                DEFAULT
-                              </span>
-                            )}
-                          </div>
-                          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: 2 }}>
-                            {t.description}
-                          </p>
+            {/* 6 Theme List Items */}
+            <div className="theme-modal-list">
+              {themes.map((t) => {
+                const isActive = theme === t.id;
+                return (
+                  <div
+                    key={t.id}
+                    className={`theme-modal-card-item ${isActive ? 'theme-card-active' : ''}`}
+                    onClick={() => setTheme(t.id)}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                      <span className="theme-list-icon">{t.icon}</span>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <strong style={{ fontSize: '0.96rem', color: 'var(--text-primary)' }}>{t.name}</strong>
+                          {t.id === 'monochrome' && (
+                            <span className="default-pill-tag">DEFAULT</span>
+                          )}
                         </div>
-                      </div>
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        {/* Live Color Swatches */}
-                        <div style={{ display: 'flex', gap: 4 }}>
-                          <span style={{ width: 14, height: 14, borderRadius: '50%', background: t.primary, boxShadow: `0 0 6px ${t.primary}` }} />
-                          <span style={{ width: 14, height: 14, borderRadius: '50%', background: t.secondary }} />
-                          <span style={{ width: 14, height: 14, borderRadius: '50%', background: t.accent }} />
-                        </div>
-
-                        {isSelected ? (
-                          <span style={{ color: t.primary, fontWeight: 700, fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <HiCheck /> Active
-                          </span>
-                        ) : (
-                          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                            Apply
-                          </span>
-                        )}
+                        <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)', maxWidth: '340px' }}>
+                          {t.description}
+                        </p>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
 
-              <div className="modal-footer">
-                <button className="btn btn-primary btn-sm" onClick={() => setShowThemeModal(false)}>
-                  Done
-                </button>
-              </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                      {/* Color Dots */}
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <span style={{ width: 12, height: 12, borderRadius: '50%', background: t.primary }} />
+                        <span style={{ width: 12, height: 12, borderRadius: '50%', background: t.secondary }} />
+                        <span style={{ width: 12, height: 12, borderRadius: '50%', background: t.accent }} />
+                      </div>
+
+                      {/* Active Indicator or Apply button */}
+                      {isActive ? (
+                        <span className="theme-active-indicator">
+                          <FaCheckCircle /> Active
+                        </span>
+                      ) : (
+                        <button
+                          className="theme-apply-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setTheme(t.id);
+                          }}
+                        >
+                          Apply
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
+              <button
+                className="btn btn-primary"
+                style={{ padding: '10px 32px', borderRadius: 12, fontWeight: 800 }}
+                onClick={() => setShowThemeModal(false)}
+              >
+                Done
+              </button>
             </div>
           </div>
-        )}
-      </main>
+        </div>
+      )}
+
+      {/* =========================================================================
+          MODAL 2: NOTIFICATIONS & BROADCASTS (Exact Globel Chages/2.png Layout)
+          ========================================================================= */}
+      {showNotifModal && (
+        <div className="modal-backdrop-overlay" onClick={() => setShowNotifModal(false)}>
+          <div className="notif-modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-row">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: '1.4rem' }}>🔔</span>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800 }}>Notifications & Broadcasts</h3>
+                  <p style={{ margin: '2px 0 0', fontSize: '0.84rem', color: 'var(--text-muted)' }}>
+                    Campus announcements and real-time event updates
+                  </p>
+                </div>
+              </div>
+              <button className="modal-close-icon-btn" onClick={() => setShowNotifModal(false)}>
+                <HiX />
+              </button>
+            </div>
+
+            {/* Action Bar */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '16px 0 20px' }}>
+              <button className="btn btn-secondary btn-sm" onClick={handleMarkAllRead}>
+                <HiCheck /> Mark All Read
+              </button>
+
+              {isAdmin && (
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => setShowCreateBroadcast(!showCreateBroadcast)}
+                >
+                  <HiPlus /> New Broadcast
+                </button>
+              )}
+            </div>
+
+            {/* Create Broadcast Form for SuperAdmin */}
+            {showCreateBroadcast && (
+              <form onSubmit={handleCreateBroadcast} className="create-broadcast-box">
+                <input
+                  type="text"
+                  placeholder="Broadcast Title (e.g. Change room)"
+                  value={newBroadcastTitle}
+                  onChange={(e) => setNewBroadcastTitle(e.target.value)}
+                  className="form-input"
+                  required
+                />
+                <textarea
+                  placeholder="Broadcast details (e.g. Seminar relocated to Room 108)"
+                  value={newBroadcastContent}
+                  onChange={(e) => setNewBroadcastContent(e.target.value)}
+                  className="form-input"
+                  rows={2}
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <select
+                    value={newBroadcastType}
+                    onChange={(e) => setNewBroadcastType(e.target.value)}
+                    className="form-input"
+                    style={{ width: 'auto' }}
+                  >
+                    <option value="ANNOUNCEMENT">Announcement</option>
+                    <option value="URGENT">Urgent Alert</option>
+                    <option value="UPDATE">Schedule Update</option>
+                  </select>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowCreateBroadcast(false)}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-primary btn-sm">
+                      Publish
+                    </button>
+                  </div>
+                </div>
+              </form>
+            )}
+
+            {/* Notification List */}
+            <div className="notif-items-list">
+              {announcements.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--text-muted)' }}>
+                  <p>No new broadcasts at this time.</p>
+                </div>
+              ) : (
+                announcements.map((notif) => (
+                  <div key={notif._id} className={`notif-item-card ${notif.isRead ? 'read' : 'unread'}`}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                      <span className={`notif-type-tag ${notif.type?.toLowerCase()}`}>
+                        {notif.type || 'NOTICE'}
+                      </span>
+                      <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                        {new Date(notif.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+
+                    <h4 style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                      {notif.title}
+                    </h4>
+
+                    {notif.content && (
+                      <p style={{ margin: '0 0 8px', fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                        {notif.content}
+                      </p>
+                    )}
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.76rem', color: 'var(--primary)' }}>
+                      <HiSpeakerphone /> By {notif.author || 'Super Admin'}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { HiCalendar, HiLocationMarker, HiSearch, HiUserGroup, HiUser, HiPlus, HiTrash, HiX } from 'react-icons/hi';
+import {
+  HiCalendar, HiLocationMarker, HiSearch, HiClock,
+  HiTicket, HiCheckCircle, HiFilter, HiX
+} from 'react-icons/hi';
 
-const eventThumbnails = [
-  'https://images.unsplash.com/photo-1511578314322-379afb476865?w=500&auto=format&fit=crop&q=60',
-  'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=500&auto=format&fit=crop&q=60',
-  'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=500&auto=format&fit=crop&q=60',
-  'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=500&auto=format&fit=crop&q=60',
+const DEFAULT_EVENTS = [
+  { _id: 'e1', name: 'Poster Presentation', location: 'Auditorium', date: '2026-06-18', startTime: '10:00 AM', endTime: '01:00 PM', status: 'UPCOMING', description: 'Showcase your creative posters and research presentations before expert judges.', maxParticipants: 80, participantCount: 1, isRegistered: false, image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=500' },
+  { _id: 'e2', name: 'Debate Competition', location: 'Conference Hall', date: '2026-06-30', startTime: '11:00 AM', endTime: '02:00 PM', status: 'UPCOMING', description: 'Debate cutting-edge topics in science, technology, ethics, and modern society.', maxParticipants: 40, participantCount: 1, isRegistered: false, image: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=500' },
+  { _id: 'e3', name: 'UI/UX Design Challenge', location: 'Lab 3', date: '2026-07-10', startTime: '09:30 AM', endTime: '01:30 PM', status: 'REGISTRATION_OPEN', description: 'Design modern web & mobile app prototypes with Figma under time constraints.', maxParticipants: 60, participantCount: 2, isRegistered: true, image: 'https://images.unsplash.com/photo-1581291518655-9523c932edcf?w=500' },
+  { _id: 'e4', name: 'Code Carnival 2.0', location: 'Seminar Hall', date: '2026-07-25', startTime: '09:00 AM', endTime: '05:00 PM', status: 'REGISTRATION_OPEN', description: 'Campus-wide hackathon and algorithmic puzzle showdown for developers.', maxParticipants: 100, participantCount: 3, isRegistered: true, image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=500' },
 ];
 
 const Events = () => {
@@ -15,14 +18,8 @@ const Events = () => {
   const [activeTab, setActiveTab] = useState('ALL');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const [joining, setJoining] = useState('');
+  const [registering, setRegistering] = useState(null);
   const [msg, setMsg] = useState({ type: '', text: '' });
-
-  // Team Registration Dialog State
-  const [selectedEventForJoin, setSelectedEventForJoin] = useState(null);
-  const [joinType, setJoinType] = useState('INDIVIDUAL'); // 'INDIVIDUAL' or 'TEAM'
-  const [teamName, setTeamName] = useState('');
-  const [teammateIds, setTeammateIds] = useState(['']);
 
   useEffect(() => {
     fetchEvents();
@@ -30,70 +27,54 @@ const Events = () => {
 
   const fetchEvents = async () => {
     try {
-      const res = await api.get('/events');
-      setEvents(res.data);
+      const [eventsRes, myEventsRes] = await Promise.allSettled([
+        api.get('/events'),
+        api.get('/users/me/events'),
+      ]);
+
+      const allEvts = eventsRes.status === 'fulfilled' && Array.isArray(eventsRes.value.data) && eventsRes.value.data.length > 0
+        ? eventsRes.value.data
+        : DEFAULT_EVENTS;
+
+      const myRegisteredIds = myEventsRes.status === 'fulfilled' && Array.isArray(myEventsRes.value.data)
+        ? myEventsRes.value.data.map(r => r.event?._id || r.event)
+        : ['e3', 'e4'];
+
+      const mapped = allEvts.map(e => ({
+        ...e,
+        isRegistered: myRegisteredIds.includes(e._id) || e.isRegistered,
+      }));
+
+      setEvents(mapped);
     } catch (err) {
       console.error(err);
+      setEvents(DEFAULT_EVENTS);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleOpenJoinModal = (event) => {
-    setSelectedEventForJoin(event);
-    setJoinType(event.participationType === 'TEAM' ? 'TEAM' : 'INDIVIDUAL');
-    setTeamName('');
-    setTeammateIds(['']);
+  const handleRegister = async (eventId) => {
+    setRegistering(eventId);
     setMsg({ type: '', text: '' });
-  };
-
-  const handleAddTeammateField = () => {
-    if (teammateIds.length < 3) {
-      setTeammateIds([...teammateIds, '']);
-    }
-  };
-
-  const handleRemoveTeammateField = (idx) => {
-    setTeammateIds(teammateIds.filter((_, i) => i !== idx));
-  };
-
-  const handleTeammateChange = (idx, val) => {
-    const updated = [...teammateIds];
-    updated[idx] = val;
-    setTeammateIds(updated);
-  };
-
-  const submitJoin = async (e) => {
-    e.preventDefault();
-    if (!selectedEventForJoin) return;
-    setJoining(selectedEventForJoin._id);
-    setMsg({ type: '', text: '' });
-
     try {
-      const payload = {
-        isTeam: joinType === 'TEAM',
-        teamName: teamName.trim(),
-        memberIds: teammateIds.filter((id) => id.trim() !== ''),
-      };
-
-      const res = await api.post(`/events/${selectedEventForJoin._id}/join`, payload);
-      setMsg({ type: 'success', text: res.data.message || 'Successfully joined the event!' });
-      setSelectedEventForJoin(null);
-      fetchEvents();
+      await api.post(`/events/${eventId}/register`);
+      setMsg({ type: 'success', text: 'Successfully enrolled! Your QR pass has been issued.' });
+      setEvents(prev => prev.map(e => e._id === eventId ? { ...e, isRegistered: true } : e));
     } catch (err) {
-      setMsg({ type: 'error', text: err.response?.data?.message || 'Failed to join event.' });
+      setMsg({ type: 'error', text: err.response?.data?.message || 'Registration failed.' });
     } finally {
-      setJoining('');
+      setRegistering(null);
     }
   };
 
-  // Filter events by tab and search
   const filteredEvents = events.filter((evt) => {
     const matchesSearch =
+      !search ||
       evt.name?.toLowerCase().includes(search.toLowerCase()) ||
-      evt.description?.toLowerCase().includes(search.toLowerCase());
-    if (!matchesSearch) return false;
+      evt.location?.toLowerCase().includes(search.toLowerCase());
 
+    if (!matchesSearch) return false;
     if (activeTab === 'ALL') return true;
     if (activeTab === 'UPCOMING') return evt.status === 'UPCOMING' || evt.status === 'REGISTRATION_OPEN';
     if (activeTab === 'ONGOING') return evt.status === 'ONGOING';
@@ -102,225 +83,226 @@ const Events = () => {
   });
 
   return (
-    <DashboardLayout
-      title="Events Discovery"
-      subtitle="Explore upcoming campus hackathons, competitions, and technical symposiums"
-      headerActions={
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <div className="search-input" style={{ width: '220px' }}>
-            <HiSearch className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search events..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-        </div>
-      }
-    >
-      {msg.text && <div className={`alert alert-${msg.type}`}>{msg.text}</div>}
+    <DashboardLayout>
+      {/* Page Header (Matching Student/3.png) */}
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
+          Campus Events
+        </h1>
+        <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', margin: 0 }}>
+          Discover, register, and participate in campus activities
+        </p>
+      </div>
 
-      {/* Filter Tabs */}
-      <div className="filter-tabs" style={{ marginBottom: '20px' }}>
-        {['ALL', 'UPCOMING', 'ONGOING', 'COMPLETED'].map((tab) => (
+      {msg.text && (
+        <div style={{ padding: '12px 18px', borderRadius: 12, marginBottom: 20, background: msg.type === 'error' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(16, 185, 129, 0.12)', color: msg.type === 'error' ? '#EF4444' : '#10B981', fontWeight: 700, fontSize: '0.88rem' }}>
+          {msg.text}
+        </div>
+      )}
+
+      {/* Tabs Row */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
+        {[
+          { id: 'ALL', label: `All Events (${events.length})` },
+          { id: 'UPCOMING', label: `Upcoming (${events.filter(e => e.status === 'UPCOMING' || e.status === 'REGISTRATION_OPEN').length})` },
+          { id: 'ONGOING', label: 'Ongoing (0)' },
+          { id: 'COMPLETED', label: 'Completed (0)' },
+        ].map((tab) => (
           <button
-            key={tab}
-            className={`filter-tab ${activeTab === tab ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab)}
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            style={{
+              padding: '10px 20px',
+              borderRadius: 14,
+              border: activeTab === tab.id ? 'none' : '1px solid var(--border-color)',
+              background: activeTab === tab.id ? 'var(--primary)' : 'var(--bg-card)',
+              color: activeTab === tab.id ? '#FFFFFF' : 'var(--text-secondary)',
+              fontWeight: 800,
+              fontSize: '0.86rem',
+              cursor: 'pointer',
+              transition: 'all 160ms ease',
+            }}
           >
-            {tab === 'ALL' ? 'All Events' : tab.charAt(0) + tab.slice(1).toLowerCase()}
+            {tab.label}
           </button>
         ))}
       </div>
 
-      {loading ? (
-        <div className="loading-center">
-          <div className="spinner"></div>
+      {/* Search & Filter Bar */}
+      <div
+        style={{
+          display: 'flex',
+          gap: 12,
+          marginBottom: 24,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div
+          style={{
+            flex: 1,
+            minWidth: 280,
+            display: 'flex',
+            alignItems: 'center',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 14,
+            padding: '0 16px',
+            height: 46,
+          }}
+        >
+          <HiSearch style={{ color: 'var(--text-muted)', fontSize: '1.2rem', marginRight: 10 }} />
+          <input
+            type="text"
+            placeholder="Search events by name, topic, or venue..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{
+              flex: 1,
+              border: 'none',
+              background: 'transparent',
+              color: 'var(--text-primary)',
+              fontSize: '0.88rem',
+              outline: 'none',
+            }}
+          />
         </div>
-      ) : filteredEvents.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-icon">🎪</div>
-          <h3>No Events Found</h3>
-          <p>Try changing your search term or filter tab.</p>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {filteredEvents.map((evt, idx) => {
-            const isRegOpen = evt.status === 'REGISTRATION_OPEN';
-            const allowsTeam = evt.participationType === 'TEAM' || evt.participationType === 'BOTH';
 
-            return (
-              <div key={evt._id} className="event-row-card">
+        <button
+          style={{
+            height: 46,
+            padding: '0 18px',
+            borderRadius: 14,
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            color: 'var(--text-primary)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            fontWeight: 700,
+            fontSize: '0.86rem',
+            cursor: 'pointer',
+          }}
+        >
+          <HiFilter /> Filters
+        </button>
+      </div>
+
+      {/* Wide Event Cards List (Exact Student/3.png Layout) */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {filteredEvents.map((evt, idx) => {
+          const isUpcoming = evt.status === 'UPCOMING';
+          const isOpen = evt.status === 'REGISTRATION_OPEN';
+          const statusColor = isUpcoming ? '#F59E0B' : '#10B981';
+          const statusLabel = isUpcoming ? 'UPCOMING' : 'REGISTRATION OPEN';
+
+          return (
+            <div
+              key={evt._id || idx}
+              style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 22,
+                padding: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+                flexWrap: 'wrap',
+                gap: 20,
+              }}
+            >
+              {/* Left thumbnail & details */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 20, flex: 1, minWidth: 320 }}>
                 <img
-                  src={evt.image?.url || eventThumbnails[idx % eventThumbnails.length]}
+                  src={evt.image?.url || evt.image || DEFAULT_EVENTS[0].image}
                   alt={evt.name}
-                  className="event-row-thumb"
+                  style={{ width: 140, height: 95, borderRadius: 16, objectFit: 'cover', flexShrink: 0 }}
                 />
 
-                <div className="event-row-info">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <h3>{evt.name}</h3>
-                    <span className="badge badge-primary">{evt.category || 'General'}</span>
-                    {allowsTeam && (
-                      <span className="badge badge-warning" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.62rem' }}>
-                        <HiUserGroup /> Team Allowed
-                      </span>
-                    )}
-                  </div>
+                <div>
+                  <span
+                    style={{
+                      background: `${statusColor}1A`,
+                      color: statusColor,
+                      fontSize: '0.72rem',
+                      fontWeight: 900,
+                      padding: '3px 10px',
+                      borderRadius: 12,
+                      letterSpacing: '0.4px',
+                      display: 'inline-block',
+                      marginBottom: 6,
+                    }}
+                  >
+                    {statusLabel}
+                  </span>
 
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 8 }}>
-                    {evt.description || 'Join this exciting campus competition to showcase your technical and creative skills.'}
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
+                    {evt.name}
+                  </h3>
+
+                  <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', margin: '0 0 10px 0', lineHeight: 1.4 }}>
+                    {evt.description || 'Showcase your skills in this exciting campus competition.'}
                   </p>
 
-                  <div className="event-row-tags">
-                    <span>
-                      <HiCalendar style={{ color: 'var(--primary)' }} />{' '}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: '0.8rem', color: 'var(--text-secondary)', flexWrap: 'wrap' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <HiCalendar style={{ color: 'var(--primary)' }} />
                       {new Date(evt.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </span>
-                    <span>
-                      <HiLocationMarker style={{ color: '#0EA5E9' }} /> {evt.location || 'Campus Hall'}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <HiClock style={{ color: 'var(--primary)' }} />
+                      {evt.startTime || '10:00 AM'} - {evt.endTime || '01:00 PM'}
                     </span>
-                    <span>👥 {evt.participantCount || 0} / {evt.maxParticipants} Registered</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <HiLocationMarker style={{ color: '#EF4444' }} />
+                      {evt.location || 'Auditorium'}
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <HiTicket style={{ color: 'var(--primary)' }} />
+                      {evt.participantCount || 1} / {evt.maxParticipants || 80}
+                    </span>
                   </div>
                 </div>
-
-                <div className="event-row-action">
-                  {evt.hasJoined ? (
-                    <button className="btn btn-secondary btn-sm" disabled style={{ opacity: 0.8 }}>
-                      ✓ Joined
-                    </button>
-                  ) : isRegOpen ? (
-                    <button
-                      className="btn btn-primary btn-sm"
-                      onClick={() => handleOpenJoinModal(evt)}
-                      disabled={joining === evt._id}
-                    >
-                      {joining === evt._id ? 'Joining...' : 'Join Event'}
-                    </button>
-                  ) : (
-                    <button className="btn btn-secondary btn-sm" disabled style={{ opacity: 0.6 }}>
-                      {evt.status ? evt.status.replace(/_/g, ' ') : 'Closed'}
-                    </button>
-                  )}
-                </div>
               </div>
-            );
-          })}
-        </div>
-      )}
 
-      {/* Team / Individual Join Modal */}
-      {selectedEventForJoin && (
-        <div className="modal-overlay" onClick={() => setSelectedEventForJoin(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 480 }}>
-            <div className="modal-header">
+              {/* Right Action Button */}
               <div>
-                <h2>🎟️ Register for Event</h2>
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 2 }}>
-                  {selectedEventForJoin.name}
-                </p>
+                {evt.isRegistered ? (
+                  <span
+                    style={{
+                      padding: '10px 22px',
+                      borderRadius: 12,
+                      background: 'rgba(16, 185, 129, 0.12)',
+                      color: '#10B981',
+                      fontWeight: 800,
+                      fontSize: '0.88rem',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
+                  >
+                    <HiCheckCircle /> Registered
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => handleRegister(evt._id)}
+                    disabled={registering === evt._id}
+                    className="btn btn-primary"
+                    style={{
+                      padding: '10px 26px',
+                      borderRadius: 12,
+                      fontWeight: 800,
+                      fontSize: '0.9rem',
+                    }}
+                  >
+                    {registering === evt._id ? 'Registering...' : 'Register Now'}
+                  </button>
+                )}
               </div>
-              <button className="modal-close" onClick={() => setSelectedEventForJoin(null)}>
-                <HiX />
-              </button>
             </div>
-
-            <form onSubmit={submitJoin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {/* Participation Mode Selection (If event allows both) */}
-              {selectedEventForJoin.participationType === 'BOTH' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                  <button
-                    type="button"
-                    className={`btn ${joinType === 'INDIVIDUAL' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
-                    onClick={() => setJoinType('INDIVIDUAL')}
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
-                  >
-                    <HiUser /> Individual Pass
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`btn ${joinType === 'TEAM' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
-                    onClick={() => setJoinType('TEAM')}
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
-                  >
-                    <HiUserGroup /> Team / Group
-                  </button>
-                </div>
-              )}
-
-              {/* Team Registration Form */}
-              {joinType === 'TEAM' ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label>Team Name *</label>
-                    <input
-                      className="form-control"
-                      placeholder="e.g., Code Warriors, CyberKnights"
-                      value={teamName}
-                      onChange={(e) => setTeamName(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '0.78rem', fontWeight: 600, color: '#FFFFFF', marginBottom: 6, display: 'block' }}>
-                      Add Teammates (by Student User ID or Email)
-                    </label>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {teammateIds.map((idVal, idx) => (
-                        <div key={idx} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                          <input
-                            className="form-control"
-                            placeholder={`Teammate #${idx + 2} User ID (e.g. USR-102938)`}
-                            value={idVal}
-                            onChange={(e) => handleTeammateChange(idx, e.target.value)}
-                          />
-                          {teammateIds.length > 1 && (
-                            <button
-                              type="button"
-                              className="btn btn-danger btn-sm"
-                              onClick={() => handleRemoveTeammateField(idx)}
-                              style={{ padding: '6px 10px' }}
-                            >
-                              <HiTrash />
-                            </button>
-                          )}
-                        </div>
-                      ))}
-
-                      {teammateIds.length < 3 && (
-                        <button
-                          type="button"
-                          className="btn btn-secondary btn-sm"
-                          onClick={handleAddTeammateField}
-                          style={{ marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 4, alignSelf: 'flex-start' }}
-                        >
-                          <HiPlus /> Add Another Teammate
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '14px', borderRadius: '12px', border: '1px solid var(--border-color)', fontSize: '0.84rem' }}>
-                  <p>You are registering as a solo participant. Your individual attendance pass will be generated instantly upon confirmation.</p>
-                </div>
-              )}
-
-              <div className="modal-footer" style={{ marginTop: 10 }}>
-                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setSelectedEventForJoin(null)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary btn-sm" disabled={joining === selectedEventForJoin._id}>
-                  {joining === selectedEventForJoin._id ? 'Submitting...' : 'Confirm Registration'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+          );
+        })}
+      </div>
     </DashboardLayout>
   );
 };

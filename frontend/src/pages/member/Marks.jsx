@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { HiCheckCircle } from 'react-icons/hi';
+import { HiCalendar, HiCheckCircle, HiPencil, HiX, HiPlus } from 'react-icons/hi';
+import { FaGraduationCap } from 'react-icons/fa';
 
 const MemberMarks = () => {
   const [events, setEvents] = useState([]);
@@ -22,8 +23,8 @@ const MemberMarks = () => {
   const fetchEvents = async () => {
     try {
       const res = await api.get('/events');
-      setEvents(res.data);
-      if (res.data.length > 0) {
+      if (Array.isArray(res.data) && res.data.length > 0) {
+        setEvents(res.data);
         setSelectedEvent(res.data[0]._id);
         loadEventDetails(res.data[0]._id);
       }
@@ -37,14 +38,14 @@ const MemberMarks = () => {
     setSelectedUser(null);
     if (!eventId) return;
     try {
-      const [evtRes, marksRes, partsRes] = await Promise.all([
+      const [evtRes, marksRes, partsRes] = await Promise.allSettled([
         api.get(`/events/${eventId}`),
         api.get(`/marks/event/${eventId}`),
         api.get(`/events/${eventId}/participants`),
       ]);
 
-      const criteria = evtRes.data.markingCriteria?.length > 0
-        ? evtRes.data.markingCriteria
+      const criteria = evtRes.status === 'fulfilled' && evtRes.value.data.markingCriteria?.length > 0
+        ? evtRes.value.data.markingCriteria
         : [
             { name: 'Problem Solving', maxMarks: 40 },
             { name: 'Logic & Approach', maxMarks: 30 },
@@ -53,8 +54,8 @@ const MemberMarks = () => {
           ];
 
       setMarkingCriteria(criteria);
-      setEvaluatedMarks(marksRes.data);
-      setEventParticipants(partsRes.data);
+      if (marksRes.status === 'fulfilled') setEvaluatedMarks(marksRes.value.data || []);
+      if (partsRes.status === 'fulfilled') setEventParticipants(partsRes.value.data || []);
     } catch (err) {
       console.error(err);
     }
@@ -64,19 +65,18 @@ const MemberMarks = () => {
     setSelectedUser(studentObj);
     setShowSelectModal(false);
 
-    // Check if this student already has evaluated marks
     const existing = evaluatedMarks.find(m => (m.userId?._id || m.userId) === (studentObj._id || studentObj.userId));
     if (existing && existing.criteria?.length > 0) {
       setMarksForm(existing.criteria.map(c => ({
         name: c.name,
         maxMarks: c.maxMarks,
-        marks: c.marks,
+        marks: c.marks || c.obtainedMarks || 0,
       })));
     } else {
       const initialMarks = markingCriteria.map(c => ({
         name: c.name,
         maxMarks: c.maxMarks,
-        marks: Math.round(c.maxMarks * 0.75),
+        marks: Math.round(c.maxMarks * 0.8),
       }));
       setMarksForm(initialMarks);
     }
@@ -101,219 +101,214 @@ const MemberMarks = () => {
     }
   };
 
-  const totalObtained = marksForm.reduce((s, c) => s + (Number(c.marks) || 0), 0);
-  const totalMax = marksForm.reduce((s, c) => s + (Number(c.maxMarks) || 0), 0);
-
   return (
-    <DashboardLayout
-      title="Marks Entry & Scoring"
-      subtitle="Grade participants based on event-specific evaluation criteria"
-    >
-      {msg.text && <div className={`alert alert-${msg.type}`}>{msg.text}</div>}
+    <DashboardLayout>
+      {/* Top Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
+        <div>
+          <h1 style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
+            Live Scoring & Marking System
+          </h1>
+          <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', margin: 0 }}>
+            Evaluate criteria and assign marks for student participants
+          </p>
+        </div>
 
-      {/* Modal to pick student participant */}
-      {showSelectModal && (
-        <div className="modal-overlay" onClick={() => setShowSelectModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 500 }}>
-            <div className="modal-header">
-              <h2>Select Student to Grade</h2>
-              <button className="modal-close" onClick={() => setShowSelectModal(false)}>✕</button>
-            </div>
-            <div className="modal-body" style={{ maxHeight: 380, overflowY: 'auto' }}>
-              {eventParticipants.length === 0 ? (
-                <p style={{ textAlign: 'center', color: '#64748B', padding: '20px' }}>
-                  No participants registered for this event.
-                </p>
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowSelectModal(true)}
+          style={{ borderRadius: 12, fontWeight: 700, padding: '10px 22px' }}
+        >
+          <HiPlus /> Score Student
+        </button>
+      </div>
+
+      {msg.text && (
+        <div style={{ padding: '12px 18px', borderRadius: 12, marginBottom: 20, background: msg.type === 'error' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(16, 185, 129, 0.12)', color: msg.type === 'error' ? '#EF4444' : '#10B981', fontWeight: 700, fontSize: '0.88rem' }}>
+          {msg.text}
+        </div>
+      )}
+
+      {/* Select Event Strip */}
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 16, padding: '14px 20px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
+        <span style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text-muted)' }}>Select Event</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, maxWidth: 380 }}>
+          <HiCalendar style={{ color: 'var(--primary)' }} />
+          <select
+            value={selectedEvent}
+            onChange={(e) => loadEventDetails(e.target.value)}
+            style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-primary)', fontSize: '0.94rem', fontWeight: 800, outline: 'none', cursor: 'pointer' }}
+          >
+            {events.map((e) => (
+              <option key={e._id} value={e._id}>{e.name}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Evaluated Marks Table */}
+      <div
+        style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 20,
+          overflow: 'hidden',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+        }}
+      >
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
+            <thead>
+              <tr style={{ background: 'var(--bg-app)', borderBottom: '1px solid var(--border-color)', textAlign: 'left' }}>
+                <th style={{ padding: '14px 18px', color: 'var(--text-muted)', fontSize: '0.74rem', fontWeight: 800 }}>STUDENT</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-muted)', fontSize: '0.74rem', fontWeight: 800 }}>ROLL NO.</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-muted)', fontSize: '0.74rem', fontWeight: 800 }}>DEPARTMENT</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-muted)', fontSize: '0.74rem', fontWeight: 800 }}>CRITERIA BREAKDOWN</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-muted)', fontSize: '0.74rem', fontWeight: 800 }}>TOTAL SCORE</th>
+                <th style={{ padding: '14px 18px', color: 'var(--text-muted)', fontSize: '0.74rem', fontWeight: 800, textAlign: 'center' }}>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {evaluatedMarks.length === 0 ? (
+                <tr>
+                  <td colSpan={6} style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
+                    No evaluations submitted yet. Click "Score Student" above to start scoring.
+                  </td>
+                </tr>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {eventParticipants.map(p => (
-                    <div
-                      key={p._id}
-                      style={{
-                        padding: '12px 14px',
-                        borderRadius: 10,
-                        border: '1px solid #E2E8F0',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        transition: 'background 0.2s',
-                      }}
-                      onClick={() => startMarking(p.userId)}
-                      onMouseEnter={(e) => e.currentTarget.style.background = '#F8FAFC'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = '#FFFFFF'}
-                    >
-                      <div>
-                        <strong style={{ display: 'block' }}>{p.userId?.firstName} {p.userId?.lastName}</strong>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                          {p.userId?.userId} • {p.userId?.department} ({p.userId?.rollNumber})
-                        </span>
-                      </div>
-                      <button className="btn btn-primary btn-sm">Select</button>
-                    </div>
-                  ))}
-                </div>
+                evaluatedMarks.map((m, idx) => {
+                  const s = m.userId || {};
+                  const fullName = `${s.firstName || ''} ${s.lastName || ''}`.trim() || 'Student';
+                  const total = m.totalMarks || (m.criteria ? m.criteria.reduce((a, b) => a + (b.marks || b.obtainedMarks || 0), 0) : 0);
+
+                  return (
+                    <tr key={m._id || idx} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                      <td style={{ padding: '14px 18px', fontWeight: 800, color: 'var(--text-primary)' }}>{fullName}</td>
+                      <td style={{ padding: '14px 18px', color: 'var(--text-secondary)' }}>{s.rollNumber || '—'}</td>
+                      <td style={{ padding: '14px 18px', color: 'var(--text-secondary)' }}>{s.department || 'BCA'}</td>
+                      <td style={{ padding: '14px 18px' }}>
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                          {m.criteria?.map((c, i) => (
+                            <span key={i} style={{ background: 'var(--bg-app)', border: '1px solid var(--border-color)', borderRadius: 8, padding: '2px 8px', fontSize: '0.75rem' }}>
+                              {c.name}: <strong>{c.marks || c.obtainedMarks}/{c.maxMarks}</strong>
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td style={{ padding: '14px 18px' }}>
+                        <strong style={{ color: '#10B981', fontSize: '0.96rem' }}>{total} / 100</strong>
+                      </td>
+                      <td style={{ padding: '14px 18px', textAlign: 'center' }}>
+                        <button
+                          onClick={() => startMarking(s)}
+                          style={{
+                            padding: '6px 14px',
+                            borderRadius: 10,
+                            background: 'var(--bg-app)',
+                            border: '1px solid var(--border-color)',
+                            color: 'var(--primary)',
+                            fontSize: '0.82rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
+                        >
+                          <HiPencil /> Rescore
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Select Student Modal */}
+      {showSelectModal && (
+        <div className="modal-backdrop-overlay" onClick={() => setShowSelectModal(false)}>
+          <div className="theme-selector-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 480 }}>
+            <div className="modal-header-row">
+              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>Select Student to Evaluate</h3>
+              <button className="modal-close-icon-btn" onClick={() => setShowSelectModal(false)}><HiX /></button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 18, maxHeight: '50vh', overflowY: 'auto' }}>
+              {eventParticipants.map((p, idx) => {
+                const s = p.userId || p.student || {};
+                const name = `${s.firstName || ''} ${s.lastName || ''}`.trim() || 'Student';
+                return (
+                  <div
+                    key={p._id || idx}
+                    onClick={() => startMarking(s)}
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: 12,
+                      background: 'var(--bg-app)',
+                      border: '1px solid var(--border-color)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <strong style={{ color: 'var(--text-primary)', display: 'block' }}>{name}</strong>
+                      <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{s.department || 'BCA'} • Roll: {s.rollNumber || '—'}</span>
+                    </div>
+                    <span style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '0.84rem' }}>Select ➔</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: selectedUser ? '1.2fr 1fr' : '1fr', gap: 24 }}>
-        {/* Left: Event Selector & Participants Table */}
-        <div>
-          <div className="card" style={{ marginBottom: 20 }}>
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label style={{ fontSize: '0.76rem', color: '#64748B' }}>Select Event</label>
-              <select
-                className="form-control"
-                value={selectedEvent}
-                onChange={(e) => loadEventDetails(e.target.value)}
-              >
-                {events.map(e => <option key={e._id} value={e._id}>{e.name}</option>)}
-              </select>
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="card-header">
-              <h2>Evaluated Participants</h2>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowSelectModal(true)}
-              >
-                + Grade Participant
-              </button>
+      {/* Scoring Modal */}
+      {selectedUser && (
+        <div className="modal-backdrop-overlay" onClick={() => setSelectedUser(null)}>
+          <div className="theme-selector-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 500 }}>
+            <div className="modal-header-row">
+              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>
+                Score: {selectedUser.firstName} {selectedUser.lastName}
+              </h3>
+              <button className="modal-close-icon-btn" onClick={() => setSelectedUser(null)}><HiX /></button>
             </div>
 
-            <div className="table-container" style={{ border: 'none', boxShadow: 'none' }}>
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Student</th>
-                    <th>Department</th>
-                    <th>Roll No.</th>
-                    <th>Total Score</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {evaluatedMarks.length > 0 ? (
-                    evaluatedMarks.map(p => (
-                      <tr key={p._id}>
-                        <td style={{ fontWeight: 600 }}>{p.userId?.firstName} {p.userId?.lastName}</td>
-                        <td>{p.userId?.department}</td>
-                        <td>{p.userId?.rollNumber}</td>
-                        <td><span className="badge badge-success">{p.totalMarks} / 100</span></td>
-                        <td>
-                          <button
-                            className="btn btn-secondary btn-sm"
-                            onClick={() => startMarking(p.userId)}
-                          >
-                            Edit
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} style={{ textAlign: 'center', color: '#64748B', padding: '30px' }}>
-                        No marks entered for this event yet. Click "+ Grade Participant" to start.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+            <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {marksForm.map((crit, idx) => (
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <label style={{ fontSize: '0.84rem', fontWeight: 700 }}>{crit.name} (Max: {crit.maxMarks})</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max={crit.maxMarks}
+                    value={crit.marks || 0}
+                    onChange={(e) => {
+                      const updated = [...marksForm];
+                      updated[idx].marks = Number(e.target.value);
+                      setMarksForm(updated);
+                    }}
+                    className="form-control"
+                    style={{ width: 90, textAlign: 'center' }}
+                  />
+                </div>
+              ))}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
+                <button className="btn btn-secondary" onClick={() => setSelectedUser(null)}>Cancel</button>
+                <button className="btn btn-primary" onClick={handleSubmitMarks} disabled={loading}>
+                  {loading ? 'Saving...' : 'Submit Evaluation'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Right: Exact Mark Entry Panel */}
-        {selectedUser && (
-          <div className="card" style={{ border: '2px solid #5C33CF' }}>
-            <div className="card-header" style={{ borderBottom: '1px solid #EAEFF5', paddingBottom: 14 }}>
-              <div>
-                <span className="badge badge-primary" style={{ marginBottom: 4 }}>Evaluation Form</span>
-                <h3 style={{ fontSize: '1.15rem' }}>Mark Entry</h3>
-              </div>
-              <span className="badge badge-success" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <HiCheckCircle /> Valid Registration
-              </span>
-            </div>
-
-            {/* Student Info Pill */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, margin: '16px 0', background: '#F8FAFC', padding: '12px 16px', borderRadius: '12px' }}>
-              <div className="identity-hero-avatar-placeholder" style={{ width: 48, height: 48, fontSize: '1.2rem' }}>
-                {selectedUser.firstName ? selectedUser.firstName[0] : 'S'}
-              </div>
-              <div>
-                <h4 style={{ fontSize: '0.98rem', fontWeight: 700 }}>
-                  {selectedUser.firstName} {selectedUser.lastName}
-                </h4>
-                <p style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--primary)' }}>
-                  {selectedUser.userId || 'USR'} • {selectedUser.department || 'BCA'} (Roll: {selectedUser.rollNumber})
-                </p>
-              </div>
-            </div>
-
-            {/* Criteria Marks Table */}
-            <div className="table-container" style={{ border: 'none', boxShadow: 'none', marginBottom: 16 }}>
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Criteria</th>
-                    <th style={{ width: '90px' }}>Marks</th>
-                    <th style={{ width: '90px' }}>Max Marks</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {marksForm.map((c, i) => (
-                    <tr key={i}>
-                      <td style={{ fontWeight: 600, fontSize: '0.84rem' }}>{c.name}</td>
-                      <td>
-                        <input
-                          type="number"
-                          className="form-control"
-                          min={0}
-                          max={c.maxMarks}
-                          value={c.marks === '' ? '' : c.marks}
-                          style={{ padding: '6px 10px', textAlign: 'center', fontWeight: 700, width: '75px' }}
-                          onChange={(e) => {
-                            const val = e.target.value === '' ? '' : Math.min(parseInt(e.target.value) || 0, c.maxMarks);
-                            const updated = [...marksForm];
-                            updated[i].marks = val;
-                            setMarksForm(updated);
-                          }}
-                        />
-                      </td>
-                      <td style={{ color: '#64748B', fontWeight: 600, textAlign: 'center' }}>
-                        {c.maxMarks}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Total Row */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px', background: '#F3F0FF', borderRadius: '12px', marginBottom: 20 }}>
-              <span style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '0.95rem' }}>Total Score:</span>
-              <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>
-                {totalObtained} <span style={{ fontSize: '0.85rem', color: '#64748B' }}>/ {totalMax}</span>
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-              <button className="btn btn-secondary" onClick={() => setSelectedUser(null)}>
-                Cancel
-              </button>
-              <button className="btn btn-primary" onClick={handleSubmitMarks} disabled={loading}>
-                {loading ? 'Saving...' : 'Save Marks'}
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </DashboardLayout>
   );
 };
