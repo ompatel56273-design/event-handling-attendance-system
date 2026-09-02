@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Sidebar from './Sidebar';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import {
   HiBell, HiCheck, HiX, HiMenu, HiSearch, HiCalendar,
-  HiChevronDown, HiSparkles, HiSpeakerphone, HiPlus
+  HiChevronDown, HiSparkles, HiSpeakerphone, HiPlus,
+  HiTrash, HiTicket, HiChartBar, HiUser, HiStar,
+  HiClipboardCheck, HiExternalLink
 } from 'react-icons/hi';
-import { FaSun, FaMoon, FaCheckCircle } from 'react-icons/fa';
+import { FaSun, FaMoon, FaCheckCircle, FaSearch } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 
 const DashboardLayout = ({ children, title, subtitle, headerActions, searchPlaceholder }) => {
@@ -20,6 +22,9 @@ const DashboardLayout = ({ children, title, subtitle, headerActions, searchPlace
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
+  const searchContainerRef = useRef(null);
+
   const [announcements, setAnnouncements] = useState([
     {
       _id: 'notif-1',
@@ -71,6 +76,15 @@ const DashboardLayout = ({ children, title, subtitle, headerActions, searchPlace
     setAnnouncements((prev) => prev.map((a) => ({ ...a, isRead: true })));
   };
 
+  const handleDeleteBroadcast = async (broadcastId) => {
+    setAnnouncements((prev) => prev.filter((a) => a._id !== broadcastId));
+    try {
+      await api.delete(`/announcements/${broadcastId}`);
+    } catch (err) {
+      console.warn('Local broadcast removed:', err);
+    }
+  };
+
   const handleCreateBroadcast = async (e) => {
     e.preventDefault();
     if (!newBroadcastTitle.trim()) return;
@@ -101,9 +115,58 @@ const DashboardLayout = ({ children, title, subtitle, headerActions, searchPlace
     }
   };
 
+  // Close search dropdown when clicking outside
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        setSearchFocused(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
+
+  // Global searchable directory across Users, Events, Marks, and Registrations
+  const SEARCH_INDEX = [
+    // Users
+    { type: 'user', title: 'John Doe', subtitle: 'USR-102938 • BCA Year 2-A • Roll 21BCA102', path: '/admin/users/USR-102938', icon: '👤', tag: 'STUDENT', role: 'admin' },
+    { type: 'user', title: 'Alice Smith', subtitle: 'USR-102939 • BSc CA & IT Year 3-B', path: '/admin/users/USR-102939', icon: '👤', tag: 'STUDENT', role: 'admin' },
+    { type: 'user', title: 'Bob Johnson', subtitle: 'USR-102940 • BCA Year 1-A • Roll 22BCA042', path: '/admin/users/USR-102940', icon: '👤', tag: 'STUDENT', role: 'admin' },
+    { type: 'user', title: 'Charlie Brown', subtitle: 'USR-102941 • BCA Year 2-C • Roll 21BCA088', path: '/admin/users/USR-102941', icon: '👤', tag: 'FACULTY', role: 'admin' },
+    { type: 'user', title: 'Emma Wilson', subtitle: 'USR-102942 • BSc CA & IT Year 2-A', path: '/admin/users/USR-102942', icon: '👤', tag: 'STUDENT', role: 'admin' },
+    // Events
+    { type: 'event', title: 'Code Carnival 2.0', subtitle: 'EVT-1004 • Seminar Hall • 25 July 2026', path: isAdmin ? '/admin/events' : (isMember ? '/member/events' : '/user/events'), icon: '💻', tag: 'EVENT' },
+    { type: 'event', title: 'UI/UX Design Challenge', subtitle: 'EVT-1003 • Lab 3 • 10 July 2026', path: isAdmin ? '/admin/events' : (isMember ? '/member/events' : '/user/events'), icon: '🎨', tag: 'EVENT' },
+    { type: 'event', title: 'Poster Presentation', subtitle: 'EVT-1001 • Auditorium • 18 June 2026', path: isAdmin ? '/admin/events' : (isMember ? '/member/events' : '/user/events'), icon: '📊', tag: 'EVENT' },
+    { type: 'event', title: 'Debate Competition', subtitle: 'EVT-1002 • Conference Hall • 30 June 2026', path: isAdmin ? '/admin/events' : (isMember ? '/member/events' : '/user/events'), icon: '🎤', tag: 'EVENT' },
+    { type: 'event', title: 'Robotics Workshop', subtitle: 'EVT-1005 • Workshop Lab • 05 Aug 2026', path: isAdmin ? '/admin/events' : (isMember ? '/member/events' : '/user/events'), icon: '🤖', tag: 'EVENT' },
+    // Marks & Scorecards
+    { type: 'mark', title: 'Code Carnival Evaluation Marks', subtitle: 'Problem Solving (40), Logic (30), Quality (20), Time (10)', path: isAdmin ? '/admin/marks' : '/member/marks', icon: '📈', tag: 'MARKS' },
+    { type: 'mark', title: 'UI/UX Sprint Scorecard', subtitle: 'Visual Aesthetics (40), User Flow (30), Prototyping (20)', path: isAdmin ? '/admin/marks' : '/member/marks', icon: '📈', tag: 'MARKS' },
+    { type: 'mark', title: 'Poster Presentation Marks Table', subtitle: 'Live Student Evaluation Criteria Matrix', path: isAdmin ? '/admin/marks' : '/member/marks', icon: '📈', tag: 'MARKS' },
+    // Registrations & Attendance
+    { type: 'reg', title: 'Student Registrations Directory', subtitle: 'Verified ticket holders & event join records', path: '/admin/registrations', icon: '🎫', tag: 'REGS', role: 'admin' },
+    { type: 'att', title: 'QR Attendance Verification System', subtitle: 'Real-time scanner & verification log', path: isAdmin ? '/admin/attendance' : '/member/scanner', icon: '📱', tag: 'ATTENDANCE' },
+    { type: 'win', title: 'Podium Winners & Hall of Fame', subtitle: 'Gold, Silver & Bronze Medalist Records', path: isAdmin ? '/admin/winners' : '/user/winners', icon: '🏆', tag: 'WINNERS' },
+  ];
+
+  const filteredSearch = globalSearch.trim().length > 0
+    ? SEARCH_INDEX.filter((item) => {
+        if (item.role === 'admin' && !isAdmin) return false;
+        const q = globalSearch.toLowerCase();
+        return item.title.toLowerCase().includes(q) || item.subtitle.toLowerCase().includes(q);
+      })
+    : [];
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (!globalSearch.trim()) return;
+    if (filteredSearch.length > 0) {
+      navigate(filteredSearch[0].path);
+      setGlobalSearch('');
+      setSearchFocused(false);
+      return;
+    }
     if (isAdmin) {
       navigate(`/admin/users?search=${encodeURIComponent(globalSearch.trim())}`);
     } else if (isMember) {
@@ -111,6 +174,8 @@ const DashboardLayout = ({ children, title, subtitle, headerActions, searchPlace
     } else {
       navigate(`/user/events?search=${encodeURIComponent(globalSearch.trim())}`);
     }
+    setGlobalSearch('');
+    setSearchFocused(false);
   };
 
   return (
@@ -133,25 +198,108 @@ const DashboardLayout = ({ children, title, subtitle, headerActions, searchPlace
               <HiMenu />
             </button>
 
-            {/* Global Search Bar with Ctrl+K shortcut */}
-            <form onSubmit={handleSearchSubmit} className="topbar-search-box">
-              <HiSearch className="search-icon" />
-              <input
-                type="text"
-                placeholder={
-                  searchPlaceholder ||
-                  (isAdmin
-                    ? 'Search events, users, registrations...'
-                    : isMember
-                    ? 'Search events, student attendance...'
-                    : 'Search events, competitions, passes...')
-                }
-                value={globalSearch}
-                onChange={(e) => setGlobalSearch(e.target.value)}
-                className="topbar-search-input"
-              />
-              <span className="search-shortcut-badge">Ctrl + K</span>
-            </form>
+            {/* Global Search Bar with Live Categorized Autocomplete */}
+            <div ref={searchContainerRef} style={{ position: 'relative' }}>
+              <form onSubmit={handleSearchSubmit} className="topbar-search-box">
+                <HiSearch className="search-icon" />
+                <input
+                  type="text"
+                  placeholder={
+                    searchPlaceholder ||
+                    (isAdmin
+                      ? 'Search events, users, registrations, marks...'
+                      : isMember
+                      ? 'Search events, student attendance, marks...'
+                      : 'Search events, competitions, passes...')
+                  }
+                  value={globalSearch}
+                  onFocus={() => setSearchFocused(true)}
+                  onChange={(e) => {
+                    setGlobalSearch(e.target.value);
+                    setSearchFocused(true);
+                  }}
+                  className="topbar-search-input"
+                />
+                <span className="search-shortcut-badge">Ctrl + K</span>
+              </form>
+
+              {/* Live Search Autocomplete Drawer */}
+              {searchFocused && globalSearch.trim().length > 0 && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    left: 0,
+                    width: 420,
+                    maxWidth: '90vw',
+                    background: 'var(--bg-card)',
+                    border: '1.5px solid var(--border-color)',
+                    borderRadius: 18,
+                    boxShadow: '0 16px 40px rgba(0,0,0,0.45)',
+                    zIndex: 9999,
+                    overflow: 'hidden',
+                    backdropFilter: 'blur(20px)',
+                  }}
+                >
+                  <div style={{ padding: '12px 16px', background: 'var(--bg-app)', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.8 }}>
+                      Search Results ({filteredSearch.length})
+                    </span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Press Enter ↵ to open</span>
+                  </div>
+
+                  <div style={{ maxHeight: 320, overflowY: 'auto', padding: '6px' }}>
+                    {filteredSearch.length === 0 ? (
+                      <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.86rem' }}>
+                        No matching users, events, or records found for <strong>"{globalSearch}"</strong>
+                      </div>
+                    ) : (
+                      filteredSearch.map((item, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => {
+                            navigate(item.path);
+                            setGlobalSearch('');
+                            setSearchFocused(false);
+                          }}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 12,
+                            padding: '10px 14px',
+                            borderRadius: 12,
+                            cursor: 'pointer',
+                            transition: 'all 120ms ease',
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-app)'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                        >
+                          <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(99, 102, 241, 0.12)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>
+                            {item.icon}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {item.title}
+                              </strong>
+                              {item.tag && (
+                                <span style={{ fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'var(--primary-light)', color: 'var(--primary)' }}>
+                                  {item.tag}
+                                </span>
+                              )}
+                            </div>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {item.subtitle}
+                            </span>
+                          </div>
+                          <HiExternalLink style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }} />
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="topbar-right">
@@ -386,39 +534,54 @@ const DashboardLayout = ({ children, title, subtitle, headerActions, searchPlace
 
             {/* Create Broadcast Form for SuperAdmin */}
             {showCreateBroadcast && (
-              <form onSubmit={handleCreateBroadcast} className="create-broadcast-box">
-                <input
-                  type="text"
-                  placeholder="Broadcast Title (e.g. Change room)"
-                  value={newBroadcastTitle}
-                  onChange={(e) => setNewBroadcastTitle(e.target.value)}
-                  className="form-input"
-                  required
-                />
-                <textarea
-                  placeholder="Broadcast details (e.g. Seminar relocated to Room 108)"
-                  value={newBroadcastContent}
-                  onChange={(e) => setNewBroadcastContent(e.target.value)}
-                  className="form-input"
-                  rows={2}
-                />
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <select
-                    value={newBroadcastType}
-                    onChange={(e) => setNewBroadcastType(e.target.value)}
-                    className="form-input"
-                    style={{ width: 'auto' }}
-                  >
-                    <option value="ANNOUNCEMENT">Announcement</option>
-                    <option value="URGENT">Urgent Alert</option>
-                    <option value="UPDATE">Schedule Update</option>
-                  </select>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowCreateBroadcast(false)}>
+              <form onSubmit={handleCreateBroadcast} className="create-broadcast-box" style={{ background: 'var(--bg-app)', border: '1.5px solid var(--border-color)', borderRadius: 18, padding: '20px', marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div>
+                  <label style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>
+                    Broadcast Title
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Schedule Change: Seminar Relocated to Room 108"
+                    value={newBroadcastTitle}
+                    onChange={(e) => setNewBroadcastTitle(e.target.value)}
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: 12, background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', color: 'var(--text-primary)', fontSize: '0.94rem', fontWeight: 600, outline: 'none' }}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>
+                    Broadcast Message Details
+                  </label>
+                  <textarea
+                    placeholder="Enter full broadcast details, guidelines, or instructions for all campus students and members..."
+                    value={newBroadcastContent}
+                    onChange={(e) => setNewBroadcastContent(e.target.value)}
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: 12, background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', color: 'var(--text-primary)', fontSize: '0.92rem', fontWeight: 500, outline: 'none', resize: 'vertical' }}
+                    rows={3}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <label style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Type:</label>
+                    <select
+                      value={newBroadcastType}
+                      onChange={(e) => setNewBroadcastType(e.target.value)}
+                      style={{ padding: '8px 14px', borderRadius: 10, background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', color: 'var(--text-primary)', fontSize: '0.86rem', fontWeight: 700, outline: 'none', cursor: 'pointer' }}
+                    >
+                      <option value="ANNOUNCEMENT">Announcement</option>
+                      <option value="URGENT">Urgent Alert</option>
+                      <option value="UPDATE">Schedule Update</option>
+                    </select>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowCreateBroadcast(false)} style={{ borderRadius: 10, padding: '8px 16px', fontWeight: 700 }}>
                       Cancel
                     </button>
-                    <button type="submit" className="btn btn-primary btn-sm">
-                      Publish
+                    <button type="submit" className="btn btn-primary btn-sm" style={{ borderRadius: 10, padding: '8px 20px', fontWeight: 800 }}>
+                      Publish Broadcast
                     </button>
                   </div>
                 </div>
@@ -428,33 +591,59 @@ const DashboardLayout = ({ children, title, subtitle, headerActions, searchPlace
             {/* Notification List */}
             <div className="notif-items-list">
               {announcements.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--text-muted)' }}>
-                  <p>No new broadcasts at this time.</p>
+                <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
+                  <p style={{ margin: 0, fontSize: '0.94rem' }}>No broadcasts published yet.</p>
                 </div>
               ) : (
                 announcements.map((notif) => (
-                  <div key={notif._id} className={`notif-item-card ${notif.isRead ? 'read' : 'unread'}`}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <div key={notif._id} className={`notif-item-card ${notif.isRead ? 'read' : 'unread'}`} style={{ position: 'relative' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                       <span className={`notif-type-tag ${notif.type?.toLowerCase()}`}>
                         {notif.type || 'NOTICE'}
                       </span>
-                      <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                        {new Date(notif.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                      </span>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                          {new Date(notif.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+
+                        {/* Admin-only Delete Broadcast button */}
+                        {isAdmin && (
+                          <button
+                            onClick={() => handleDeleteBroadcast(notif._id)}
+                            title="Remove Broadcast Message (Admin Only)"
+                            style={{
+                              background: 'rgba(239, 68, 68, 0.12)',
+                              border: '1px solid rgba(239, 68, 68, 0.28)',
+                              color: '#EF4444',
+                              borderRadius: 8,
+                              padding: '4px 10px',
+                              fontSize: '0.74rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 4,
+                            }}
+                          >
+                            <HiTrash /> Remove
+                          </button>
+                        )}
+                      </div>
                     </div>
 
-                    <h4 style={{ margin: '0 0 4px', fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                       {notif.title}
                     </h4>
 
                     {notif.content && (
-                      <p style={{ margin: '0 0 8px', fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                      <p style={{ margin: '0 0 10px', fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
                         {notif.content}
                       </p>
                     )}
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.76rem', color: 'var(--primary)' }}>
-                      <HiSpeakerphone /> By {notif.author || 'Super Admin'}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.76rem', color: 'var(--primary)', fontWeight: 700 }}>
+                      <HiSpeakerphone /> Broadcast by {notif.author || 'Super Admin'}
                     </div>
                   </div>
                 ))

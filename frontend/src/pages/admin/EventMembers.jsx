@@ -3,12 +3,13 @@ import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import {
   HiPlus, HiKey, HiCalendar, HiX,
-  HiChevronLeft, HiChevronRight, HiFilter
+  HiChevronLeft, HiChevronRight, HiFilter,
+  HiEye, HiEyeOff, HiLockClosed
 } from 'react-icons/hi';
 
 const DEFAULT_MOCK_MEMBERS = [
-  { _id: 'm1', name: 'Emma Watson', email: 'emma.member@eventhandling.com', accountStatus: 'ACTIVE', createdAt: '2026-08-22' },
-  { _id: 'm2', name: 'Mike Johnson', email: 'member@eventhandling.com', accountStatus: 'ACTIVE', createdAt: '2026-08-22' },
+  { _id: 'm1', name: 'Emma Watson', email: 'emma.member@eventhandling.com', accountStatus: 'ACTIVE', currentPassword: 'Member@Emma123', createdAt: '2026-08-22' },
+  { _id: 'm2', name: 'Mike Johnson', email: 'member@eventhandling.com', accountStatus: 'ACTIVE', currentPassword: 'Member@Mike2026', createdAt: '2026-08-22' },
 ];
 
 const AdminEventMembers = () => {
@@ -16,7 +17,9 @@ const AdminEventMembers = () => {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '' });
-  const [passwordForm, setPasswordForm] = useState({ id: '', newPassword: '' });
+  const [passwordForm, setPasswordForm] = useState({ id: '', name: '', email: '', currentPassword: '', newPassword: '' });
+  const [showCurrentPw, setShowCurrentPw] = useState(false);
+  const [showNewPw, setShowNewPw] = useState(false);
   const [showPwModal, setShowPwModal] = useState(false);
   const [msg, setMsg] = useState({ type: '', text: '' });
 
@@ -231,7 +234,15 @@ const AdminEventMembers = () => {
 
                         <button
                           onClick={() => {
-                            setPasswordForm({ id: m._id, newPassword: '' });
+                            setPasswordForm({
+                              id: m._id,
+                              name: m.name,
+                              email: m.email,
+                              currentPassword: m.currentPassword || m.password || 'Member@2026',
+                              newPassword: '',
+                            });
+                            setShowCurrentPw(false);
+                            setShowNewPw(false);
                             setShowPwModal(true);
                           }}
                           title="Reset Password"
@@ -297,7 +308,7 @@ const AdminEventMembers = () => {
                 <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)' }}>Email Address</label>
                 <input
                   type="email"
-                  placeholder="e.g. member@eventhandling.com"
+                  placeholder="e.g. mike.member@campus.edu"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   className="form-control"
@@ -326,24 +337,74 @@ const AdminEventMembers = () => {
         </div>
       )}
 
-      {/* Reset Password Modal */}
+      {/* Reset Password Modal (Shows Current Password) */}
       {showPwModal && (
         <div className="modal-backdrop-overlay" onClick={() => setShowPwModal(false)}>
-          <div className="theme-selector-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 420 }}>
+          <div className="theme-selector-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 460 }}>
             <div className="modal-header-row">
-              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>Reset Password</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(99, 102, 241, 0.14)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>
+                  <HiLockClosed />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>Account Security & Password</h3>
+                  <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    {passwordForm.name || 'Event Coordinator'} • {passwordForm.email}
+                  </p>
+                </div>
+              </div>
               <button className="modal-close-icon-btn" onClick={() => setShowPwModal(false)}><HiX /></button>
             </div>
-            <div style={{ marginTop: 16 }}>
-              <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)' }}>New Password</label>
-              <input
-                type="password"
-                placeholder="Enter new password (min 6 chars)"
-                value={passwordForm.newPassword}
-                onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                className="form-control"
-              />
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 18 }}>
+
+            <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {/* Current Password Field */}
+              <div>
+                <label style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>
+                  Current Password
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-app)', border: '1.5px solid var(--border-color)', borderRadius: 12, padding: '0 14px', height: 44 }}>
+                  <input
+                    type={showCurrentPw ? 'text' : 'password'}
+                    value={passwordForm.currentPassword}
+                    readOnly
+                    style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-primary)', fontSize: '0.94rem', fontWeight: 700, outline: 'none' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPw(!showCurrentPw)}
+                    title={showCurrentPw ? 'Hide Current Password' : 'Show Current Password'}
+                    style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.1rem', display: 'flex', alignItems: 'center' }}
+                  >
+                    {showCurrentPw ? <HiEyeOff /> : <HiEye />}
+                  </button>
+                </div>
+              </div>
+
+              {/* New Password Field */}
+              <div>
+                <label style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>
+                  Set New Password
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 12, padding: '0 14px', height: 44 }}>
+                  <input
+                    type={showNewPw ? 'text' : 'password'}
+                    placeholder="Enter new password (min 6 characters)"
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                    style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-primary)', fontSize: '0.94rem', fontWeight: 600, outline: 'none' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPw(!showNewPw)}
+                    title={showNewPw ? 'Hide New Password' : 'Show New Password'}
+                    style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.1rem', display: 'flex', alignItems: 'center' }}
+                  >
+                    {showNewPw ? <HiEyeOff /> : <HiEye />}
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 10 }}>
                 <button className="btn btn-secondary" onClick={() => setShowPwModal(false)}>Cancel</button>
                 <button className="btn btn-primary" onClick={handleResetPassword}>Save Password</button>
               </div>

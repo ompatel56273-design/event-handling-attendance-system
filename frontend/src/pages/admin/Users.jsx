@@ -6,7 +6,8 @@ import ExportDropdown from '../../components/common/ExportDropdown';
 import {
   HiSearch, HiKey, HiPlus, HiEye, HiUsers,
   HiAcademicCap, HiUserGroup, HiShieldCheck, HiX,
-  HiChevronLeft, HiChevronRight, HiFilter
+  HiChevronLeft, HiChevronRight, HiFilter,
+  HiEyeOff, HiLockClosed
 } from 'react-icons/hi';
 import { FaUserGraduate, FaChalkboardTeacher, FaUserCheck, FaUserSlash } from 'react-icons/fa';
 
@@ -18,7 +19,9 @@ const AdminUsers = () => {
   const [statusFilter, setStatusFilter] = useState('All');
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [passwordForm, setPasswordForm] = useState({ userId: '', newPassword: '' });
+  const [passwordForm, setPasswordForm] = useState({ userId: '', name: '', email: '', currentPassword: '', newPassword: '' });
+  const [showCurrentPw, setShowCurrentPw] = useState(false);
+  const [showNewPw, setShowNewPw] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [addForm, setAddForm] = useState({
@@ -407,7 +410,16 @@ const AdminUsers = () => {
 
                         <button
                           onClick={() => {
-                            setPasswordForm({ userId: u.userId, newPassword: '' });
+                            const name = `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.name || 'Student';
+                            setPasswordForm({
+                              userId: u.userId || u._id,
+                              name,
+                              email: u.email,
+                              currentPassword: u.password || 'Student@123',
+                              newPassword: '',
+                            });
+                            setShowCurrentPw(false);
+                            setShowNewPw(false);
                             setShowPasswordModal(true);
                           }}
                           title="Reset Password"
@@ -510,26 +522,74 @@ const AdminUsers = () => {
         </div>
       )}
 
-      {/* Password Reset Modal */}
+      {/* Password Reset Modal (Shows Current Password) */}
       {showPasswordModal && (
         <div className="modal-backdrop-overlay" onClick={() => setShowPasswordModal(false)}>
-          <div className="theme-selector-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 440 }}>
+          <div className="theme-selector-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 460 }}>
             <div className="modal-header-row">
-              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>Reset Password</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(99, 102, 241, 0.14)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>
+                  <HiLockClosed />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>Account Security & Password</h3>
+                  <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    {passwordForm.name || 'Student Account'} • {passwordForm.userId}
+                  </p>
+                </div>
+              </div>
               <button className="modal-close-icon-btn" onClick={() => setShowPasswordModal(false)}><HiX /></button>
             </div>
-            <div style={{ marginTop: 18 }}>
-              <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)' }}>User ID</label>
-              <input type="text" value={passwordForm.userId} disabled className="form-control" style={{ marginBottom: 12 }} />
-              <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)' }}>New Password</label>
-              <input
-                type="password"
-                placeholder="Enter new password (min 6 chars)"
-                value={passwordForm.newPassword}
-                onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                className="form-control"
-              />
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
+
+            <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {/* Current Password */}
+              <div>
+                <label style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>
+                  Current Password
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-app)', border: '1.5px solid var(--border-color)', borderRadius: 12, padding: '0 14px', height: 44 }}>
+                  <input
+                    type={showCurrentPw ? 'text' : 'password'}
+                    value={passwordForm.currentPassword}
+                    readOnly
+                    style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-primary)', fontSize: '0.94rem', fontWeight: 700, outline: 'none' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPw(!showCurrentPw)}
+                    title={showCurrentPw ? 'Hide Current Password' : 'Show Current Password'}
+                    style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.1rem', display: 'flex', alignItems: 'center' }}
+                  >
+                    {showCurrentPw ? <HiEyeOff /> : <HiEye />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Set New Password */}
+              <div>
+                <label style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>
+                  Set New Password
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 12, padding: '0 14px', height: 44 }}>
+                  <input
+                    type={showNewPw ? 'text' : 'password'}
+                    placeholder="Enter new password (min 6 characters)"
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                    style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-primary)', fontSize: '0.94rem', fontWeight: 600, outline: 'none' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPw(!showNewPw)}
+                    title={showNewPw ? 'Hide New Password' : 'Show New Password'}
+                    style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.1rem', display: 'flex', alignItems: 'center' }}
+                  >
+                    {showNewPw ? <HiEyeOff /> : <HiEye />}
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 10 }}>
                 <button className="btn btn-secondary" onClick={() => setShowPasswordModal(false)}>Cancel</button>
                 <button className="btn btn-primary" onClick={handleResetPassword}>Save Password</button>
               </div>

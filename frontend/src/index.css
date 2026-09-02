@@ -2273,21 +2273,27 @@ input[type="number"] {
 
 /* Global Select & Dropdown Option Styling */
 select {
-  background-color: var(--bg-card) !important;
-  color: var(--text-primary) !important;
-  border: 1px solid var(--border-color) !important;
+  color-scheme: dark !important;
+  background-color: var(--bg-card, #0B0F19) !important;
+  color: var(--text-primary, #FFFFFF) !important;
+  border: 1px solid var(--border-color, #1E293B) !important;
   border-radius: 12px;
   outline: none;
   cursor: pointer;
 }
 
-select option {
+select option,
+select optgroup {
+  color-scheme: dark !important;
   background-color: #0B0F19 !important;
   color: #FFFFFF !important;
   padding: 12px 14px;
 }
 
-[data-mode="light"] select option {
+[data-mode="light"] select,
+[data-mode="light"] select option,
+[data-mode="light"] select optgroup {
+  color-scheme: light !important;
   background-color: #FFFFFF !important;
   color: #0F172A !important;
 }

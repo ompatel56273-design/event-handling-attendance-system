@@ -204,50 +204,54 @@ const AdminAttendance = () => {
         </div>
       )}
 
-      {/* Event & User Selectors */}
+      {/* Event & User Selectors (Big Prominent Size) */}
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
-          gap: 20,
-          marginBottom: 26,
+          gap: 22,
+          marginBottom: 28,
         }}
       >
         <div>
-          <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, display: 'block' }}>
-            Select Event
+          <label style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-muted)', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <HiCalendar style={{ color: 'var(--primary)' }} /> SELECT CAMPUS EVENT
           </label>
-          <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 14, padding: '0 16px', height: 48 }}>
-            <HiCalendar style={{ color: 'var(--primary)', fontSize: '1.2rem', marginRight: 10 }} />
+          <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 16, padding: '0 20px', height: 56, boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(99, 102, 241, 0.14)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', marginRight: 14, flexShrink: 0 }}>
+              <HiCalendar />
+            </div>
             <select
               value={selectedEvent}
               onChange={handleEventChange}
-              style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-primary)', fontSize: '0.92rem', fontWeight: 700, outline: 'none', cursor: 'pointer' }}
+              style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-primary)', fontSize: '1.05rem', fontWeight: 800, outline: 'none', cursor: 'pointer', height: '100%' }}
             >
               {events.map((e) => (
-                <option key={e._id} value={e._id}>{e.name}</option>
+                <option key={e._id} value={e._id}>{e.name} • {e.location || 'Campus Venue'}</option>
               ))}
             </select>
           </div>
         </div>
 
         <div>
-          <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, display: 'block' }}>
-            Select User (Optional)
+          <label style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-muted)', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span>👤</span> SELECT ENROLLED USER (OPTIONAL)
           </label>
-          <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 14, padding: '0 16px', height: 48 }}>
-            <span style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginRight: 10 }}>👤</span>
+          <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 16, padding: '0 20px', height: 56, boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(16, 185, 129, 0.14)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.15rem', marginRight: 14, flexShrink: 0 }}>
+              👤
+            </div>
             <select
               value={selectedUser}
               onChange={handleUserChange}
-              style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-primary)', fontSize: '0.92rem', fontWeight: 700, outline: 'none', cursor: 'pointer' }}
+              style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-primary)', fontSize: '1.02rem', fontWeight: 800, outline: 'none', cursor: 'pointer', height: '100%' }}
             >
               {participants.map((p) => {
                 const s = p.student || p.user || {};
                 const name = `${s.firstName || ''} ${s.lastName || ''}`.trim() || 'Student';
                 const id = s.userId || p._id;
                 return (
-                  <option key={p._id} value={p._id}>{name} ({id})</option>
+                  <option key={p._id} value={p._id}>{name} ({id}) — Roll: {s.rollNumber || 'N/A'}</option>
                 );
               })}
             </select>
