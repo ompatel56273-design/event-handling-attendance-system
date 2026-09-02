@@ -11,12 +11,18 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null);
-  const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const [sessionId, setSessionId] = useState(null);
+  const [token, setToken] = useState(() => localStorage.getItem('token') || null);
+  const [role, setRole] = useState(() => localStorage.getItem('role') || null);
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('user');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+  const [sessionId, setSessionId] = useState(() => localStorage.getItem('sessionId') || null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const initAuth = async () => {

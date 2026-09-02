@@ -296,49 +296,26 @@ const PublicLanding = () => {
             </button>
 
             {/* Dashboard / Sign In Button */}
-            {isAuthenticated ? (
-              <Link
-                to={getDashboardPath(role)}
-                style={{
-                  height: 40,
-                  padding: '0 22px',
-                  borderRadius: 10,
-                  background: brandPurple,
-                  color: '#FFFFFF',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  boxShadow: '0 4px 14px rgba(91, 77, 251, 0.35)',
-                }}
-              >
-                Dashboard
-                <span style={{ fontSize: '0.95rem' }}>☷</span>
-              </Link>
-            ) : (
-              <Link
-                to="/login"
-                style={{
-                  height: 40,
-                  padding: '0 22px',
-                  borderRadius: 10,
-                  background: brandPurple,
-                  color: '#FFFFFF',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  boxShadow: '0 4px 14px rgba(91, 77, 251, 0.35)',
-                }}
-              >
-                Dashboard
-                <span style={{ fontSize: '0.95rem' }}>☷</span>
-              </Link>
-            )}
+            <Link
+              to={isAuthenticated || localStorage.getItem('token') ? getDashboardPath(role || localStorage.getItem('role')) : "/login"}
+              style={{
+                height: 40,
+                padding: '0 22px',
+                borderRadius: 10,
+                background: brandPurple,
+                color: '#FFFFFF',
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                boxShadow: '0 4px 14px rgba(91, 77, 251, 0.35)',
+              }}
+            >
+              Dashboard
+              <span style={{ fontSize: '0.95rem' }}>☷</span>
+            </Link>
           </div>
         </div>
       </nav>
