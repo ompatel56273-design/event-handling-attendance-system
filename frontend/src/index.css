@@ -2246,34 +2246,109 @@ select option {
 }
 
 /* ==========================================================================
-   EVENTHUB SUITE — FIXED VIEWPORT LAYOUT (Sticky Header & Footer on Scroll)
+   EVENTHUB SUITE — FULL WINDOW EDGE-TO-EDGE FIXED LAYOUT
+   Sticky Topbar Header (Top: 0) • Sticky Footer (Bottom: 0) • Full Window & Mobile Responsive
    ========================================================================== */
+html, body {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 .app-layout {
   display: flex;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
+  min-height: 100vh;
   max-height: 100vh;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
+  position: relative;
   background-color: var(--bg-app);
+}
+
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  max-width: 280px;
+  height: 100vh;
+  background: var(--sidebar-bg, #040508);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1000;
+  padding: 24px 18px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin: 0;
+  box-shadow: 6px 0 30px rgba(0, 0, 0, 0.7);
+  transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .main-content {
   display: flex;
   flex-direction: column;
   flex: 1;
+  width: calc(100% - 280px);
   height: 100vh;
   max-height: 100vh;
   margin-left: 280px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: 0;
+  padding: 0;
   overflow: hidden;
   position: relative;
   background-color: var(--bg-app);
 }
 
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 72px;
+  min-height: 72px;
+  padding: 0 36px;
+  margin: 0;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 500;
+  backdrop-filter: blur(20px);
+  flex-shrink: 0;
+}
+
 .page-wrapper {
   flex: 1;
+  width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 32px 40px;
+  padding: 30px 36px;
+  margin: 0;
   scrollbar-width: thin !important;
   scrollbar-color: var(--border-color) transparent !important;
 }
@@ -2292,31 +2367,20 @@ select option {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 40px;
+  width: 100%;
+  height: 50px;
+  min-height: 50px;
+  padding: 0 36px;
+  margin: 0;
   background: var(--bg-surface);
   border-top: 1px solid var(--border-color);
   font-size: 0.82rem;
   color: var(--text-muted);
-  flex-shrink: 0;
-  z-index: 90;
-}
-
-/* ==========================================================================
-   EVENTHUB SUITE — TOPBAR & HEADER STYLING
-   ========================================================================== */
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 72px;
-  padding: 0 40px;
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border-color);
   position: sticky;
-  top: 0;
-  z-index: 100;
-  backdrop-filter: blur(16px);
-  width: 100%;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 400;
   flex-shrink: 0;
 }
 
@@ -2837,51 +2901,117 @@ select option {
   gap: 10px;
 }
 
-/* Responsive Overrides */
+/* Responsive Overrides (Full Window & Mobile Phone Sizes) */
 @media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%) !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+    box-shadow: none !important;
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0) !important;
+    box-shadow: 10px 0 50px rgba(0, 0, 0, 0.85) !important;
+  }
+
+  .mobile-drawer-overlay {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, 0.75) !important;
+    backdrop-filter: blur(6px) !important;
+    z-index: 9998 !important;
+  }
+
+  .mobile-close-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: #FFFFFF;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: auto;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
   .topbar {
     padding: 0 20px;
+    height: 66px;
+    min-height: 66px;
   }
+
+  .topbar-hamburger-btn {
+    display: flex !important;
+  }
+
   .page-wrapper {
     padding: 24px 20px;
   }
+
   .topbar-date-pill {
     display: none;
   }
+
   .topbar-search-box {
     width: 260px;
+  }
+
+  .dashboard-page-footer {
+    padding: 0 20px;
   }
 }
 
 @media (max-width: 768px) {
-  .main-content {
-    margin-left: 0 !important;
-    padding: 0 !important;
-  }
-  .topbar-hamburger-btn {
-    display: flex;
-  }
   .topbar-search-box {
     display: none;
   }
+
   .topbar-user-info-text {
     display: none;
   }
+
   .topbar-theme-selector-btn .theme-name-text {
     display: none;
   }
+
   .topbar {
-    height: 64px;
+    height: 60px;
+    min-height: 60px;
     padding: 0 16px;
   }
+
   .page-wrapper {
-    padding: 20px 16px;
+    padding: 18px 14px;
   }
+
   .dashboard-page-footer {
-    padding: 20px 16px;
+    padding: 12px 16px;
     flex-direction: column;
-    gap: 8px;
+    height: auto;
+    min-height: auto;
+    gap: 6px;
     text-align: center;
+  }
+
+  .theme-selector-modal,
+  .notif-modal-container {
+    width: calc(100vw - 28px) !important;
+    max-width: calc(100vw - 28px) !important;
+    padding: 20px 16px !important;
   }
 }
 
