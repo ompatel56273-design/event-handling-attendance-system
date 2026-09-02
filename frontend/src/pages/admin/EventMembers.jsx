@@ -265,7 +265,7 @@ const AdminEventMembers = () => {
           <span>Showing 1 to {members.length} of {members.length} members</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><HiChevronLeft /></button>
-            <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--primary)', color: '#FFFFFF', border: 'none', fontWeight: 800, cursor: 'pointer' }}>1</button>
+            <button className="pagination-active-btn" style={{ width: 32, height: 32, borderRadius: 8, border: 'none', fontWeight: 900, cursor: 'pointer' }}>1</button>
             <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><HiChevronRight /></button>
           </div>
         </div>

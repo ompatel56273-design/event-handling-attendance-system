@@ -2148,6 +2148,31 @@ select option:checked, select option:hover, select option:focus {
   font-weight: 800 !important;
 }
 
+/* Universal Pagination Active Button Styling */
+.pagination-active-btn {
+  background: var(--primary) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  font-weight: 900 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+[data-mode="dark"][data-theme="monochrome"] .pagination-active-btn,
+[data-theme="monochrome"] .pagination-active-btn {
+  background: #F8FAFC !important;
+  color: #040508 !important;
+}
+
+[data-mode="light"] .pagination-active-btn,
+[data-mode="light"][data-theme="monochrome"] .pagination-active-btn,
+[data-mode="light"][data-theme="black-white"] .pagination-active-btn,
+[data-mode="light"][data-theme="professional"] .pagination-active-btn {
+  background: #0F172A !important;
+  color: #FFFFFF !important;
+}
+
 [data-mode="light"] .card,
 [data-mode="light"] .stat-card-clean,
 [data-mode="light"] .upcoming-mini-card,

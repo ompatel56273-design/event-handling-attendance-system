@@ -1,14 +1,33 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { HiCheckCircle, HiXCircle, HiShieldCheck, HiArrowRight } from 'react-icons/hi';
+import { useAuth } from '../../context/AuthContext';
+import { HiCheckCircle, HiXCircle, HiShieldCheck, HiArrowRight, HiArrowLeft } from 'react-icons/hi';
 import { FaCertificate, FaShieldAlt } from 'react-icons/fa';
 
 const VerifyCertificate = () => {
   const { certificateId } = useParams();
+  const navigate = useNavigate();
+  const { role, user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const handleReturn = () => {
+    if (window.history.length > 2) {
+      navigate(-1);
+      return;
+    }
+    if (role === 'SUPER_ADMIN') {
+      navigate('/admin/dashboard');
+    } else if (role === 'EVENT_MEMBER') {
+      navigate('/member/dashboard');
+    } else if (role === 'USER') {
+      navigate('/user/dashboard');
+    } else {
+      navigate('/');
+    }
+  };
 
   useEffect(() => {
     const verify = async () => {
@@ -58,7 +77,7 @@ const VerifyCertificate = () => {
         </p>
       </div>
 
-      {/* Main Verification Card (Exact Globel Chages/3.png Layout) */}
+      {/* Main Verification Card */}
       <div
         style={{
           maxWidth: 580,
@@ -101,17 +120,17 @@ const VerifyCertificate = () => {
           This digital credential was verified by CampusFlow Certification Authority.
         </p>
 
-        {/* Official Details Table */}
+        {/* Certificate Details Sheet */}
         <div
           style={{
             width: '100%',
-            background: '#0F172A',
+            background: '#0B0F19',
             border: '1px solid #1E293B',
-            borderRadius: 18,
+            borderRadius: 16,
             overflow: 'hidden',
             marginBottom: 28,
-            fontSize: '0.86rem',
             textAlign: 'left',
+            fontSize: '0.88rem',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #1E293B' }}>
@@ -121,7 +140,7 @@ const VerifyCertificate = () => {
 
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #1E293B' }}>
             <span style={{ color: '#64748B', fontWeight: 700, fontSize: '0.78rem' }}>CERTIFICATE ID</span>
-            <strong style={{ color: '#818CF8', fontFamily: 'monospace' }}>{data?.certificateId || certificateId || 'CRT-102938'}</strong>
+            <span style={{ color: '#6366F1', fontWeight: 800, fontFamily: 'monospace' }}>{data?.certificateId || certificateId}</span>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #1E293B' }}>
@@ -149,8 +168,8 @@ const VerifyCertificate = () => {
         </div>
 
         {/* Portal Action */}
-        <Link
-          to="/login"
+        <button
+          onClick={handleReturn}
           style={{
             width: '100%',
             padding: '14px',
@@ -159,16 +178,18 @@ const VerifyCertificate = () => {
             color: '#FFFFFF',
             fontWeight: 800,
             fontSize: '0.94rem',
-            textDecoration: 'none',
+            border: 'none',
+            cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: 8,
             boxShadow: '0 8px 24px rgba(99, 102, 241, 0.35)',
+            transition: 'all 160ms ease',
           }}
         >
-          ➔ Go to EventHub Portal
-        </Link>
+          <HiArrowLeft /> Return to Dashboard / Portal
+        </button>
       </div>
     </div>
   );

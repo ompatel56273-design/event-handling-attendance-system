@@ -5,6 +5,7 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import QRCode from 'react-qr-code';
 import FullScreenQRModal from '../../components/common/FullScreenQRModal';
 import EventThumbnail from '../../components/common/EventThumbnail';
+import ExportDropdown from '../../components/common/ExportDropdown';
 import {
   HiArrowLeft, HiCalendar, HiLocationMarker, HiTicket,
   HiCheckCircle, HiIdentification, HiAcademicCap,
@@ -106,9 +107,21 @@ const UserDetails = () => {
     if (userId) fetchUser();
   }, [userId]);
 
-  const fullName = `${userData.firstName || 'John'} ${userData.lastName || 'Doe'}`.trim();
-  const initials = (userData.firstName?.[0] || 'J') + (userData.lastName?.[0] || 'D');
-  const passportQR = `CAMPUS-PASS-${userData.userId || 'USR-102938'}-${userData.rollNumber || '21BCA102'}`;
+  const userExportHeaders = ['RECORD TYPE', 'FIELD / EVENT', 'DETAIL / VALUE', 'STATUS / SCORE'];
+  const userExportRows = [
+    ['Identity Profile', 'Full Name', fullName, userData.isActive ? 'Active' : 'Inactive'],
+    ['Identity Profile', 'User ID', userData.userId || '', 'Verified'],
+    ['Identity Profile', 'Roll Number', userData.rollNumber || '', 'Academic'],
+    ['Identity Profile', 'Department & Class', `${userData.department} - Year ${userData.year} (${userData.className})`, 'Enrolled'],
+    ['Identity Profile', 'Email Address', userData.email || '', 'Primary'],
+    ['Identity Profile', 'Phone Number', userData.mobile || '', 'Contact'],
+    ...(userData.joinedEvents || []).map(e => [
+      'Joined Event',
+      e.name,
+      `${e.date} at ${e.location}`,
+      e.attendanceVerified ? `Scanned (${e.marks ? `Score: ${e.marks.total}/100` : 'Attended'})` : 'Registered'
+    ]),
+  ];
 
   return (
     <DashboardLayout>
@@ -122,22 +135,32 @@ const UserDetails = () => {
           <HiArrowLeft /> Back to Users
         </button>
 
-        <span
-          style={{
-            background: 'rgba(16, 185, 129, 0.12)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            color: '#10B981',
-            fontSize: '0.78rem',
-            fontWeight: 800,
-            padding: '6px 16px',
-            borderRadius: 20,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <HiShieldCheck style={{ fontSize: '1.05rem' }} /> VERIFIED STUDENT ACCOUNT
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <ExportDropdown
+            title={`${fullName} — Comprehensive Student Dossier`}
+            headers={userExportHeaders}
+            data={userExportRows}
+            filename={`${userData.userId || 'student'}_details_dossier`}
+            showImport={false}
+          />
+
+          <span
+            style={{
+              background: 'rgba(16, 185, 129, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              color: '#10B981',
+              fontSize: '0.78rem',
+              fontWeight: 800,
+              padding: '6px 16px',
+              borderRadius: 20,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <HiShieldCheck style={{ fontSize: '1.05rem' }} /> VERIFIED STUDENT ACCOUNT
+          </span>
+        </div>
       </div>
 
       {/* Hero Profile Overview Card */}
