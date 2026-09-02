@@ -27,10 +27,8 @@ const MASTER_STUDENT_DATASET = [
     eventDate: '2026-07-25',
     venue: 'Seminar Hall',
     attendanceStatus: 'VERIFIED (Attended)',
-    checkInTime: '2026-07-25 09:15 AM',
     winnerStatus: '🥇 1st Place Gold Winner',
-    certificateId: 'CRT-102938',
-    verification: 'VERIFIED & CERTIFIED'
+    certificateId: 'CRT-102938'
   },
   {
     userId: 'USR-102939',
@@ -47,10 +45,8 @@ const MASTER_STUDENT_DATASET = [
     eventDate: '2026-07-10',
     venue: 'Lab 3',
     attendanceStatus: 'VERIFIED (Attended)',
-    checkInTime: '2026-07-10 09:45 AM',
     winnerStatus: '🥈 2nd Place Silver Medal',
-    certificateId: 'CRT-102939',
-    verification: 'VERIFIED & CERTIFIED'
+    certificateId: 'CRT-102939'
   },
   {
     userId: 'USR-102940',
@@ -67,10 +63,8 @@ const MASTER_STUDENT_DATASET = [
     eventDate: '2026-07-25',
     venue: 'Seminar Hall',
     attendanceStatus: 'REGISTERED (Pending Scan)',
-    checkInTime: '—',
     winnerStatus: '🥉 3rd Place Bronze Medal',
-    certificateId: 'CRT-102940',
-    verification: 'VERIFIED'
+    certificateId: 'CRT-102940'
   },
   {
     userId: 'USR-102941',
@@ -87,10 +81,8 @@ const MASTER_STUDENT_DATASET = [
     eventDate: '2026-06-18',
     venue: 'Auditorium',
     attendanceStatus: 'VERIFIED (Attended)',
-    checkInTime: '2026-06-18 10:10 AM',
     winnerStatus: '🎖️ Top 5 Finalist',
-    certificateId: 'CRT-102941',
-    verification: 'VERIFIED'
+    certificateId: 'CRT-102941'
   },
   {
     userId: 'USR-102942',
@@ -107,10 +99,8 @@ const MASTER_STUDENT_DATASET = [
     eventDate: '2026-06-30',
     venue: 'Conference Hall',
     attendanceStatus: 'REGISTERED (Pending Scan)',
-    checkInTime: '—',
     winnerStatus: '🥈 Runner-Up Award',
-    certificateId: 'CRT-102942',
-    verification: 'VERIFIED & CERTIFIED'
+    certificateId: 'CRT-102942'
   }
 ];
 
@@ -129,10 +119,8 @@ const MASTER_CSV_HEADERS = [
   { key: 'eventDate', label: 'EVENT DATE' },
   { key: 'venue', label: 'EVENT VENUE' },
   { key: 'attendanceStatus', label: 'ATTENDANCE STATUS' },
-  { key: 'checkInTime', label: 'CHECK-IN TIME' },
   { key: 'winnerStatus', label: 'WINNER / PODIUM STATUS' },
   { key: 'certificateId', label: 'CERTIFICATE ID' },
-  { key: 'verification', label: 'VERIFICATION STATUS' },
 ];
 
 const MOCK_FALLBACK_RECENT_REGS = [
@@ -739,28 +727,28 @@ const AdminDashboard = () => {
       </div>
 
       {/* =========================================================================
-          CAMPUS ANALYTICS & DISTRIBUTION HUB (3 PIE / DONUT CHARTS)
+          CAMPUS ANALYTICS & DISTRIBUTION HUB (3 LARGE PIE / DONUT CHARTS)
           ========================================================================= */}
       <div style={{ marginBottom: 30 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, flexWrap: 'wrap', gap: 10 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
           <div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
+            <h3 style={{ fontSize: '1.35rem', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
               Campus Analytics & Distribution
             </h3>
-            <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', margin: 0 }}>
-              Live distribution metrics across departments, attendance verification, and student batches
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0 }}>
+              Live visual distribution metrics across departments, attendance verification, and student batches
             </p>
           </div>
-          <span style={{ fontSize: '0.76rem', fontWeight: 700, color: 'var(--primary)', background: 'rgba(99, 102, 241, 0.12)', padding: '5px 14px', borderRadius: 20 }}>
-            Visual Campus Distribution
+          <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--primary)', background: 'rgba(99, 102, 241, 0.14)', padding: '6px 16px', borderRadius: 20 }}>
+            Live Institutional Distribution
           </span>
         </div>
 
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
-            gap: 20,
+            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+            gap: 24,
           }}
         >
           {/* Pie Chart 1: Department Enrollment Distribution */}
@@ -768,58 +756,59 @@ const AdminDashboard = () => {
             style={{
               background: 'var(--bg-card)',
               border: '1px solid var(--border-color)',
-              borderRadius: 20,
-              padding: '22px 24px',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+              borderRadius: 22,
+              padding: '28px 26px',
+              boxShadow: '0 6px 24px rgba(0,0,0,0.04)',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <strong style={{ fontSize: '0.96rem', color: 'var(--text-primary)' }}>Department Distribution</strong>
-              <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', background: 'var(--bg-app)', padding: '3px 8px', borderRadius: 6 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <strong style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--text-primary)' }}>Department Distribution</strong>
+              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', background: 'var(--bg-app)', padding: '4px 10px', borderRadius: 8 }}>
                 245 Students
               </span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: 14 }}>
-              {/* Multi-slice Donut */}
-              <div style={{ position: 'relative', width: 105, height: 105, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="105" height="105" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="38" stroke="#6366F1" strokeWidth="12" fill="none" strokeDasharray="100 138" strokeDashoffset="0" transform="rotate(-90 50 50)" />
-                  <circle cx="50" cy="50" r="38" stroke="#38BDF8" strokeWidth="12" fill="none" strokeDasharray="72 166" strokeDashoffset="-100" transform="rotate(-90 50 50)" />
-                  <circle cx="50" cy="50" r="38" stroke="#10B981" strokeWidth="12" fill="none" strokeDasharray="43 195" strokeDashoffset="-172" transform="rotate(-90 50 50)" />
-                  <circle cx="50" cy="50" r="38" stroke="#F59E0B" strokeWidth="12" fill="none" strokeDasharray="23 215" strokeDashoffset="-215" transform="rotate(-90 50 50)" />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: 20, flexWrap: 'wrap' }}>
+              {/* Large Multi-slice Donut */}
+              <div style={{ position: 'relative', width: 150, height: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="150" height="150" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="48" stroke="#E2E8F0" strokeWidth="16" fill="none" opacity="0.15" />
+                  <circle cx="60" cy="60" r="48" stroke="#6366F1" strokeWidth="16" fill="none" strokeDasharray="126.7 174.9" strokeDashoffset="0" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="48" stroke="#38BDF8" strokeWidth="16" fill="none" strokeDasharray="90.5 211.1" strokeDashoffset="-126.7" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="48" stroke="#10B981" strokeWidth="16" fill="none" strokeDasharray="54.3 247.3" strokeDashoffset="-217.2" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="48" stroke="#F59E0B" strokeWidth="16" fill="none" strokeDasharray="30.1 271.5" strokeDashoffset="-271.5" transform="rotate(-90 60 60)" />
                 </svg>
                 <div style={{ position: 'absolute', textAlign: 'center' }}>
-                  <span style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--text-primary)', display: 'block', lineHeight: 1 }}>4</span>
-                  <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', fontWeight: 600 }}>Depts</span>
+                  <span style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--text-primary)', display: 'block', lineHeight: 1 }}>4</span>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.5px' }}>DEPTS</span>
                 </div>
               </div>
 
-              {/* Legend */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: '0.78rem' }}>
+              {/* Large Legend */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: '0.9rem', flex: 1, minWidth: 160 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#6366F1' }} /> BCA
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)' }}>
+                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#6366F1' }} /> BCA
                   </span>
-                  <strong>42% (103)</strong>
+                  <strong style={{ color: 'var(--text-primary)', fontSize: '0.94rem' }}>42% (103)</strong>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#38BDF8' }} /> BSc CA & IT
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)' }}>
+                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#38BDF8' }} /> BSc CA & IT
                   </span>
-                  <strong>30% (74)</strong>
+                  <strong style={{ color: 'var(--text-primary)', fontSize: '0.94rem' }}>30% (74)</strong>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981' }} /> MCA
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)' }}>
+                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#10B981' }} /> MCA
                   </span>
-                  <strong>18% (44)</strong>
+                  <strong style={{ color: 'var(--text-primary)', fontSize: '0.94rem' }}>18% (44)</strong>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#F59E0B' }} /> MSc IT
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)' }}>
+                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#F59E0B' }} /> MSc IT
                   </span>
-                  <strong>10% (24)</strong>
+                  <strong style={{ color: 'var(--text-primary)', fontSize: '0.94rem' }}>10% (24)</strong>
                 </div>
               </div>
             </div>
@@ -830,51 +819,52 @@ const AdminDashboard = () => {
             style={{
               background: 'var(--bg-card)',
               border: '1px solid var(--border-color)',
-              borderRadius: 20,
-              padding: '22px 24px',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+              borderRadius: 22,
+              padding: '28px 26px',
+              boxShadow: '0 6px 24px rgba(0,0,0,0.04)',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <strong style={{ fontSize: '0.96rem', color: 'var(--text-primary)' }}>Attendance Verification</strong>
-              <span style={{ fontSize: '0.74rem', color: '#10B981', background: 'rgba(16, 185, 129, 0.12)', padding: '3px 8px', borderRadius: 6, fontWeight: 700 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <strong style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--text-primary)' }}>Attendance Verification</strong>
+              <span style={{ fontSize: '0.8rem', color: '#10B981', background: 'rgba(16, 185, 129, 0.14)', padding: '4px 10px', borderRadius: 8, fontWeight: 800 }}>
                 68% Scanned
               </span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: 14 }}>
-              {/* Multi-slice Donut */}
-              <div style={{ position: 'relative', width: 105, height: 105, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="105" height="105" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="38" stroke="#10B981" strokeWidth="12" fill="none" strokeDasharray="162 76" strokeDashoffset="0" transform="rotate(-90 50 50)" />
-                  <circle cx="50" cy="50" r="38" stroke="#F59E0B" strokeWidth="12" fill="none" strokeDasharray="57 181" strokeDashoffset="-162" transform="rotate(-90 50 50)" />
-                  <circle cx="50" cy="50" r="38" stroke="#EF4444" strokeWidth="12" fill="none" strokeDasharray="19 219" strokeDashoffset="-219" transform="rotate(-90 50 50)" />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: 20, flexWrap: 'wrap' }}>
+              {/* Large Multi-slice Donut */}
+              <div style={{ position: 'relative', width: 150, height: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="150" height="150" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="48" stroke="#E2E8F0" strokeWidth="16" fill="none" opacity="0.15" />
+                  <circle cx="60" cy="60" r="48" stroke="#10B981" strokeWidth="16" fill="none" strokeDasharray="205.1 96.5" strokeDashoffset="0" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="48" stroke="#F59E0B" strokeWidth="16" fill="none" strokeDasharray="72.4 229.2" strokeDashoffset="-205.1" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="48" stroke="#EF4444" strokeWidth="16" fill="none" strokeDasharray="24.1 277.5" strokeDashoffset="-277.5" transform="rotate(-90 60 60)" />
                 </svg>
                 <div style={{ position: 'absolute', textAlign: 'center' }}>
-                  <span style={{ fontSize: '1rem', fontWeight: 900, color: '#10B981', display: 'block', lineHeight: 1 }}>68%</span>
-                  <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', fontWeight: 600 }}>Present</span>
+                  <span style={{ fontSize: '1.45rem', fontWeight: 900, color: '#10B981', display: 'block', lineHeight: 1 }}>68%</span>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.5px' }}>PRESENT</span>
                 </div>
               </div>
 
-              {/* Legend */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: '0.78rem' }}>
+              {/* Large Legend */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: '0.9rem', flex: 1, minWidth: 160 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981' }} /> Verified (Present)
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)' }}>
+                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#10B981' }} /> Verified (Present)
                   </span>
-                  <strong>68% (166)</strong>
+                  <strong style={{ color: '#10B981', fontSize: '0.94rem' }}>68% (166)</strong>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#F59E0B' }} /> Pending Check-in
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)' }}>
+                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#F59E0B' }} /> Pending Check-in
                   </span>
-                  <strong>24% (59)</strong>
+                  <strong style={{ color: 'var(--text-primary)', fontSize: '0.94rem' }}>24% (59)</strong>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#EF4444' }} /> Absent / Cancelled
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)' }}>
+                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#EF4444' }} /> Absent / Cancelled
                   </span>
-                  <strong>8% (20)</strong>
+                  <strong style={{ color: '#EF4444', fontSize: '0.94rem' }}>8% (20)</strong>
                 </div>
               </div>
             </div>
@@ -885,51 +875,52 @@ const AdminDashboard = () => {
             style={{
               background: 'var(--bg-card)',
               border: '1px solid var(--border-color)',
-              borderRadius: 20,
-              padding: '22px 24px',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+              borderRadius: 22,
+              padding: '28px 26px',
+              boxShadow: '0 6px 24px rgba(0,0,0,0.04)',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <strong style={{ fontSize: '0.96rem', color: 'var(--text-primary)' }}>Batch / Year Split</strong>
-              <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', background: 'var(--bg-app)', padding: '3px 8px', borderRadius: 6 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <strong style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--text-primary)' }}>Batch / Year Split</strong>
+              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', background: 'var(--bg-app)', padding: '4px 10px', borderRadius: 8 }}>
                 3 Academic Years
               </span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: 14 }}>
-              {/* Multi-slice Donut */}
-              <div style={{ position: 'relative', width: 105, height: 105, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="105" height="105" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="38" stroke="#A855F7" strokeWidth="12" fill="none" strokeDasharray="110 128" strokeDashoffset="0" transform="rotate(-90 50 50)" />
-                  <circle cx="50" cy="50" r="38" stroke="#3B82F6" strokeWidth="12" fill="none" strokeDasharray="76 162" strokeDashoffset="-110" transform="rotate(-90 50 50)" />
-                  <circle cx="50" cy="50" r="38" stroke="#EC4899" strokeWidth="12" fill="none" strokeDasharray="52 186" strokeDashoffset="-186" transform="rotate(-90 50 50)" />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: 20, flexWrap: 'wrap' }}>
+              {/* Large Multi-slice Donut */}
+              <div style={{ position: 'relative', width: 150, height: 150, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="150" height="150" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="48" stroke="#E2E8F0" strokeWidth="16" fill="none" opacity="0.15" />
+                  <circle cx="60" cy="60" r="48" stroke="#A855F7" strokeWidth="16" fill="none" strokeDasharray="138.7 162.9" strokeDashoffset="0" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="48" stroke="#3B82F6" strokeWidth="16" fill="none" strokeDasharray="96.5 205.1" strokeDashoffset="-138.7" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="48" stroke="#EC4899" strokeWidth="16" fill="none" strokeDasharray="66.4 235.2" strokeDashoffset="-235.2" transform="rotate(-90 60 60)" />
                 </svg>
                 <div style={{ position: 'absolute', textAlign: 'center' }}>
-                  <span style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--text-primary)', display: 'block', lineHeight: 1 }}>3</span>
-                  <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', fontWeight: 600 }}>Batches</span>
+                  <span style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--text-primary)', display: 'block', lineHeight: 1 }}>3</span>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.5px' }}>YEARS</span>
                 </div>
               </div>
 
-              {/* Legend */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: '0.78rem' }}>
+              {/* Large Legend */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: '0.9rem', flex: 1, minWidth: 160 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#A855F7' }} /> 2nd Year Students
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)' }}>
+                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#A855F7' }} /> 2nd Year Students
                   </span>
-                  <strong>46% (113)</strong>
+                  <strong style={{ color: 'var(--text-primary)', fontSize: '0.94rem' }}>46% (113)</strong>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#3B82F6' }} /> 3rd Year Seniors
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)' }}>
+                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#3B82F6' }} /> 3rd Year Seniors
                   </span>
-                  <strong>32% (78)</strong>
+                  <strong style={{ color: 'var(--text-primary)', fontSize: '0.94rem' }}>32% (78)</strong>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#EC4899' }} /> 1st Year Freshers
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)' }}>
+                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#EC4899' }} /> 1st Year Freshers
                   </span>
-                  <strong>22% (54)</strong>
+                  <strong style={{ color: 'var(--text-primary)', fontSize: '0.94rem' }}>22% (54)</strong>
                 </div>
               </div>
             </div>
