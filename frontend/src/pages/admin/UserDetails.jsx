@@ -84,11 +84,70 @@ const DEFAULT_USER_DETAILS = {
   ],
 };
 
+const MOCK_USERS_MAP = {
+  'USR-102938': {
+    ...DEFAULT_USER_DETAILS,
+    userId: 'USR-102938',
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john.doe@email.com',
+    rollNumber: '21BCA102',
+    department: 'BCA',
+    year: 2,
+    className: 'A',
+  },
+  'USR-102939': {
+    ...DEFAULT_USER_DETAILS,
+    userId: 'USR-102939',
+    firstName: 'Alice',
+    lastName: 'Smith',
+    email: 'alice.smith@email.com',
+    rollNumber: '20BSc044',
+    department: 'BSc CA & IT',
+    year: 3,
+    className: 'B',
+  },
+  'USR-102940': {
+    ...DEFAULT_USER_DETAILS,
+    userId: 'USR-102940',
+    firstName: 'Bob',
+    lastName: 'Johnson',
+    email: 'bob.johnson@email.com',
+    rollNumber: '22BCA042',
+    department: 'BCA',
+    year: 1,
+    className: 'A',
+  },
+  'USR-102941': {
+    ...DEFAULT_USER_DETAILS,
+    userId: 'USR-102941',
+    firstName: 'Charlie',
+    lastName: 'Brown',
+    email: 'charlie.brown@email.com',
+    rollNumber: '21BCA088',
+    department: 'BCA',
+    year: 2,
+    className: 'C',
+  },
+  'USR-102942': {
+    ...DEFAULT_USER_DETAILS,
+    userId: 'USR-102942',
+    firstName: 'Emma',
+    lastName: 'Wilson',
+    email: 'emma.wilson@email.com',
+    rollNumber: '21BSc019',
+    department: 'BSc CA & IT',
+    year: 2,
+    className: 'A',
+  },
+};
+
 const UserDetails = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const [userData, setUserData] = useState(DEFAULT_USER_DETAILS);
-  const [loading, setLoading] = useState(true);
+  const initialData = MOCK_USERS_MAP[userId] || { ...DEFAULT_USER_DETAILS, userId: userId || 'USR-102938' };
+  const [userData, setUserData] = useState(initialData);
+  const [loading, setLoading] = useState(false);
   const [fullScreenQR, setFullScreenQR] = useState(null);
 
   useEffect(() => {
@@ -99,6 +158,9 @@ const UserDetails = () => {
           setUserData(prev => ({ ...prev, ...res.data }));
         }
       } catch (err) {
+        if (MOCK_USERS_MAP[userId]) {
+          setUserData(MOCK_USERS_MAP[userId]);
+        }
         console.warn('Using local detailed fallback for user:', err);
       } finally {
         setLoading(false);
@@ -106,6 +168,10 @@ const UserDetails = () => {
     };
     if (userId) fetchUser();
   }, [userId]);
+
+  const fullName = `${userData.firstName || 'John'} ${userData.lastName || 'Doe'}`.trim();
+  const initials = ((userData.firstName?.[0] || 'J') + (userData.lastName?.[0] || 'D')).toUpperCase();
+  const passportQR = `CAMPUS-PASS-${userData.userId || 'USR-102938'}-${userData.rollNumber || '21BCA102'}`;
 
   const userExportHeaders = ['RECORD TYPE', 'FIELD / EVENT', 'DETAIL / VALUE', 'STATUS / SCORE'];
   const userExportRows = [

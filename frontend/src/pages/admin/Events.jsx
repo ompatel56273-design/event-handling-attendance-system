@@ -1,22 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import EventThumbnail from '../../components/common/EventThumbnail';
 import {
   HiPlus, HiPencil, HiTrash, HiCheck, HiX,
   HiSearch, HiCalendar, HiLocationMarker, HiTicket,
-  HiChevronLeft, HiChevronRight, HiDownload, HiClock
+  HiChevronLeft, HiChevronRight, HiDownload, HiClock,
+  HiUpload, HiPhotograph
 } from 'react-icons/hi';
 import { FaCalendarAlt, FaHourglassHalf, FaPlayCircle, FaCheckCircle } from 'react-icons/fa';
 
-const PRESET_EVENT_IMAGES = [
-  { name: 'Hackathon & Coding', url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&auto=format&fit=crop&q=60' },
-  { name: 'AI & Robotics Tech', url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&auto=format&fit=crop&q=60' },
-  { name: 'Cybersecurity Arena', url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=60' },
-  { name: 'Design & UI/UX Sprint', url: 'https://images.unsplash.com/photo-1581291518655-9523c932edcf?w=800&auto=format&fit=crop&q=60' },
-  { name: 'Poster Presentation', url: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&auto=format&fit=crop&q=60' },
-  { name: 'Debate & Oratory', url: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&auto=format&fit=crop&q=60' },
-];
+const DEFAULT_EVENT_IMAGE = 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800';
 
 const DEFAULT_MOCK_EVENTS = [
   { _id: 'e1', eventId: 'EVT-1001', name: 'Poster Presentation', location: 'Auditorium', date: '2026-06-18', startTime: '10:00 AM', endTime: '01:00 PM', status: 'UPCOMING', participantCount: 1, maxParticipants: 80, image: { url: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800' } },
@@ -36,11 +30,12 @@ const AdminEvents = () => {
   const [statusFilter, setStatusFilter] = useState('All');
   const [submitting, setSubmitting] = useState(false);
   const [msg, setMsg] = useState({ type: '', text: '' });
+  const fileInputRef = useRef(null);
 
   const initialForm = {
     name: '',
     description: '',
-    imageUrl: PRESET_EVENT_IMAGES[0].url,
+    imageUrl: DEFAULT_EVENT_IMAGE,
     date: '',
     startTime: '10:00 AM',
     endTime: '04:00 PM',
@@ -109,6 +104,16 @@ const AdminEvents = () => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setForm((prev) => ({ ...prev, imageUrl: reader.result }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleStatusChange = async (eventId, newStatus) => {
@@ -559,25 +564,59 @@ const AdminEvents = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)' }}>Select Banner Artwork</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginTop: 6 }}>
-                  {PRESET_EVENT_IMAGES.map((img) => (
-                    <div
-                      key={img.name}
-                      onClick={() => setForm({ ...form, imageUrl: img.url })}
-                      style={{
-                        position: 'relative',
-                        borderRadius: 10,
-                        overflow: 'hidden',
-                        height: 54,
-                        border: form.imageUrl === img.url ? '2px solid var(--primary)' : '1px solid var(--border-color)',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <img src={img.url} alt={img.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                  ))}
+                <label style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6, display: 'block' }}>
+                  Upload Banner Image
+                </label>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    placeholder="Enter image URL or upload from device..."
+                    value={form.imageUrl}
+                    onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+                    className="form-control"
+                    style={{ flex: 1 }}
+                  />
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="btn btn-secondary"
+                    style={{ borderRadius: 12, padding: '0 18px', height: 42, gap: 8, whiteSpace: 'nowrap', fontWeight: 700, display: 'inline-flex', alignItems: 'center' }}
+                  >
+                    <HiUpload style={{ fontSize: '1.1rem' }} /> Upload Image
+                  </button>
                 </div>
+
+                {/* Banner Thumbnail Preview */}
+                {form.imageUrl && (
+                  <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', background: 'var(--bg-app)', border: '1px solid var(--border-color)', borderRadius: 12 }}>
+                    <img
+                      src={form.imageUrl}
+                      alt="Banner Preview"
+                      style={{ width: 64, height: 38, borderRadius: 8, objectFit: 'cover', border: '1px solid var(--border-color)' }}
+                    />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-primary)', display: 'block' }}>Selected Banner</span>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+                        {form.imageUrl.startsWith('data:') ? 'Custom uploaded image' : form.imageUrl}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, imageUrl: '' })}
+                      style={{ background: 'transparent', border: 'none', color: '#EF4444', cursor: 'pointer', fontSize: '1.1rem', display: 'flex' }}
+                      title="Remove banner image"
+                    >
+                      <HiX />
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div>
