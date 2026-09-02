@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import EventThumbnail from '../../components/common/EventThumbnail';
 import {
   HiUsers, HiCalendar, HiTicket, HiQrcode,
   HiPlus, HiArrowRight, HiChevronRight, HiEye,
@@ -661,10 +662,11 @@ const AdminDashboard = () => {
 
               return (
                 <div key={evt._id || idx} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <img
-                    src={evt.image?.url || evt.image || 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=200'}
-                    alt={evt.name}
-                    style={{ width: 44, height: 44, borderRadius: 10, objectFit: 'cover' }}
+                  <EventThumbnail
+                    name={evt.name}
+                    image={evt.image}
+                    size={44}
+                    borderRadius={10}
                   />
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>

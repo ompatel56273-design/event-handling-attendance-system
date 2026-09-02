@@ -191,8 +191,10 @@ const AdminWinners = () => {
             onChange={(e) => setSelectedEvent(e.target.value)}
             style={{ flex: 1, border: 'none', background: 'transparent', color: 'var(--text-primary)', fontSize: '0.94rem', fontWeight: 800, outline: 'none', cursor: 'pointer' }}
           >
-            <option value="All">Poster Presentation</option>
-            {events.map(e => <option key={e._id} value={e.name}>{e.name}</option>)}
+            <option value="All">All Events (Show All)</option>
+            {Array.from(new Set(events.map(e => e.name))).map(name => (
+              <option key={name} value={name}>{name}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -482,7 +484,7 @@ const AdminWinners = () => {
           <span>Showing 1 to {filteredWinners.length} of {filteredWinners.length} winners</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><HiChevronLeft /></button>
-            <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--primary)', color: '#FFFFFF', border: 'none', fontWeight: 800, cursor: 'pointer' }}>1</button>
+            <button className="pagination-active-btn" style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--primary)', color: 'var(--primary-contrast, #090B10)', border: 'none', fontWeight: 900, cursor: 'pointer' }}>1</button>
             <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><HiChevronRight /></button>
           </div>
         </div>

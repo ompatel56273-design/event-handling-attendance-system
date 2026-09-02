@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import EventThumbnail from '../../components/common/EventThumbnail';
 import {
   HiPlus, HiPencil, HiTrash, HiCheck, HiX,
   HiSearch, HiCalendar, HiLocationMarker, HiTicket,
@@ -356,10 +357,11 @@ const AdminEvents = () => {
                   <tr key={evt._id || idx} style={{ borderBottom: '1px solid var(--border-color)' }}>
                     {/* Banner Image */}
                     <td style={{ padding: '14px 18px' }}>
-                      <img
-                        src={evt.image?.url || PRESET_EVENT_IMAGES[0].url}
-                        alt={evt.name}
-                        style={{ width: 64, height: 42, borderRadius: 8, objectFit: 'cover' }}
+                      <EventThumbnail
+                        name={evt.name}
+                        image={evt.image?.url || evt.image}
+                        size={48}
+                        borderRadius={8}
                       />
                     </td>
 
@@ -465,7 +467,7 @@ const AdminEvents = () => {
             <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <HiChevronLeft />
             </button>
-            <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--primary)', color: '#FFFFFF', border: 'none', fontWeight: 800, cursor: 'pointer' }}>
+            <button className="pagination-active-btn" style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--primary)', color: 'var(--primary-contrast, #090B10)', border: 'none', fontWeight: 900, cursor: 'pointer' }}>
               1
             </button>
             <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', cursor: 'pointer' }}>

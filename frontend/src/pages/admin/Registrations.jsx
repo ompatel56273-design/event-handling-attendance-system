@@ -414,7 +414,7 @@ const AdminRegistrations = () => {
             <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <HiChevronLeft />
             </button>
-            <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--primary)', color: '#FFFFFF', border: 'none', fontWeight: 800, cursor: 'pointer' }}>
+            <button className="pagination-active-btn" style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--primary)', color: 'var(--primary-contrast, #090B10)', border: 'none', fontWeight: 900, cursor: 'pointer' }}>
               1
             </button>
             <button style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-app)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', cursor: 'pointer' }}>
